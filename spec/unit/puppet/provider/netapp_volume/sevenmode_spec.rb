@@ -7,7 +7,7 @@ require 'puppet/util/network_device/netapp/NaServer'
 describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
 
   before :each do
-    described_class.stubs(:suitable?).returns true
+    described_class.stubs(:suitable?).returns :true
     Puppet::Type.type(:netapp_volume).stubs(:defaultprovider).returns described_class
   end
   

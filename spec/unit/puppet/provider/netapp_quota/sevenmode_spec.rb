@@ -6,49 +6,100 @@ require 'puppet/util/network_device/netapp/NaServer'
 
 describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
 
+  # let(:resource) do
+  #   { 
+  #     :ensure => :present, 
+  #     :name => '/vol/vol1/qtree1',
+  #     :provider => described_class.name
+  #   }
+  # end
+  # let(:provider) { resource.provider }
+
+
   before :each do
-    described_class.stubs(:suitable?).returns true
-    Puppet::Type.type(:netapp_quota).stubs(:defaultprovider).returns described_class
+    #described_class.stubs(:suitable?).returns true
+    #Puppet::Type.type(:netapp_quota).stubs(:sevenmode).returns described_class
+    provider.stubs(:suitable?).returns true
+    Puppet::Type.type(:netapp_quota).stubs(:defaultprovider).returns provider
   end
 
-  let :tree_quota do
-    Puppet::Type.type(:netapp_quota).new(
+  let(:parameters) do 
+    { :name => '/vol/vol1/qtree1' }
+  end
+
+  let(:resource) do 
+    Puppet::Type.type(:netapp_quota).new(parameters.merge({
+      :provider => described_class.name
+    }))
+  end
+
+  let(:provider) do
+    resource.provider
+    # described_class.new(
+    #   :name => '/vol/vol1/qtree1'
+    # )
+  end
+
+  let(:tree_quota_parameters) do 
+    {
       :name     => '/vol/vol1/qtree1',
       :ensure   => :present,
       :volume   => 'vol1',
       :type     => :tree,
-      :provider => provider
-    )
+    }
   end
 
-  let :user_quota do
-    Puppet::Type.type(:netapp_quota).new(
+  let(:user_quota_parameters) do 
+    {
       :name     => 'bob',
       :ensure   => :present,
       :volume   => 'vol1',
       :qtree    => 'qtree1',
       :type     => :user,
-      :provider => provider
-    )
+    }
   end
 
-  let :group_quota do
-    Puppet::Type.type(:netapp_quota).new(
+  let(:group_quota_parameters) do 
+    {
       :name     => 'staff',
       :ensure   => :present,
       :volume   => 'vol1',
       :qtree    => 'qtree1',
       :type     => :group,
-      :provider => provider
-    )
+    }
   end
 
-  let :provider do
-    described_class.new(
-      :name => '/vol/vol1/qtree1'
-    )
-  end
+  # let :tree_quota do
+  #   Puppet::Type.type(:netapp_quota).new(
+  #     :name     => '/vol/vol1/qtree1',
+  #     :ensure   => :present,
+  #     :volume   => 'vol1',
+  #     :type     => :tree,
+  #     :provider => provider
+  #   )
+  # end
 
+  # let :user_quota do
+  #   Puppet::Type.type(:netapp_quota).new(
+  #     :name     => 'bob',
+  #     :ensure   => :present,
+  #     :volume   => 'vol1',
+  #     :qtree    => 'qtree1',
+  #     :type     => :user,
+  #     :provider => provider
+  #   )
+  # end
+
+  # let :group_quota do
+  #   Puppet::Type.type(:netapp_quota).new(
+  #     :name     => 'staff',
+  #     :ensure   => :present,
+  #     :volume   => 'vol1',
+  #     :qtree    => 'qtree1',
+  #     :type     => :group,
+  #     :provider => provider
+  #   )
+  # end
 
   describe "#size_in_byte" do
     it "should convert a value with no unit to an integer" do
@@ -143,63 +194,68 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     end
   end
 
-  describe "when asking exists?" do
-    it "should return true if resource is present" do
-      tree_quota.provider.set(:ensure => :present)
-      tree_quota.provider.should be_exists
+  context 'on a tree quota' do
+    let(:parameters) do
+      tree_quota_parameters
     end
+    describe "when asking exists?" do
+      it "should return true if resource is present" do
+        resource.provider.set(:ensure => :present)
+        resource.provider.should be_exists
+      end
 
-    it "should return false if resource is absent" do
-      tree_quota.provider.set(:ensure => :absent)
-      tree_quota.provider.should_not be_exists
-    end
-  end
-
-  describe "when creating a resource" do
-    it "should be able to create a tree resource" do
-      tree_quota.provider.expects(:add).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '')
-      tree_quota.provider.create
-    end
-
-    {
-      :disklimit     => 'disk-limit',
-      :softdisklimit => 'soft-disk-limit',
-      :threshold     => 'threshold'
-    }.each do |limit_property, api_property|
-      describe "with a #{limit_property}" do
-        {
-          'absent' => '-',
-          '300K'   => '300',
-          '20M'    => '20480',
-          '3G'     => '3145728',
-          '1T'     => '1073741824'
-        }.each do |limit_value, api_value|
-          it "should pass #{api_value} if desired value is #{limit_value}" do
-            tree_quota[limit_property] = limit_value
-            tree_quota.provider.expects(:add).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '', api_property, api_value)
-            tree_quota.provider.create
-          end
-        end
+      it "should return false if resource is absent" do
+        resource.provider.set(:ensure => :absent)
+        resource.provider.should_not be_exists
       end
     end
 
-    {
-      :filelimit     => 'file-limit',
-      :softfilelimit => 'soft-file-limit'
-    }.each do |limit_property, api_property|
-      describe "with a #{limit_property}" do
-        {
-          'absent' => '-',
-          '300'    => '300',
-          '2K'     => '2048',
-          '30M'    => '31457280',
-          '5G'     => '5368709120',
-          '1T'     => '1099511627776'
-        }.each do |limit_value, api_value|
-          it "should pass #{api_value} if desired value is #{limit_value}" do
-            tree_quota[limit_property] = limit_value
-            tree_quota.provider.expects(:add).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '', api_property, api_value)
-            tree_quota.provider.create
+    describe "when creating a resource" do
+      it "should be able to create a tree resource" do
+        resource.provider.expects(:add).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '')
+        resource.provider.create
+      end
+
+      {
+        :disklimit     => 'disk-limit',
+        :softdisklimit => 'soft-disk-limit',
+        :threshold     => 'threshold'
+      }.each do |limit_property, api_property|
+        describe "with a #{limit_property}" do
+          {
+            'absent' => '-',
+            '300K'   => '300',
+            '20M'    => '20480',
+            '3G'     => '3145728',
+            '1T'     => '1073741824'
+          }.each do |limit_value, api_value|
+            it "should pass #{api_value} if desired value is #{limit_value}" do
+              resource[limit_property] = limit_value
+              resource.provider.expects(:add).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '', api_property, api_value)
+              resource.provider.create
+            end
+          end
+        end
+      end
+
+      {
+        :filelimit     => 'file-limit',
+        :softfilelimit => 'soft-file-limit'
+      }.each do |limit_property, api_property|
+        describe "with a #{limit_property}" do
+          {
+            'absent' => '-',
+            '300'    => '300',
+            '2K'     => '2048',
+            '30M'    => '31457280',
+            '5G'     => '5368709120',
+            '1T'     => '1099511627776'
+          }.each do |limit_value, api_value|
+            it "should pass #{api_value} if desired value is #{limit_value}" do
+              resource[limit_property] = limit_value
+              resource.provider.expects(:add).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '', api_property, api_value)
+              resource.provider.create
+            end
           end
         end
       end
@@ -207,25 +263,40 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
   end
 
   describe "when destroying a resource" do
-    it "should be able to destroy a tree quota" do
-      # if we destroy a provider, we must have been present before so we must have values in @property_hash
-      tree_quota.provider.set(:type => :tree, :volume => 'vol1')
-      tree_quota.provider.expects(:del).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '')
-      tree_quota.provider.destroy
+    context "on a tree quota" do
+      let(:parameters) do 
+        tree_quota_parameters
+      end
+      it "should be able to destroy it" do
+        # if we destroy a provider, we must have been present before so we must have values in @property_hash
+        resource.provider.set(:type => :tree, :volume => 'vol1')
+        resource.provider.expects(:del).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol1', 'qtree', '')
+        resource.provider.destroy
+      end
     end
 
-    it "should be able to destroy a user quota" do
-      # if we destroy a provider, we must have been present before so we must have values in @property_hash
-      user_quota.provider.set(:name => 'bob', :type => :user, :volume => 'vol1', :qtree => 'q1')
-      user_quota.provider.expects(:del).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol1', 'qtree', 'q1')
-      user_quota.provider.destroy
+    context "on a user quota" do
+      let(:parameters) do 
+        user_quota_parameters
+      end
+      it "should be able to destroy it" do
+        # if we destroy a provider, we must have been present before so we must have values in @property_hash
+        resource.provider.set(:name => 'bob', :type => :user, :volume => 'vol1', :qtree => 'q1')
+        resource.provider.expects(:del).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol1', 'qtree', 'q1')
+        resource.provider.destroy
+      end
     end
 
-    it "should be able to destroy a group quota" do
-      # if we destroy a provider, we must have been present before so we must have values in @property_hash
-      group_quota.provider.set(:name => 'staff', :type => :group, :volume => 'vol1', :qtree => 'q1')
-      group_quota.provider.expects(:del).with('quota-target', 'staff', 'quota-type', 'group', 'volume', 'vol1', 'qtree', 'q1')
-      group_quota.provider.destroy
+    describe "on a group quota" do
+      let(:parameters) do
+        group_quota_parameters
+      end
+      it "should be able to destroy it" do
+        # if we destroy a provider, we must have been present before so we must have values in @property_hash
+        resource.provider.set(:name => 'staff', :type => :group, :volume => 'vol1', :qtree => 'q1')
+        resource.provider.expects(:del).with('quota-target', 'staff', 'quota-type', 'group', 'volume', 'vol1', 'qtree', 'q1')
+        resource.provider.destroy
+      end
     end
   end
 
@@ -268,22 +339,34 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
       :threshold     => 'threshold'
     }.each do |property, apiproperty|
       describe property do
-        it "should pass \"-\" as a value for #{apiproperty} if desired value is absent" do
-          user_quota.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
-          user_quota.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '-')
-          user_quota.provider.send("#{property}=", :absent)
+        context "on a user quota" do
+          let(:parameters) do
+            user_quota_parameters
+          end
+    require 'pry'
+    binding.pry
+          it "should pass \"-\" as a value for #{apiproperty} if desired value is absent" do
+            resource.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
+            resource.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '-')
+            resource.provider.send("#{property}=", :absent)
+          end
+
+          it "should convert value to KB if desired value is numeric" do
+            resource.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
+            resource.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '102400')
+            resource.provider.send("#{property}=", 104857600) # 100MB
+          end
         end
 
-        it "should convert value to KB if desired value is numeric" do
-          user_quota.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
-          user_quota.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '102400')
-          user_quota.provider.send("#{property}=", 104857600) # 100MB
-        end
-
-        it "should pass \"\" as a qtree for tree quotas" do
-          tree_quota.provider.set(:name => '/vol/vol1/qtree1', :type => :tree, :volume => 'vol3')
-          tree_quota.provider.expects(:mod).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol3', 'qtree', '', apiproperty, '4')
-          tree_quota.provider.send("#{property}=", 4096)
+        context "on a tree quota" do
+          let(:parameters) do 
+            tree_quota_parameters
+          end
+          it "should pass \"\" as a qtree for tree quotas" do
+            resource.provider.set(:name => '/vol/vol1/qtree1', :type => :tree, :volume => 'vol3')
+            resource.provider.expects(:mod).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol3', 'qtree', '', apiproperty, '4')
+            resource.provider.send("#{property}=", 4096)
+          end
         end
       end
     end
@@ -293,22 +376,32 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
       :softfilelimit => 'soft-file-limit'
     }.each do |property, apiproperty|
       describe property do
-        it "should pass \"-\" as a value for #{apiproperty} if desired value is absent" do
-          user_quota.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
-          user_quota.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '-')
-          user_quota.provider.send("#{property}=", :absent)
+        context "on a user quota" do
+          let(:parameters) do 
+            user_quota_parameters
+          end
+          it "should pass \"-\" parameters for #{apiproperty} if desired value is absent" do
+            resource.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
+            resource.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '-')
+            resource.provider.send("#{property}=", :absent)
+          end
+
+          it "should pass the desired value if desired value is numeric" do
+            resource.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
+            resource.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '104857600')
+            resource.provider.send("#{property}=", 104857600) # 100M
+          end
         end
 
-        it "should pass the desired value if desired value is numeric" do
-          user_quota.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
-          user_quota.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '104857600')
-          user_quota.provider.send("#{property}=", 104857600) # 100M
-        end
-
-        it "should pass \"\" as a qtree for tree quotas" do
-          tree_quota.provider.set(:name => '/vol/vol1/qtree1', :type => :tree, :volume => 'vol3')
-          tree_quota.provider.expects(:mod).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol3', 'qtree', '', apiproperty, '4096')
-          tree_quota.provider.send("#{property}=", 4096)
+        context "on a tree quota" do
+          let(:parameters) do 
+            tree_quota_parameters
+          end
+          it "should pass \"\" as a qtree for tree quotas" do
+            resource.provider.set(:name => '/vol/vol1/qtree1', :type => :tree, :volume => 'vol3')
+            resource.provider.expects(:mod).with('quota-target', '/vol/vol1/qtree1', 'quota-type', 'tree', 'volume', 'vol3', 'qtree', '', apiproperty, '4096')
+            resource.provider.send("#{property}=", 4096)
+          end
         end
       end
     end

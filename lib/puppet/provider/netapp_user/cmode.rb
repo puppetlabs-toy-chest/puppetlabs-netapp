@@ -80,7 +80,7 @@ Puppet::Type.type(:netapp_user).provide(:cmode, :parent => Puppet::Provider::Net
   end
 
   def flush
-    Puppet.debug("Puppet::Provider::Netapp_user: Got to flush for resource #{@resource[:username]}.")
+    Puppet.debug("Puppet::Provider::Netapp_user::cMode: Got to flush for resource #{@resource[:username]}.")
 
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")

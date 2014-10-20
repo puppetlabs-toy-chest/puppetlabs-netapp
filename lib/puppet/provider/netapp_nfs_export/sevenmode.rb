@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp'
 
-Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provider::Netapp) do
-  @doc = "Manage Netapp export creation, modification and deletion."
+Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Provider::Netapp) do
+  @doc = "Manage Netapp NFS export creation, modification and deletion on 7Mode."
   
   confine :feature => :posix
   defaultfor :feature => :posix
@@ -23,7 +23,7 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
   mk_resource_methods
 
   def self.instances
-    Puppet.debug("Puppet::Provider::Netapp_export: got to self.instances.")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: got to self.instances.")
     exports = []
 
     # Get a list of all nfs export rules
@@ -35,7 +35,7 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
     # Itterate through each 'export-info' block.
     rules.each do |rule|
       name = rule.child_get_string("pathname")
-      Puppet.debug("Puppet::Provider::Netapp_export.prefetch: Processing rule for export #{name}. \n")
+      Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode.prefetch: Processing rule for export #{name}. \n")
       
       # Construct an export hash for rule
       export = { :name => name,
@@ -110,7 +110,7 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
   end
   
   def self.prefetch(resources)
-    Puppet.debug("Puppet::Provider::Netapp_export: Got to self.prefetch.")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: Got to self.prefetch.")
     # Itterate instances and match provider where relevant.
     instances.each do |prov|
       Puppet.debug("Prov.name = #{resources[prov.name]}. ")
@@ -121,13 +121,13 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
   end
 
   def flush
-    Puppet.debug("Puppet::Provider::Netapp_export: Got to flush for resource #{@resource[:name]}.")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: Got to flush for resource #{@resource[:name]}.")
     
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
     case @property_hash[:ensure]
     when :absent
-      Puppet.debug("Puppet::Provider::Netapp_export: Ensure is absent.")
+      Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: Ensure is absent.")
       
       # Query Netapp to remove export against path. 
       cmd = NaElement.new("nfs-exportfs-delete-rules")
@@ -141,11 +141,11 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
       # Invoke the constructed request
       result = edel('persistent', @resource[:persistent].to_s, 'pathnames', pathnames)
   
-      Puppet.debug("Puppet::Provider::Netapp_export: export rule #{@resource[:name]} destroyed successfully. \n")
+      Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: export rule #{@resource[:name]} destroyed successfully. \n")
       return true
     
     when :present
-      Puppet.debug("Puppet::Provider::Netapp_export: Ensure is present.")
+      Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: Ensure is present.")
 
       # Construct rule list
       rule_list = NaElement.new("exports-rule-info-2")
@@ -203,14 +203,14 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
       result = emodify('persistent', @resource[:persistent].to_s, 'rule', rule_list)
   
       # Passed above, therefore must of worked.
-      Puppet.debug("Puppet::Provider::Netapp_export: export rule #{@resource[:name]} modified successfully on path #{@resource[:path]}. \n")
+      Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: export rule #{@resource[:name]} modified successfully on path #{@resource[:path]}. \n")
       return true
       
     end #EOC
   end
   
   def create
-    Puppet.debug("Puppet::Provider::Netapp_export: creating Netapp export rule #{@resource[:name]} on path #{@resource[:path]}.")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: creating Netapp export rule #{@resource[:name]} on path #{@resource[:path]}.")
 
     # Construct rule list
     rule_list = NaElement.new("exports-rule-info-2")
@@ -271,23 +271,23 @@ Puppet::Type.type(:netapp_export).provide(:sevenmode, :parent => Puppet::Provide
     loaded_paths = output.child_get("pathname-info")
     # Check if var is actually null. 
     if(loaded_paths.nil?)
-      Puppet.debug("Puppet::Provider::Netapp_export: export rule #{@resource[:name]} creation failed. \n")
-      raise Puppet::Error, "Puppet::Provider::Netapp_export: export rule #{@resource[:name]} creation failed. Verify settings. \n"
+      Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: export rule #{@resource[:name]} creation failed. \n")
+      raise Puppet::Error, "Puppet::Provider::Netapp_nfs_export.sevenmode: export rule #{@resource[:name]} creation failed. Verify settings. \n"
       return false
     end
     
     # Passed above, therefore must of worked. 
-    Puppet.debug("Puppet::Provider::Netapp_export: export rule #{@resource[:name]} created successfully on path #{@resource[:path]}. \n")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: export rule #{@resource[:name]} created successfully on path #{@resource[:path]}. \n")
     return true
   end
   
   def destroy
-    Puppet.debug("Puppet::Provider::Netapp_export: destroying Netapp export rule #{@resource[:name]} against path #{@resource[:path]}")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: destroying Netapp export rule #{@resource[:name]} against path #{@resource[:path]}")
     @property_hash[:ensure] = :absent
   end
 
   def exists?
-    Puppet.debug("Puppet::Provider::Netapp_export: checking existance of Netapp export rule #{@resource[:name]}.")
+    Puppet.debug("Puppet::Provider::Netapp_nfs_export.sevenmode: checking existance of Netapp export rule #{@resource[:name]}.")
     @property_hash[:ensure] == :present
   end
 
