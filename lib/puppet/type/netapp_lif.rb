@@ -134,9 +134,9 @@ Puppet::Type.newtype(:netapp_lif) do
   
   # Validate input values
   validate do 
-    raise ArgumentError, "Address is required" if self[:address].nil?
-    raise ArgumentError, "Vserver is required" if self[:vserver].nil?
-    raise ArgumentError, "Netmask or Netmasklength are required" if self[:netmask].nil? and self[:netmasklength].nil?
+    raise ArgumentError, "Address is required" if (self[:address] || self.provider.address).nil?
+    raise ArgumentError, "Vserver is required" if (self[:vserver] || self.provider.vserver).nil?
+    raise ArgumentError, "Netmask or Netmasklength are required" if (self[:netmask] || self.provider.netmask).nil? and (self[:netmasklength] || self.provider.netmasklength).nil?
     raise ArgumentError, "Netmask and Netmasklength are mutually exclusive" if self[:netmask] and self[:netmasklength]
   end
 
