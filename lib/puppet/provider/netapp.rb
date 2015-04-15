@@ -24,29 +24,43 @@ class Puppet::Provider::Netapp < Puppet::Provider
   # Helper function for simplifying the execution of NetApp API commands, in a similar fashion to the commands function.
   # Arguments should be a hash of 'command name' => 'api command'.
   def self.netapp_commands(command_specs)
+    # This is basically stolen from Puppet::Provider#create_class_and_instance_method
+    #
+    #   A novice was trying to fix a broken lisp machine by turning the
+    #   power off and on.  Knight, seeing what the student was doing spoke
+    #   sternly- "You can not fix a machine by just power-cycling it with no
+    #   understanding of what is going wrong."
+    #     Knight turned the machine off and on.
+    #       The machine worked.
     command_specs.each do |name, apicommand|
-      # The `create_class_and_instance_method` method was added in puppet 3.0.0
-      create_class_and_instance_method(name) do |*args|
-        Puppet.debug("apicommand is a - #{apicommand.class}")
-        if apicommand.is_a?(Hash) && apicommand[:iter]
-          Puppet.debug("Got an iter request, for #{apicommand[:result_element]} element.")
-          result = netapp_itterate(apicommand[:api], apicommand[:result_element])
-        else
-          Puppet.debug("Args array length = #{args.length}")
-          if args.length == 1 and args[0].class == NaElement
-            Puppet.debug("Executing invoke_elem with NaElement object.")
-            result = transport.invoke_elem(args[0])
+      if ! singleton_class.method_defined?(name)
+        meta_def(name) do |*args|
+          Puppet.debug("apicommand is a - #{apicommand.class}")
+          if apicommand.is_a?(Hash) && apicommand[:iter]
+            Puppet.debug("Got an iter request, for #{apicommand[:result_element]} element.")
+            result = netapp_itterate(apicommand[:api], apicommand[:result_element])
           else
-            Puppet.debug("Executing api call #{[apicommand, args].flatten.join(' ')}")
-            result = transport.invoke(apicommand, *args)
+            Puppet.debug("Args array length = #{args.length}")
+            if args.length == 1 and args[0].class == NaElement
+              Puppet.debug("Executing invoke_elem with NaElement object.")
+              result = transport.invoke_elem(args[0])
+            else
+              Puppet.debug("Executing api call #{[apicommand, args].flatten.join(' ')}")
+              result = transport.invoke(apicommand, *args)
+            end
+            if result.results_status == 'failed'
+              raise Puppet::Error, "Executing api call #{[apicommand, args].flatten.join(' ')} failed: #{result.results_reason.inspect}"
+            end
           end
-          if result.results_status == 'failed'
-            raise Puppet::Error, "Executing api call #{[apicommand, args].flatten.join(' ')} failed: #{result.results_reason.inspect}"
-          end
-        end
 
-        # Return the results
-        result
+          # Return the results
+          result
+        end
+      end
+      if ! method_defined?(name)
+        define_method(name) do |*args|
+          self.class.send(name,args)
+        end
       end
     end
   end
