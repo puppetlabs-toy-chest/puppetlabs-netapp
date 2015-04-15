@@ -1,6 +1,6 @@
 require 'puppet/util/network_device'
 require 'puppet/util/network_device/netapp/facts'
-require 'puppet/util/network_device/netapp/NaServer'
+require 'puppet/netapp_sdk'
 require 'uri'
 
 #require 'addressable/uri'
