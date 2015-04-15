@@ -31,7 +31,7 @@ Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Ne
     # HTTPS connection for each request so this does not scale well.
     # As a workaround pass include-output-entry and parse the
     # thresholds by hand.
-    response = list('include-output-entry', 'true')
+    response = list('include-output-entry', 'true') || []
     response.each do |quota_entry|
       quota_hash = {
         :name   => quota_entry.child_get_string("quota-target"),

@@ -39,8 +39,8 @@ Puppet::Type.type(:netapp_user).provide(:cmode, :parent => Puppet::Provider::Net
       Puppet.debug("Puppet::Provider::Netapp_user::cMode.prefetch: Processing user info block for #{username}.")
 
       # Create base hash
-      account_info = { :username => username,
-                       :ensure   => :present }
+      account_info = { :name   => username,
+                       :ensure => :present }
 
       # Add comment if present
       account_info[:comment] = account.child_get_string("comment") unless account.child_get_string("comment").nil?

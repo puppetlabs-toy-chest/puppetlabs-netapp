@@ -36,8 +36,8 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
 
       # Construct initial hash for lif
       lif_hash = {
-        :interfacename => lif_name,
-        :ensure        => :present
+        :name   => lif_name,
+        :ensure => :present
       }
 
       # Pull out required info
