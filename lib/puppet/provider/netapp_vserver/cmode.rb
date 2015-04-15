@@ -55,13 +55,13 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       namemappingswitch = []
       namemappingswitch_info = vserver.child_get("name-mapping-switch").children_get()
       namemappingswitch_info.each do |nmswitch|
-        namemappingswitch << nmswitch.get_content()
+        namemappingswitch << nmswitch.content()
       end unless namemappingswitch_info.nil?
       # Name server switch
       nameserverswitch = []
       nameserverswitch_info = vserver.child_get("name-server-switch").children_get()
       nameserverswitch_info.each do |nsswitch|
-        nameserverswitch << nsswitch.get_content()
+        nameserverswitch << nsswitch.content()
       end unless nameserverswitch_info.nil?
 
       # Policies
@@ -72,14 +72,14 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       aggregates = []
       aggregates_info = vserver.child_get("aggr-list")
       aggregates_info.children_get().each do |aggregate|
-        aggregates << aggregate.get_content()
+        aggregates << aggregate.content()
       end unless aggregates_info.nil?
 
       # Protocols
       protocols = []
       protocols_info = vserver.child_get("allowed-protocols").children_get()
       protocols_info.each do |protocol|
-        protocols << protocol.get_content()
+        protocols << protocol.content()
       end unless protocols_info.nil?
 
       Puppet.debug("Puppet::Provider::Netapp_vserver.cmode instances: Vserver_name = #{vserver_name}.")

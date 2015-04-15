@@ -59,7 +59,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       protocols = []
       rule_protocols = rule.child_get('protocol').children_get()
       rule_protocols.each do |protocol|
-        protocols << protocol.get_content()
+        protocols << protocol.content()
       end
       # Add it to the export_rule hash
       export_rule[:protocol] = protocols
@@ -68,7 +68,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       ro_security = []
       ro_rules = rule.child_get('ro-rule').children_get()
       ro_rules.each do |ro_rule|
-        ro_security << ro_rule.get_content() 
+        ro_security << ro_rule.content() 
       end
       # Add it to the export_rule hash
       export_rule[:rorule] = ro_security
@@ -77,7 +77,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       rw_security = []
       rw_rules = rule.child_get('rw-rule').children_get()
       rw_rules.each do |rw_rule|
-        rw_security << rw_rule.get_content()
+        rw_security << rw_rule.content()
       end
       # Add it to the export_rule hash
       export_rule[:rwrule] = rw_security
@@ -86,7 +86,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       su_security = []
       su_rules = rule.child_get('super-user-security').children_get()
       su_rules.each do |su_rule|
-        su_security << su_rule.get_content()
+        su_security << su_rule.content()
       end
       # Add it to the export_rule hash
       export_rule[:superusersecurity] = su_security

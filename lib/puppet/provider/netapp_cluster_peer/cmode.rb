@@ -46,7 +46,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
       # Process the peer-address array
       peer_addresses = []
       peer.child_get('peer-addresses').children_get().each do |peer_address|
-        peer_addresses << peer_address.get_content()
+        peer_addresses << peer_address.content()
       end
       peer_hash[:peeraddresses] = peer_addresses
 

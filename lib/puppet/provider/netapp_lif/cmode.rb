@@ -58,7 +58,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
       # Process data-protocols array
       data_protocols = []
       lif.child_get('data-protocols').children_get().each do |lif_dp|
-        data_protocols << lif_dp.get_content()
+        data_protocols << lif_dp.content()
       end
       lif_hash[:dataprotocols] = data_protocols
 
