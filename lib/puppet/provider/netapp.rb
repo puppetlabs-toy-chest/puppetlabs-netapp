@@ -59,7 +59,7 @@ class Puppet::Provider::Netapp < Puppet::Provider
       end
       if ! method_defined?(name)
         define_method(name) do |*args|
-          self.class.send(name,args)
+          self.class.send(name,*args)
         end
       end
     end
@@ -76,7 +76,7 @@ class Puppet::Provider::Netapp < Puppet::Provider
     # Itterate over the api
     while !tag.nil?
       # Invoke api request
-      Puppet.debug("Invoking: [#{api}, \"tag\", #{tag}]")
+      Puppet.debug("Invoking: [#{api.inspect}, \"tag\", #{tag.inspect}]")
       output = transport.invoke(api, "tag", tag)
       if output.results_status == 'failed'
         raise Puppet::Error, "Executing api call #{[api,"tag",tag].flatten.join(' ')} failed: #{output.results_reason.inspect}"
