@@ -40,7 +40,7 @@ Puppet::Type.newtype(:netapp_aggregate) do
   end
 
   newproperty(:diskcount) do
-    desc "Numbr of disks to place in the aggregate, including parity disks."
+    desc "Number of disks to place in the aggregate, including parity disks."
 
     validate do |value|
       raise ArgumentError, "Diskcount must be between 1 and 2147483647." unless value.to_i.between?(1,2147483647)
