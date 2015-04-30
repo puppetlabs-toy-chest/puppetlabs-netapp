@@ -6,29 +6,29 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
   confine :feature => :posix
   defaultfor :feature => :posix
 
-  netapp_commands :aggrget     => {:api => 'aggr-get-iter', :iter => true, :result_element =>'attributes-list'} 
+  netapp_commands :aggrget     => {:api => 'aggr-get-iter', :iter => true, :result_element =>'attributes-list'}
   netapp_commands :aggrcreate  => 'aggr-create'
   netapp_commands :aggradd     => 'aggr-add'
   netapp_commands :aggrmod     => 'aggr-modify'
   netapp_commands :aggrdestroy => 'aggr-destroy'
   netapp_commands :aggronline  => 'aggr-online'
   netapp_commands :aggroffline => 'aggr-offline'
-  
+
   mk_resource_methods
-  
+
   def self.instances
     Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode self.instances: Got to self.instances.")
-    
+
     aggregates = []
-    
+
     # Get the aggregates
     results = aggrget()
-    
+
     results.each do |aggregate|
       # Pull out relevant fields
       aggregate_name = aggregate.child_get_string('aggregate-name')
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode self.instances: Getting aggregate info for #{aggregate_name}.")
-      
+
       # Construct the aggr_info hash
       aggr_info = {
         :name => aggregate_name,
@@ -36,21 +36,21 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       }
 
       # Start to add values
-      # Aggregate state 
+      # Aggregate state
       aggr_info[:state] = aggregate.child_get('aggr-raid-attributes').child_get_string('state')
-      # Aggregate blocktype. 
-      aggr_info[:blocktype] = aggregate.child_get('aggr-fs-attributes').child_get_string('block-type') 
+      # Aggregate blocktype.
+      aggr_info[:blocktype] = aggregate.child_get('aggr-fs-attributes').child_get_string('block-type')
 
       # Get current diskcount
       aggr_info[:diskcount] = aggregate.child_get('aggr-raid-attributes').child_get_string('disk-count')
-      
+
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode self.instances: aggr_info = #{aggr_info}.")
       aggregates << new(aggr_info)
     end
-    
+
     aggregates
   end
-  
+
   def self.prefetch(resources)
     Puppet.debug("Puppet::Provider::Netapp_aggregate.cMode: Got to self.prefetch.")
     # Iterate instances and match provider where relevant.
@@ -61,14 +61,14 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       end
     end
   end
-  
+
   def flush
     Puppet.debug("Puppet::Provider::Netapp_aggregate.cMode flush: Got to flush for resource #{@resource[:name]}.")
 
-    # Are we updating or destroying? 
+    # Are we updating or destroying?
     Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: required resource state = #{@property_hash[:ensure]}")
 
-    # Can't modify an aggregate if it's creating, so early out. 
+    # Can't modify an aggregate if it's creating, so early out.
     if @property_hash[:state] == 'creating'
         Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: Aggregate is creating, can't modify...")
       return true

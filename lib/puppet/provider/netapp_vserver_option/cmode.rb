@@ -31,7 +31,7 @@ Puppet::Type.type(:netapp_vserver_option).provide(:cmode, :parent => Puppet::Pro
       Puppet.debug("Option name #{option_name}, value #{option_value}.")
 
       # Construct hash
-      option_info = {  
+      option_info = {
         :name   => option_name,
         :ensure => :present,
         :value  => option_value

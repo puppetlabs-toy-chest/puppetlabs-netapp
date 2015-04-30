@@ -9,15 +9,15 @@ Puppet::Type.newtype(:netapp_lun) do
     desc "Lun path"
     isnamevar
 
-    validate do |value| 
+    validate do |value|
       raise ArgumentError, "#{value} is an invalid Lun path." unless value =~ /(\/\w+){3,4}/
     end
   end
 
-  newproperty(:size) do 
+  newproperty(:size) do
     desc "Lun size. Can either be specified in bytes, or specify one of the following size units: [mgt]."
 
-    validate do |value| 
+    validate do |value|
       raise ArgumentError, "Value must either be in bytes, or specify a size unit." unless value =~ /\d+[mgt]?/
     end
 
@@ -48,17 +48,17 @@ Puppet::Type.newtype(:netapp_lun) do
   end
 
   newparam(:ostype) do
-    desc "Lun OS Type. Defaults to 'image'. Possible values: 'image', 'aix', 'hpux', 'hyper_v', 'linux', 'netware', 'openvms', 
+    desc "Lun OS Type. Defaults to 'image'. Possible values: 'image', 'aix', 'hpux', 'hyper_v', 'linux', 'netware', 'openvms',
     'solaris', 'solaris_efi', 'vmware', 'windows', 'windows_2008', 'windows_gpt'"
     newvalues(:image, :aix, :hpux, :hyper_v, :linux, :netware, :openvms, :solaris, :solaris_efi, :vmware, :windows, :windows_2008, :windows_gpt)
     defaultto(:image)
   end
 
-  newparam(:prefixsize) do 
+  newparam(:prefixsize) do
     desc "Lun prefix stream size in bytes. Default value is based on ostype. Not required for 'image' ostype. Must be a multiple of 512 bytes."
 
-    validate do |value| 
-      # TODO: Must devide by 512 bytes. 
+    validate do |value|
+      # TODO: Must devide by 512 bytes.
       raise ArgumentError, 'Prefixsize must divide by 512' unless value.to_i % 512 == 0
     end
   end
@@ -67,7 +67,7 @@ Puppet::Type.newtype(:netapp_lun) do
     desc "QOS Policy group"
   end
 
-  newparam(:spaceresenabled) do 
+  newparam(:spaceresenabled) do
     desc "Enable Lun space reservation? Defaults to true."
     newvalues(:true, :false)
     defaultto(:true)

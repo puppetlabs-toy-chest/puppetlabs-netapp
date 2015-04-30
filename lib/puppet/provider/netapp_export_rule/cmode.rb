@@ -2,15 +2,15 @@ require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp CMode export rule creation, modification and deletion."
-  
+
   confine :feature => :posix
   defaultfor :feature => :posix
-  
+
   netapp_commands :elist   => {:api => 'export-rule-get-iter', :iter => true, :result_element => 'attributes-list'}
-  netapp_commands :eadd    => 'export-rule-create' 
-  netapp_commands :edel    => 'export-rule-destroy' 
+  netapp_commands :eadd    => 'export-rule-create'
+  netapp_commands :edel    => 'export-rule-destroy'
   netapp_commands :emodify => 'export-rule-modify'
-  
+
   mk_resource_methods
 
   def self.instances
@@ -26,23 +26,23 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       ruleindex = rule.child_get_int("rule-index")
       name = "#{policyname}:#{ruleindex}"
       Puppet.debug("Puppet::Provider::Netapp_export.cmode.prefetch: Processing rule for export #{name}. \n")
-      
+
       # Construct an export hash for rule
       export_rule = { :name => name,
                  :ensure => :present }
-      
+
       # Add the anon UID if present.
       export_rule[:anonuid] = rule.child_get_string("anonymous-user-id") unless rule.child_get_string("anonymous-user-id").nil?
       # Add the client match string if present.
       export_rule[:clientmatch] = rule.child_get_string("client-match") unless rule.child_get_string("client-match").nil?
-      
+
       # Export chown mode
       export_rule[:exportchownmode] = rule.child_get_string("export-chown-mode") unless rule.child_get_string("export-chown-mode").nil?
 
       # NTS Unix security ops
       export_rule[:ntfsunixsecops] = rule.child_get_string("export-ntfs-unix-security-ops") unless rule.child_get_string("export-ntfs-unix-security-ops").nil?
 
-      # Add the allowdev and allowsetuid 
+      # Add the allowdev and allowsetuid
       export_rule[:allowdevenabled] = rule.child_get_string("is-allow-dev-is-enabled") unless rule.child_get_string("is-allow-dev-is-enabled").nil?
       export_rule[:allowsetuid] = rule.child_get_string("is-allow-set-uid-enabled") unless rule.child_get_string("is-allow-set-uid-enabled").nil?
 
@@ -55,16 +55,16 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       # Add it to the export_rule hash
       export_rule[:protocol] = protocols
 
-      # Get an array of read only security flavors 
+      # Get an array of read only security flavors
       ro_security = []
       ro_rules = rule.child_get('ro-rule').children_get()
       ro_rules.each do |ro_rule|
-        ro_security << ro_rule.content() 
+        ro_security << ro_rule.content()
       end
       # Add it to the export_rule hash
       export_rule[:rorule] = ro_security
 
-      # Get an array of read write security flavors 
+      # Get an array of read write security flavors
       rw_security = []
       rw_rules = rule.child_get('rw-rule').children_get()
       rw_rules.each do |rw_rule|
@@ -73,7 +73,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       # Add it to the export_rule hash
       export_rule[:rwrule] = rw_security
 
-      # Get an array of super user security flavors 
+      # Get an array of super user security flavors
       su_security = []
       su_rules = rule.child_get('super-user-security').children_get()
       su_rules.each do |su_rule|
@@ -87,12 +87,12 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       Puppet.debug("Export rule looks like: #{export_rule.inspect}")
       export_rules << new(export_rule)
     end
-  
-    # Return the final exports array. 
+
+    # Return the final exports array.
     Puppet.debug("Returning exports array. ")
     export_rules
   end
-  
+
   def self.prefetch(resources)
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: Got to self.prefetch.")
     # Itterate instances and match provider where relevant.
@@ -107,7 +107,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
 
   def flush
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: Got to flush for resource #{@resource[:name]}.")
-    
+
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
 
@@ -124,7 +124,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
 
       Puppet.debug("Puppet::Provider::Netapp_export.cmode: export rule #{@resource[:name]} destroyed successfully. \n")
       return true
-    
+
     when :present
       Puppet.debug("Puppet::Provider::Netapp_export.cmode: Ensure is present.")
 
@@ -171,14 +171,14 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
 
       # Modify the rule
       result = emodify(export_rule_modify)
-  
+
       # Passed above, therefore must of worked.
       Puppet.debug("Puppet::Provider::Netapp_export.cmode: export rule #{@resource[:name]} modified successfully. \n")
       return true
-      
+
     end #EOC
   end
-  
+
   def create
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: creating Netapp export rule #{@resource[:name]}.")
 
@@ -230,11 +230,11 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     # Add the export rule
     result = eadd(export_rule_create)
 
-    # Passed above, therefore must of worked. 
+    # Passed above, therefore must of worked.
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: export rule #{@resource[:name]}.")
     return true
   end
-  
+
   def destroy
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: destroying Netapp export rule #{@resource[:name]}.")
     @property_hash[:ensure] = :absent
@@ -245,5 +245,5 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     @property_hash[:ensure] == :present
   end
 
-  
+
 end

@@ -1,18 +1,18 @@
 require 'spec_helper'
- 
+
 describe Puppet::Type.type(:netapp_role) do
 
-  before do 
+  before do
     @role_example = {
-      :rolename     => 'role',  
-      :comment      => 'Role comment', 
+      :rolename     => 'role',
+      :comment      => 'Role comment',
       :capabilities => 'capability'
     }
     @provider = stub('provider', :class => described_class.defaultprovider, :clear => nil)
     described_class.defaultprovider.stubs(:new).returns(@provider)
   end
 
-  let :role_resource do 
+  let :role_resource do
     @role_example
   end
 
@@ -65,12 +65,12 @@ describe Puppet::Type.type(:netapp_role) do
       it "should not support other values" do
         expect { described_class.new(:rolename => 'role1', :ensure => 'foo') }.to raise_error(Puppet::Error, /Invalid value "foo"/)
       end
-      
+
       it "should not have a default value" do
         described_class.new(:rolename => 'role1')[:ensure].should == nil
       end
     end
-    
+
     describe "for comment" do
       it "should support an alphanumerical comment, with hyphens and fullstop" do
         described_class.new(:rolename => 'role1', :comment => 'This is test role-1.', :ensure => :present)[:comment].should == 'This is test role-1.'
@@ -80,31 +80,31 @@ describe Puppet::Type.type(:netapp_role) do
         expect { described_class.new(:rolename => 'role1', :comment => 'This is test role !', :ensure => :present) }.to raise_error(Puppet::Error, /This is test role ! is not a valid comment/)
       end
     end
-    
+
     describe "for capabilities" do
       it "should support a single capability" do
         described_class.new(:rolename => 'role', :capabilities => 'login-api')[:capabilities].should == 'login-api'
       end
-      
+
       it "should support a comma-seperated list of capabilities" do
         described_class.new(:rolename => 'role1', :capabilities => 'login-api,login-ssh')[:capabilities].should == 'login-api,login-ssh'
       end
-      
+
       it "should support a wildcard capability" do
         described_class.new(:rolename => 'role1', :capabilities => 'login-*')[:capabilities].should == 'login-*'
       end
-      
+
       it "should not support special characters" do
         expect { described_class.new(:rolename => 'user1', :capabilities => 'login-!') }.to raise_error(Puppet::Error, /login-! is not a valid capabilities list/)
       end
-      
+
       it "insync? should return false if is and should values dont match" do
         role = role_resource.dup
         is_capabilities = 'capability1'
         role[:capabilities] = 'capability1,capability2'
         described_class.new(role).property(:capabilities).insync?(is_capabilities).should be_false
       end
-      
+
       it "insync? should return true if is and should values match" do
         role = role_resource.dup
         is_capabilities = 'capability1,capability2'
@@ -112,7 +112,7 @@ describe Puppet::Type.type(:netapp_role) do
         described_class.new(role).property(:capabilities).insync?(is_capabilities).should be_true
       end
     end
-    
+
   end
 
 end

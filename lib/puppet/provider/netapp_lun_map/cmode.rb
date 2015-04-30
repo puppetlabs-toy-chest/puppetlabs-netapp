@@ -2,10 +2,10 @@ require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_lun_map).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Lun map creation and deletion."
-  
+
   confine :feature => :posix
   defaultfor :feature => :posix
-  
+
   netapp_commands :lun_maplist => {:api => 'lun-map-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :lun_map     => 'lun-map'
   netapp_commands :lun_unmap   => 'lun-unmap'
@@ -29,7 +29,7 @@ Puppet::Type.type(:netapp_lun_map).provide(:cmode, :parent => Puppet::Provider::
       # Get the initiator group
       lunmap_initiator_group = map.child_get_string('initiator-group')
 
-      # Construct the lunmap hash 
+      # Construct the lunmap hash
       lunmap_hash = {
         :lunmap         => lunmap_name,
         :ensure         => :present,
@@ -60,7 +60,7 @@ Puppet::Type.type(:netapp_lun_map).provide(:cmode, :parent => Puppet::Provider::
   def flush
     Puppet.debug("Puppet::Provider::Netapp_lun_map.cmode: flushing Netapp Lun map #{@resource[:lunmap]}.")
 
-    # Are we updating or destroying? 
+    # Are we updating or destroying?
     Puppet.debug("Puppet::Provider::Netapp_lun_map.cmode: required resource state = #{@property_hash[:ensure]}")
     if @property_hash[:ensure] == :absent
       Puppet.debug("Puppet::Provider::Netapp_lun_map.cmode: Ensure is absent. Destroying...")
@@ -84,7 +84,7 @@ Puppet::Type.type(:netapp_lun_map).provide(:cmode, :parent => Puppet::Provider::
     path, lun_id = @resource[:lunmap].split(':')
     Puppet.debug("Puppet::Provider::Netapp_lun_map.cmode: Mapping lun id #{lun_id} on path #{path}.")
 
-    # Map the lun 
+    # Map the lun
     result = lun_map('path', path, 'lun-id', lun_id, 'initiator-group', @resource[:initiatorgroup])
 
     # Lun mapped successfully

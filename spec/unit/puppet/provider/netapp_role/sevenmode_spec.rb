@@ -10,7 +10,7 @@ describe Puppet::Type.type(:netapp_role).provider(:sevenmode) do
     described_class.stubs(:suitable?).returns true
     Puppet::Type.type(:netapp_role).stubs(:defaultprovider).returns described_class
   end
-  
+
   let :role do
     Puppet::Type.type(:netapp_role).new(
       :rolename     => 'role',
@@ -18,15 +18,15 @@ describe Puppet::Type.type(:netapp_role).provider(:sevenmode) do
       :comment      => 'test role',
       :capabilities => 'login-*,cli-*,api-*,security-*',
       :provider     => provider
-    )    
+    )
   end
-  
+
   let :provider do
     described_class.new(
       :rolename => 'role'
     )
   end
-  
+
   describe "#instances" do
     it "should return an array of current role entries" do
       described_class.expects(:rlist).returns YAML.load_file(my_fixture('role-list.yml'))
@@ -49,14 +49,14 @@ describe Puppet::Type.type(:netapp_role).provider(:sevenmode) do
       ]
     end
   end
-  
+
   describe "#prefetch" do
     it "exists" do
       described_class.expects(:rlist).returns YAML.load_file(my_fixture('role-list.yml'))
       described_class.prefetch({})
     end
   end
-  
+
   describe "when asking exists?" do
     it "should return true if resource is present" do
       role.provider.set(:ensure => :present)
@@ -68,14 +68,14 @@ describe Puppet::Type.type(:netapp_role).provider(:sevenmode) do
       role.provider.should_not be_exists
     end
   end
-  
+
   describe "when creating a resource" do
-    it "should be able to create a role" do    
+    it "should be able to create a role" do
       role.provider.expects(:radd).with('useradmin-role', is_a(NaElement))
       role.provider.create
     end
   end
-  
+
   describe "when destroying a resource" do
     it "should be able to destroy a role" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
@@ -85,7 +85,7 @@ describe Puppet::Type.type(:netapp_role).provider(:sevenmode) do
       role.provider.flush
     end
   end
-  
+
   describe "when modifying a resource" do
     it "should be able to modify an existing role" do
       # Need to have a resource present that we can modify
@@ -94,5 +94,5 @@ describe Puppet::Type.type(:netapp_role).provider(:sevenmode) do
       role.provider.flush
     end
   end
-  
+
 end

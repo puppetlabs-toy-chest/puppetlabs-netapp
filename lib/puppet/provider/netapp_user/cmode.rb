@@ -18,7 +18,7 @@ Puppet::Type.type(:netapp_user).provide(:cmode, :parent => Puppet::Provider::Net
 
     # Query Netapp for user list.
     result = securitylist
-    
+
     # Empty accounts array
     account_instances = []
 
@@ -38,16 +38,16 @@ Puppet::Type.type(:netapp_user).provide(:cmode, :parent => Puppet::Provider::Net
 
       # Account locked?
       account_info[:status] = account.child_get_string("is-locked") unless account.child_get_string("is-locked").nil?
-        
+
       # Role
       account_info[:role] = account.child_get_string("role-name") unless account.child_get_string("role-name").nil?
-      
+
       # Application
       account_info[:application] = account.child_get_string("application") unless account.child_get_string("application").nil?
-        
+
       # Authentication method
       account_info[:authmethod] = account.child_get_string("authentication-method") unless account.child_get_string("authentication-method").nil?
-          
+
       # Create the instance and add to users array.
       Puppet.debug("Creating instance for '#{username}'.")
       account_instances << new(account_info)

@@ -2,40 +2,40 @@ require 'puppet/provider/netapp_sevenmode'
 
 Puppet::Type.type(:netapp_group).provide(:sevenmode, :parent => Puppet::Provider::NetappSevenmode) do
   @doc = "Manage Netapp group creation, modification and deletion."
-  
+
   confine :feature => :posix
   defaultfor :feature => :posix
-  
-  netapp_commands :glist   => 'useradmin-group-list' 
+
+  netapp_commands :glist   => 'useradmin-group-list'
   netapp_commands :gdel    => 'useradmin-group-delete'
   netapp_commands :gadd    => 'useradmin-group-add'
   netapp_commands :gmodify => 'useradmin-group-modify'
-  
+
   mk_resource_methods
-  
+
   def self.instances
     Puppet.debug("Puppet::Provider::Netapp_group: got to self.instances.")
-    
+
     group_instances = []
-    
-    # Query Netapp for user group list. 
+
+    # Query Netapp for user group list.
     result = glist
-    
+
     # Get a list of all groups into array
     group_list = result.child_get("useradmin-groups")
     groups = group_list.children_get()
-    
-    # Iterate through each 'useradmin-group-info' block. 
+
+    # Iterate through each 'useradmin-group-info' block.
     groups.each do |group|
-      
+
       # Pull out relevant info
       groupname = group.child_get_string("name")
-      Puppet.debug("Puppet::Provider::Netapp_group.prefetch: Processing group info block for #{groupname}.")         
-      
+      Puppet.debug("Puppet::Provider::Netapp_group.prefetch: Processing group info block for #{groupname}.")
+
       # Create base hash
       group_info = { :groupname => groupname,
                      :ensure    => :present }
-      
+
       # Add comment if present
       group_info[:comment] = group.child_get_string("comment") unless group.child_get_string("comment").nil?
 
@@ -47,21 +47,21 @@ Puppet::Type.type(:netapp_group).provide(:sevenmode, :parent => Puppet::Provider
         role_name = group_role.child_get_string("name")
         role_list << role_name + ","
       end
-      
+
       # Add groups to hash, removing trailing comma
       group_info[:roles] = role_list.chomp!(",")
-      
+
       # Create the instance and add to group array.
       Puppet.debug("Creating instance for '#{groupname}'. \n")
-      group_instances << new(group_info)   
+      group_instances << new(group_info)
     end
-    
-    # Return the final group array. 
+
+    # Return the final group array.
     Puppet.debug("Returning group array. ")
     group_instances
 
   end
-  
+
   def self.prefetch(resources)
     Puppet.debug("Puppet::Provider::Netapp_group: Got to self.prefetch.")
     # Iterate instances and match provider where relevant.
@@ -72,31 +72,31 @@ Puppet::Type.type(:netapp_group).provide(:sevenmode, :parent => Puppet::Provider
       end
     end
   end
-  
+
   def flush
     Puppet.debug("Puppet::Provider::Netapp_group: Got to flush for resource #{@resource[:groupname]}.")
-    
+
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
-    case @property_hash[:ensure] 
-    when :absent  
+    case @property_hash[:ensure]
+    when :absent
       # Query Netapp to remove user group.
       result = gdel('group-name', @resource[:groupname])
       Puppet.debug("Puppet::Provider::Netapp_group: group #{@resource[:groupname]} deleted successfully. \n")
       return true
     when :present
-      # Query Netapp device to modify user group. 
-      
+      # Query Netapp device to modify user group.
+
       # Construct useradmin-group-info
       group_info = NaElement.new("useradmin-group-info")
       # Add values
       group_info.child_add_string("name", @resource[:groupname])
-      # Add the comment tag if populated. 
+      # Add the comment tag if populated.
       group_info.child_add_string("comment", @resource[:comment]) if @resource[:comment]
-      
+
       # Create useradmin-roles container
       group_roles = NaElement.new("useradmin-roles")
-      
+
       # Split the :groups value into array and iterate populating user_groups element.
       roles = @resource[:roles].split(",")
       roles.each do |role|
@@ -104,19 +104,19 @@ Puppet::Type.type(:netapp_group).provide(:sevenmode, :parent => Puppet::Provider
         role_info.child_add_string("name", role)
         group_roles.child_add(role_info)
       end
-      
+
       # Put it all togeather
       group_info.child_add(group_roles)
-      
+
       # Invoke the constructed request
       result = gmodify('useradmin-group', group_info)
-      
-      # Passed above, therefore must of worked. 
+
+      # Passed above, therefore must of worked.
       Puppet.debug("Puppet::Provider::Netapp_group: group #{@resource[:groupname]} created successfully. \n")
       return true
     end
   end
-  
+
   def create
     Puppet.debug("Puppet::Provider::Netapp_group: creating Netapp group for #{@resource[:groupname]}. \n")
 
@@ -124,12 +124,12 @@ Puppet::Type.type(:netapp_group).provide(:sevenmode, :parent => Puppet::Provider
     group_info = NaElement.new("useradmin-group-info")
     # Add values
     group_info.child_add_string("name", @resource[:groupname])
-    # Add the comment tag if populated. 
+    # Add the comment tag if populated.
     group_info.child_add_string("comment", @resource[:comment]) if @resource[:comment]
-    
+
     # Create useradmin-groups container
     group_roles = NaElement.new("useradmin-roles")
-    
+
     # Split the :groups value into array and iterate populating user_groups element.
     roles = @resource[:roles].split(",")
     roles.each do |role|
@@ -137,28 +137,28 @@ Puppet::Type.type(:netapp_group).provide(:sevenmode, :parent => Puppet::Provider
       role_info.child_add_string("name", role)
       group_roles.child_add(role_info)
     end
-    
+
     # Put it all together
     group_info.child_add(group_roles)
-    
+
     # Invoke the constructed request
     result = gadd('useradmin-group', group_info)
-    
-    # Passed above, therefore must of worked. 
+
+    # Passed above, therefore must of worked.
     Puppet.debug("Puppet::Provider::Netapp_group: group #{@resource[:groupname]} created successfully. \n")
     @property_hash.clear
     return true
   end
-  
+
   def destroy
     Puppet.debug("Puppet::Provider::Netapp_group: destroying Netapp group #{@resource[:groupname]}.")
     @property_hash[:ensure] = :absent
   end
-  
+
   def exists?
     Puppet.debug("Puppet::Provider::Netapp_group: checking existence of Netapp group #{@resource[:groupname]}.")
     Puppet.debug("Value = #{@property_hash[:ensure]}")
     @property_hash[:ensure] == :present
   end
-  
+
 end

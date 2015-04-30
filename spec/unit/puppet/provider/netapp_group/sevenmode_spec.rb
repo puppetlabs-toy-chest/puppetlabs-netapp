@@ -10,7 +10,7 @@ describe Puppet::Type.type(:netapp_group).provider(:sevenmode) do
     described_class.stubs(:suitable?).returns true
     Puppet::Type.type(:netapp_group).stubs(:defaultprovider).returns described_class
   end
-  
+
   let :group do
     Puppet::Type.type(:netapp_group).new(
       :groupname => 'group',
@@ -18,15 +18,15 @@ describe Puppet::Type.type(:netapp_group).provider(:sevenmode) do
       :comment   => 'test group',
       :roles     => 'role1,role2',
       :provider  => provider
-    )    
+    )
   end
-  
+
   let :provider do
     described_class.new(
       :groupname => 'group'
     )
   end
-  
+
   describe "#instances" do
     it "should return an array of current group entries" do
       described_class.expects(:glist).returns YAML.load_file(my_fixture('group-list.yml'))
@@ -49,14 +49,14 @@ describe Puppet::Type.type(:netapp_group).provider(:sevenmode) do
       ]
     end
   end
-  
+
   describe "#prefetch" do
     it "exists" do
       described_class.expects(:glist).returns YAML.load_file(my_fixture('group-list.yml'))
       described_class.prefetch({})
     end
   end
-  
+
   describe "when asking exists?" do
     it "should return true if resource is present" do
       group.provider.set(:ensure => :present)
@@ -68,14 +68,14 @@ describe Puppet::Type.type(:netapp_group).provider(:sevenmode) do
       group.provider.should_not be_exists
     end
   end
-  
+
   describe "when creating a resource" do
-    it "should be able to create a group" do    
+    it "should be able to create a group" do
       group.provider.expects(:gadd).with('useradmin-group', is_a(NaElement))
       group.provider.create
     end
   end
-  
+
   describe "when destroying a resource" do
     it "should be able to destroy a group" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
@@ -85,7 +85,7 @@ describe Puppet::Type.type(:netapp_group).provider(:sevenmode) do
       group.provider.flush
     end
   end
-  
+
   describe "when modifying a resource" do
     it "should be able to modify an existing group" do
       # Need to have a resource present that we can modify
@@ -94,5 +94,5 @@ describe Puppet::Type.type(:netapp_group).provider(:sevenmode) do
       group.provider.flush
     end
   end
-  
+
 end

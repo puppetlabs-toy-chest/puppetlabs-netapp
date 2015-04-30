@@ -1,14 +1,14 @@
 require 'puppet/parameter/boolean'
 
-Puppet::Type.newtype(:netapp_export_rule) do 
+Puppet::Type.newtype(:netapp_export_rule) do
   @doc = "Manage Netapp CMode Export rule creation, modification and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:name) do
-    desc "The export policy. Composite name based on policy name and rule index." 
+    desc "The export policy. Composite name based on policy name and rule index."
     isnamevar
     #TODO: Add validation
 #    validate do |value|
@@ -17,14 +17,14 @@ Puppet::Type.newtype(:netapp_export_rule) do
 #     end
 #    end
   end
-  
-  newproperty(:anonuid) do 
+
+  newproperty(:anonuid) do
     desc "User name or ID to map anonymous users to. Defaults to 65534."
     defaultto '65534'
     validate do |value|
       raise ArgumentError, "Anonuid should be a string." unless value.is_a?String
     end
-    
+
 #    def insync?(is)
       # Should is an array, so pull first value.
 #      should = @should.first
@@ -35,7 +35,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
 #      return true
 #    end
   end
-  
+
   newproperty(:clientmatch) do
     desc "Client match specification for the export rule."
     validate do |value|
@@ -75,7 +75,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
     defaultto(:any)
 
     validate do |value|
-      #TODO: Need to validate provided values. 
+      #TODO: Need to validate provided values.
     end
 
     def insync?(is)
@@ -109,7 +109,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
 
     validate do |value|
-      #TODO: Need to validate provided values. 
+      #TODO: Need to validate provided values.
     end
 
     def insync?(is)
@@ -143,7 +143,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
 
     validate do |value|
-      #TODO: Need to validate provided values. 
+      #TODO: Need to validate provided values.
     end
 
     def insync?(is)
@@ -177,7 +177,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
 
     validate do |value|
-      #TODO: Need to validate provided values. 
+      #TODO: Need to validate provided values.
     end
 
     def insync?(is)
@@ -206,12 +206,12 @@ Puppet::Type.newtype(:netapp_export_rule) do
     end
   end
 
-  # Make sure that ReadOnly and ReadWrite aren't the same values. 
+  # Make sure that ReadOnly and ReadWrite aren't the same values.
   validate do
     #raise ArgumentError, "Readonly and Readwrite params cannot be the same." if self[:readwrite] == self[:readonly]
   end
-  
-  # # Autorequire any matching netapp_volume resources. 
+
+  # # Autorequire any matching netapp_volume resources.
   # autorequire(:netapp_volume) do
   #   requires = []
   #   [self[:name], self[:path]].compact.each do |path|
@@ -221,6 +221,6 @@ Puppet::Type.newtype(:netapp_export_rule) do
   #   end
   #   requires
   # end
-  
-  
+
+
 end

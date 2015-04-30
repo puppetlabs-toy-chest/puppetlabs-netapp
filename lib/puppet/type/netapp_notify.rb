@@ -2,7 +2,7 @@
 # Simple module for logging messages on the client-side
 #
 
-Puppet::Type.newtype(:netapp_notify) do 
+Puppet::Type.newtype(:netapp_notify) do
     @doc = "Sends an arbitrary message to the agent run-time log."
 
     apply_to_device

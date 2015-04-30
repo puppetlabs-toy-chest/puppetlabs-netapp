@@ -1,27 +1,27 @@
-Puppet::Type.newtype(:netapp_vserver) do 
+Puppet::Type.newtype(:netapp_vserver) do
   @doc = "Manage Netapp Vserver creation, modification and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:name) do
     desc "The vserver name"
     isnamevar
-    
+
     validate do |value|
       #TODO: Add vserver name validation. Should be FQDN format
     end
   end
-  
+
   newproperty(:state) do
     desc "The vserver state"
-    
+
     newvalues(:stopped, :running)
     defaultto(:running)
 
-    munge do |value| 
-      case value 
+    munge do |value|
+      case value
       when 'starting'
         value = :running
       when 'stopping'
@@ -31,40 +31,40 @@ Puppet::Type.newtype(:netapp_vserver) do
       end
     end
   end
-  
+
   newparam(:rootvol) do
     desc "The vserver root volume"
     isrequired
   end
-  
+
   newparam(:rootvolaggr) do
     desc "Vserver root volume aggregate"
     isrequired
   end
-  
+
   newparam(:rootvolsecstyle) do
     desc "Vserver root volume security style"
     isrequired
-    
+
     newvalues(:unix, :ntfs, :mixed, :unified)
   end
-  
+
   newproperty(:comment) do
     desc "Vserver comment"
   end
-  
+
   newparam(:language) do
     desc "Vserver language"
-    
-    newvalues("c", "c.UTF-8", "ar", "cs", "da", "de", "en", "en_us", "es", "fi", "fr", "he", 
-      "hr", "hu", "it", "ja", "ja_v1", "ja_jp.pck", "ja_jp.932", "ja_jp.pck_v2", "ko", 
+
+    newvalues("c", "c.UTF-8", "ar", "cs", "da", "de", "en", "en_us", "es", "fi", "fr", "he",
+      "hr", "hu", "it", "ja", "ja_v1", "ja_jp.pck", "ja_jp.932", "ja_jp.pck_v2", "ko",
       "no", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "tr", "zh", "zh.gbk", "zh_tw")
     defaultto("c.UTF-8")
   end
-  
+
   newproperty(:namemappingswitch, :array_matching => :all) do
     desc "Vserver name mapping switch. Defaults to 'file'."
-    
+
     newvalues(:file, :ldap)
     #defaultto([:file])
     #
@@ -76,10 +76,10 @@ Puppet::Type.newtype(:netapp_vserver) do
       currentvalue.map!(&:to_sym).inspect
     end
   end
-  
+
   newproperty(:nameserverswitch, :array_matching => :all) do
     desc "Vserver name server switch. Defaults to 'file'."
-    
+
     newvalues(:file, :ldap, :nis)
     defaultto([:file])
 
@@ -91,11 +91,11 @@ Puppet::Type.newtype(:netapp_vserver) do
       currentvalue.map!(&:to_sym).inspect
     end
   end
-  
+
   newproperty(:quotapolicy) do
     desc "Vserver quota policy"
   end
-  
+
   newproperty(:snapshotpolicy) do
     desc "Vserver snapshot policy"
   end
@@ -136,7 +136,7 @@ Puppet::Type.newtype(:netapp_vserver) do
       currentvalue.inspect
     end
   end
-  
+
   newproperty(:allowedprotos, :array_matching => :all) do
     desc "Vserver allowed protocols"
     newvalues(:nfs, :cifs, :fcp, :iscsi, :ndmpd)
@@ -158,7 +158,7 @@ Puppet::Type.newtype(:netapp_vserver) do
     end
   end
 
-  
+
   ## Validate required params
   validate do
     raise ArgumentError, 'Rootvol is required' if self[:rootvol].nil? and self.provider.rootvol.nil?

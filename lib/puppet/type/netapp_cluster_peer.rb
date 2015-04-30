@@ -1,18 +1,18 @@
 require 'ipaddr'
 
-Puppet::Type.newtype(:netapp_cluster_peer) do 
+Puppet::Type.newtype(:netapp_cluster_peer) do
   @doc = "Manage Netapp Cluster Peering."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:name) do
     desc "The cluster peer name. Must match the remote cluster name."
     isnamevar
   end
 
-  newproperty(:peeraddresses, :array_matching => :all) do 
+  newproperty(:peeraddresses, :array_matching => :all) do
     desc "Cluster peer address array"
 
     validate do |value|
@@ -43,7 +43,7 @@ Puppet::Type.newtype(:netapp_cluster_peer) do
     end
   end
 
-  newparam(:username) do 
+  newparam(:username) do
     desc "Cluster peer username."
 
     validate do |value|
@@ -51,7 +51,7 @@ Puppet::Type.newtype(:netapp_cluster_peer) do
     end
   end
 
-  newparam(:password) do 
+  newparam(:password) do
     desc "Cluster peer password."
 
     validate do |value|
@@ -69,7 +69,7 @@ Puppet::Type.newtype(:netapp_cluster_peer) do
   end
 
   # Validate required params
-  validate do 
+  validate do
     raise ArgumentError, "Peer address must be an array." unless self[:peeraddresses].is_a?Array
     raise ArgumentError, "Username is required." if self[:username].nil?
     raise ArgumentError, "Password is required." if self[:password].nil?

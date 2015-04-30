@@ -1,14 +1,14 @@
-Puppet::Type.newtype(:netapp_aggregate) do 
+Puppet::Type.newtype(:netapp_aggregate) do
   @doc = "Manage Netapp Aggregate creation, modification and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
 
   newparam(:name) do
     desc "The aggregate name"
     isnamevar
-    
+
     validate do |value|
       raise ArgumentError, "#{value} is invalid." unless value =~ /\w+/
     end
@@ -67,7 +67,7 @@ Puppet::Type.newtype(:netapp_aggregate) do
     defaultto(:false)
   end
 
-  newparam(:groupselectionmode) do 
+  newparam(:groupselectionmode) do
     desc "How should Data ONTAP add disks to raidgroups. Possible values: 'last', 'one', 'new', 'all'."
     newvalues(:last, :one, :new, :all)
   end
@@ -78,7 +78,7 @@ Puppet::Type.newtype(:netapp_aggregate) do
 
   newparam(:raidsize) do
     desc "Maximum number of disks in each RAID group in aggregate. Valid values are between 2 and 28"
-    
+
     validate do |value|
       raise ArgumentError, 'Raidsize must be between 2 and 28' unless value.to_i.between?(2, 28)
     end
@@ -97,7 +97,7 @@ Puppet::Type.newtype(:netapp_aggregate) do
   end
 
   # Validate provided parameters
-  validate do 
+  validate do
   end
 
 end

@@ -17,7 +17,7 @@ describe Puppet::Util::NetworkDevice::Netapp::Device do
     n.attr_set("errno", 13001)
     n
   end
-  
+
   describe "when connecting to a new device" do
     it "should reject a single hostname" do
       expect { described_class.new('pfiler.example.com') }.to raise_error(ArgumentError, /Invalid scheme/)
@@ -62,7 +62,7 @@ describe Puppet::Util::NetworkDevice::Netapp::Device do
 
       described_class.new('https://root:secret@pfiler.example.com/VFILER01/reserved_for_later_usage')
     end
-    
+
     it "should error if \"invoke system-get-version\" fails" do
       transport = mock 'netapp server'
       Puppet.expects(:debug).with regexp_matches(%r{connecting to Netapp device https://root:\*\*\*\*@pfiler\.example\.com})
@@ -71,10 +71,10 @@ describe Puppet::Util::NetworkDevice::Netapp::Device do
       transport.expects(:set_transport_type).with('HTTPS')
       transport.expects(:set_port).with(443)
       transport.expects(:invoke).with('system-get-version').returns result_failed
-      
+
       expect { described_class.new('https://root:secret@pfiler.example.com') }.to raise_error(Puppet::Error, 'invoke system-get-version failed: No response received')
     end
-    
+
     it "should generate facts" do
       pending
     end

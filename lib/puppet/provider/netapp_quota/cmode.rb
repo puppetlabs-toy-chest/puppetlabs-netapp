@@ -4,7 +4,7 @@ Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Ne
 
   confine :feature => :posix
   defaultfor :feature => :posix
-  
+
   netapp_commands :list => {:api => 'quota-list-entries-iter', :iter => :true, :result_element => 'attributes-list'}
   netapp_commands :add => 'quota-add-entry'
   netapp_commands :del => 'quota-delete-entry'

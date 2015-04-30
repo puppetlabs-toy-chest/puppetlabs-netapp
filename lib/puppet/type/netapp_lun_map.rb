@@ -9,7 +9,7 @@ Puppet::Type.newtype(:netapp_lun_map) do
     desc "Lun map - Composite key of format {path}:{lun-id}."
     isnamevar
 
-    validate do |value| 
+    validate do |value|
       raise ArgumentError, "#{value} is an invalid Lun map." unless value =~ /(\/\w+){3,4}:\d{1,4}/
       lun_id = value.split(':').last
       raise ArgumentError, "#{lun_id} is an invalid lun ID" unless lun_id.to_i.between?(1,4095)

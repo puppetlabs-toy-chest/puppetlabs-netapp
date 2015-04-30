@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:netapp_role) do 
+Puppet::Type.newtype(:netapp_role) do
   @doc = "Manage Netapp Role creation, modification and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:rolename) do
     desc "The role name."
     isnamevar
@@ -23,16 +23,16 @@ Puppet::Type.newtype(:netapp_role) do
       end
     end
   end
-  
+
   newproperty(:capabilities) do
     desc "List of capabilities for this role. Comma separate multiple values. "
-    
+
     validate do |value|
       unless value =~ /^[\w\s\-\*]+(,?[\w\s\-\*]*)*$/
          raise ArgumentError, "%s is not a valid capabilities list." % value
       end
     end
-    
+
     def insync?(is)
       # @should is an Array. see lib/puppet/type.rb insync?
       should = @should.first
@@ -40,7 +40,7 @@ Puppet::Type.newtype(:netapp_role) do
       # Split is and should into arrays on ,
       should_arr = should.split(',')
       is_arr = is.split(',')
-      
+
       # Comparison of arrays
       return false unless is_arr.class == Array and should_arr.class == Array
       # Should is master, therefore any difference needs correction
@@ -50,7 +50,7 @@ Puppet::Type.newtype(:netapp_role) do
       # Got here, so must match
       return true
     end
-    
+
   end
-  
+
 end

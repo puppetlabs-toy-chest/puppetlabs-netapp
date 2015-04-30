@@ -10,9 +10,9 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
   netapp_commands :clusterpeeradd  => 'cluster-peer-create'
   netapp_commands :clusterpeermod  => 'cluster-peer-modify'
   netapp_commands :clusterpeerdel  => 'cluster-peer-delete'
-  
+
   mk_resource_methods
-  
+
   def self.instances
     Puppet.debug("Puppet::Provider::Netapp_cluster_peer.cmode: Got to self.instances.")
     peers = []
@@ -27,7 +27,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
 
       # Construct a peer hash
       peer_hash = {
-        :name   => peer_name, 
+        :name   => peer_name,
         :ensure => :present
       }
 
@@ -65,7 +65,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
   def flush
     Puppet.debug("Puppet::Provider::Netapp_cluster_peer.cmode: flushing Netapp Cluster peer #{@resource[:name]}.")
 
-    # Are we updating or destroying? 
+    # Are we updating or destroying?
     Puppet.debug("Puppet::Provider::Netapp_cluster_peer.cmode: required resource state = #{@property_hash[:ensure]}")
     case @property_hash[:ensure]
     when :absent
@@ -124,7 +124,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
     # Create the peer relationship
     result = clusterpeeradd(peer_create)
 
-    # Peer relationship created successfully. 
+    # Peer relationship created successfully.
     Puppet.debug("Puppet::Provider::Netapp_cluster_peer.cmode: Peer relationship with #{@resource[:name]} created successfully.")
     return true
   end

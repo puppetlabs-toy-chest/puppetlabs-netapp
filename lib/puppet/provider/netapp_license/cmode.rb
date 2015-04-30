@@ -8,24 +8,24 @@ Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::
 
   netapp_commands :licenseget => 'license-v2-list-info'
   netapp_commands :licenseadd => 'license-v2-add'
-  
+
   mk_resource_methods
-  
+
   def self.instances
     Puppet.debug("Puppet::Provider::Netapp_cluster_id.cmode self.instances: Got to self.instances.")
-    
+
     clusters = []
-    
+
     # Get the cluster ID
     result = clusteridget()
-    
+
     #Puppet.debug("Result looks like #{result.sprintf()}")
     # Pull out relevant fields
     cluster_id = result.child_get('attributes').child_get('cluster-identity-info')
     cluster_name = cluster_id.child_get_string('cluster-name')
     cluster_location = cluster_id.child_get_string('cluster-location')
     cluster_contact = cluster_id.child_get_string('cluster-contact')
-    
+
     # Construct the cluster_info hash
     cluster_info = {
       :name => cluster_name,
@@ -33,13 +33,13 @@ Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::
       :location => cluster_location,
       :contact => cluster_contact
     }
-    
+
     Puppet.debug("Puppet::Provider::Netapp_cluster_id.cmode self.instances: cluster_info = #{cluster_info}.")
     clusters << new(cluster_info)
-    
+
     clusters
   end
-  
+
   def self.prefetch(resources)
     Puppet.debug("Puppet::Provider::Netapp_cluster_id.cMode: Got to self.prefetch.")
     # Iterate instances and match provider where relevant.
@@ -50,13 +50,13 @@ Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::
       end
     end
   end
-  
+
   def flush
     Puppet.debug("Puppet::Provider::Netapp_cluster_id.cMode: Got to flush for resource #{@resource[:name]}.")
 
     # Update cluster ID details
     result = clusteridmod('cluster-name', @resource[:name], 'cluster-location', @resource[:location], 'cluster-contact', @resource[:contact])
-    
+
   end
 
   def create

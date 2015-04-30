@@ -10,7 +10,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
     described_class.stubs(:suitable?).returns :true
     Puppet::Type.type(:netapp_volume).stubs(:defaultprovider).returns described_class
   end
-  
+
   let :volume do
     Puppet::Type.type(:netapp_volume).new(
       :name          => 'volume',
@@ -23,20 +23,20 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       :options       => {'convert_ucode' => 'off', 'no_atime_update' => 'on', 'try_first' => 'volume_grow'},
       :snapschedule  => {'days' => 0, 'minutes' => 0, 'weeks' => 0, 'hours' => 24},
       :provider      => provider
-    )    
+    )
   end
-  
+
   let :provider do
     described_class.new(
       :name => 'volume'
     )
   end
-  
+
   describe "#instances" do
     it "should return an array of current volume entries" do
       described_class.expects(:vollist).returns YAML.load_file(my_fixture('volume-list.yml'))
       described_class.expects(:optslist).at_least_once.returns YAML.load_file(my_fixture('volume-options-list.yml'))
-      described_class.expects(:snapschedlist).at_least_once.returns YAML.load_file(my_fixture('volume-snapsched-list.yml'))        
+      described_class.expects(:snapschedlist).at_least_once.returns YAML.load_file(my_fixture('volume-snapsched-list.yml'))
       instances = described_class.instances
       instances.size.should == 3
       instances.map do |prov|
@@ -205,7 +205,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       ]
     end
   end
-  
+
   describe "#prefetch" do
     it "exists" do
       described_class.expects(:vollist).returns YAML.load_file(my_fixture('volume-list.yml'))
@@ -214,7 +214,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       described_class.prefetch({})
     end
   end
-  
+
   describe "when asking exists?" do
     it "should return true if resource is present" do
       volume.provider.set(:ensure => :present)
@@ -226,9 +226,9 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.should_not be_exists
     end
   end
-  
+
   describe "when creating a resource" do
-    it "should be able to create an online volume" do    
+    it "should be able to create an online volume" do
       volume.provider.expects(:volcreate).with('volume', 'volume', 'size', '20m', 'containing-aggr-name', 'aggr1', 'language-code', :en, 'space-reserve', :none)
       volume.provider.expects(:autosizeset).with('volume', 'volume', 'is-enabled', :true, 'maximum-size', '24m', 'increment-size', '1m')
       volume.provider.expects(:voloptset).with('volume', 'volume', 'option-name', 'convert_ucode', 'option-value', 'off')
@@ -238,7 +238,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.expects(:snapschedset).with('volume', 'volume', 'weeks', '0', 'days', '0', 'hours', '24', 'minutes', '0', 'which-hours', '', 'which-minutes', '')
       volume.provider.create
     end
-    
+
     it "should be able to create an offline volume" do
       volume[:state] = :offline
       volume.provider.expects(:volcreate).with('volume', 'volume', 'size', '20m', 'containing-aggr-name', 'aggr1', 'language-code', :en, 'space-reserve', :none)
@@ -249,7 +249,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.expects(:voloffline).with('name', 'volume')
       volume.provider.create
     end
-    
+
     it "should be able to create a restricted volume" do
       volume[:state] = :restricted
       volume.provider.expects(:volcreate).with('volume', 'volume', 'size', '20m', 'containing-aggr-name', 'aggr1', 'language-code', :en, 'space-reserve', :none)
@@ -261,7 +261,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.create
     end
   end
-  
+
   describe "when destroying a resource" do
     it "should be able to destroy an online volume" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
@@ -272,7 +272,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.destroy
       volume.provider.flush
     end
-    
+
     it "should be able to destroy an offline volume" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
       volume.provider.set(:name => 'volume')
@@ -281,7 +281,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.destroy
       volume.provider.flush
     end
-    
+
     it "should be able to destroy a restricted volume" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
       volume.provider.set(:name => 'volume')
@@ -291,7 +291,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
       volume.provider.flush
     end
   end
-  
+
   describe "when modifying a resource" do
     describe "for #initsize=" do
       it "should be able to resize an existing volume with autoincrement enabled" do
@@ -302,7 +302,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:autosizeset).with('volume', 'volume', 'is-enabled', :true, 'maximum-size', '2457m', 'increment-size', '102m')
         volume.provider.send("initsize=", '2g')
       end
-      
+
       it "should be able to resize an existing volume with autoincrement disabled" do
         # Need to have a resource present that we can modify
         volume.provider.set(:name => 'volume', :ensure => :present, :initsize => '1g', :autoincrement => :false)
@@ -312,7 +312,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.send("initsize=", '2g')
       end
     end
-    
+
     describe "for #snapreserve=" do
       it "should be able to modify snapreserve value on an existing volume" do
         # Need to have a resource present that we can modify
@@ -322,7 +322,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.send("snapreserve=", 10)
       end
     end
-    
+
     describe "for #autoincrement=" do
       it "should be enable autoincrement on an existing volume" do
         # Need to have a resource present that we can modify
@@ -331,7 +331,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:autosizeset).with('volume', 'volume', 'is-enabled', :true, 'maximum-size', '24m', 'increment-size', '1m')
         volume.provider.send("autoincrement=", :true)
       end
-      
+
       it "should be disable autoincrement on an existing volume" do
         # Need to have a resource present that we can modify
         volume.provider.set(:name => 'volume', :ensure => :present, :autoincrement => :true)
@@ -340,7 +340,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.send("autoincrement=", :false)
       end
     end
-    
+
     describe "for #state=" do
       it "should be able to offline an existing online volume" do
         # Need to have a resource present that we can modify
@@ -349,7 +349,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:voloffline).with('name', 'volume')
         volume.provider.send("state=", :offline)
       end
-      
+
       it "should be able to restrict an existing online volume" do
         # Need to have a resource present that we can modify
         volume.provider.set(:name => 'volume', :ensure => :present, :state => :online)
@@ -357,7 +357,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:volrestrict).with('name', 'volume')
         volume.provider.send("state=", :restricted)
       end
-      
+
       it "should be able to offline an existing online volume" do
         # Need to have a resource present that we can modify
         volume.provider.set(:name => 'volume', :ensure => :present, :state => :online)
@@ -365,7 +365,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:voloffline).with('name', 'volume')
         volume.provider.send("state=", :offline)
       end
-      
+
       it "should be able to online an existing offline volume" do
         # Need to have a resource present that we can modify
         volume.provider.set(:name => 'volume', :ensure => :present, :state => :offline)
@@ -373,7 +373,7 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:volonline).with('name', 'volume')
         volume.provider.send("state=", :online)
       end
-      
+
       it "should be able to online an existing restricted volume" do
         # Need to have a resource present that we can modify
         volume.provider.set(:name => 'volume', :ensure => :present, :state => :restricted)
@@ -381,6 +381,6 @@ describe Puppet::Type.type(:netapp_volume).provider(:sevenmode) do
         volume.provider.expects(:volonline).with('name', 'volume')
         volume.provider.send("state=", :online)
       end
-    end 
+    end
   end
 end

@@ -7,8 +7,8 @@ require 'puppet/util/network_device/netapp/NaServer'
 describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
 
   # let(:resource) do
-  #   { 
-  #     :ensure => :present, 
+  #   {
+  #     :ensure => :present,
   #     :name => '/vol/vol1/qtree1',
   #     :provider => described_class.name
   #   }
@@ -23,11 +23,11 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     Puppet::Type.type(:netapp_quota).stubs(:defaultprovider).returns provider
   end
 
-  let(:parameters) do 
+  let(:parameters) do
     { :name => '/vol/vol1/qtree1' }
   end
 
-  let(:resource) do 
+  let(:resource) do
     Puppet::Type.type(:netapp_quota).new(parameters.merge({
       :provider => described_class.name
     }))
@@ -40,7 +40,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     # )
   end
 
-  let(:tree_quota_parameters) do 
+  let(:tree_quota_parameters) do
     {
       :name     => '/vol/vol1/qtree1',
       :ensure   => :present,
@@ -49,7 +49,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     }
   end
 
-  let(:user_quota_parameters) do 
+  let(:user_quota_parameters) do
     {
       :name     => 'bob',
       :ensure   => :present,
@@ -59,7 +59,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     }
   end
 
-  let(:group_quota_parameters) do 
+  let(:group_quota_parameters) do
     {
       :name     => 'staff',
       :ensure   => :present,
@@ -264,7 +264,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
 
   describe "when destroying a resource" do
     context "on a tree quota" do
-      let(:parameters) do 
+      let(:parameters) do
         tree_quota_parameters
       end
       it "should be able to destroy it" do
@@ -276,7 +276,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     end
 
     context "on a user quota" do
-      let(:parameters) do 
+      let(:parameters) do
         user_quota_parameters
       end
       it "should be able to destroy it" do
@@ -359,7 +359,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
         end
 
         context "on a tree quota" do
-          let(:parameters) do 
+          let(:parameters) do
             tree_quota_parameters
           end
           it "should pass \"\" as a qtree for tree quotas" do
@@ -377,7 +377,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
     }.each do |property, apiproperty|
       describe property do
         context "on a user quota" do
-          let(:parameters) do 
+          let(:parameters) do
             user_quota_parameters
           end
           it "should pass \"-\" parameters for #{apiproperty} if desired value is absent" do
@@ -394,7 +394,7 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
         end
 
         context "on a tree quota" do
-          let(:parameters) do 
+          let(:parameters) do
             tree_quota_parameters
           end
           it "should pass \"\" as a qtree for tree quotas" do

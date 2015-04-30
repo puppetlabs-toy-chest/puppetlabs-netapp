@@ -1,13 +1,13 @@
 require 'ipaddr'
 
-Puppet::Type.newtype(:netapp_lif) do 
+Puppet::Type.newtype(:netapp_lif) do
   @doc = "Manage Netapp Logical Inteface (LIF) creation, modification and deletion."
 
   apply_to_device
 
   ensurable
 
-  newparam(:interfacename) do 
+  newparam(:interfacename) do
     desc "LIF name"
     isnamevar
 
@@ -16,11 +16,11 @@ Puppet::Type.newtype(:netapp_lif) do
     end
   end
 
-  newproperty(:address) do 
+  newproperty(:address) do
     desc "LIF IP address"
-    
+
     validate do |value|
-      begin 
+      begin
         ip = IPAddr.new(value)
       rescue ArgumentError
         raise ArgumentError, "#{value} is not a vaild IP address"
@@ -38,7 +38,7 @@ Puppet::Type.newtype(:netapp_lif) do
     desc "LIF comment"
   end
 
-  newparam(:dataprotocols, :array_matching => :all) do 
+  newparam(:dataprotocols, :array_matching => :all) do
     desc "LIF data protocols. Possible values: 'nfs', 'cifs', 'iscsi', 'fcp', 'fcache', 'none'"
     newvalues(:nfs, :cifs, :iscsi, :fcp, :fcache, :none)
     validate do |value|
@@ -79,7 +79,7 @@ Puppet::Type.newtype(:netapp_lif) do
     desc "LIF home port."
   end
 
-  newproperty(:isautorevert) do 
+  newproperty(:isautorevert) do
     desc "Should the LIF revert to it's home node. Defaults to: false."
     newvalues(:true, :false)
     defaultto(:false)
@@ -88,13 +88,13 @@ Puppet::Type.newtype(:netapp_lif) do
   newproperty(:netmask) do
     desc "LIF netmask."
     validate do |value|
-      unless value =~ /(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})/ 
+      unless value =~ /(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})/
         raise ArgumentError, "#{value} is not a valid netmask."
       end
     end
   end
 
-  newproperty(:netmasklength) do 
+  newproperty(:netmasklength) do
     desc "LIF netmask length"
     validate do |value|
       begin
@@ -114,7 +114,7 @@ Puppet::Type.newtype(:netapp_lif) do
 
   newproperty(:routinggroupname) do
     desc "LIF Routing group. Valid format is [dcn][ip address]/[subnet]."
-    validate do |value| 
+    validate do |value|
       unless value =~ /[dcn](?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})\/\d{1,2}/
         raise ArgumentError, "%s is not a valid routing group name." % value
       end
@@ -131,9 +131,9 @@ Puppet::Type.newtype(:netapp_lif) do
     desc "LIF Vserver name"
   end
 
-  
+
   # Validate input values
-  validate do 
+  validate do
     raise ArgumentError, "Address is required" if (self[:address] || self.provider.address).nil?
     raise ArgumentError, "Vserver is required" if (self[:vserver] || self.provider.vserver).nil?
     raise ArgumentError, "Netmask or Netmasklength are required" if (self[:netmask] || self.provider.netmask).nil? and (self[:netmasklength] || self.provider.netmasklength).nil?

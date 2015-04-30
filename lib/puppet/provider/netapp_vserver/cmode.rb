@@ -76,7 +76,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       Puppet.debug("Puppet::Provider::Netapp_vserver.cmode instances: Vserver_name = #{vserver_name}.")
 
       # Construct hash
-      vserver_info = {  
+      vserver_info = {
         :name              => vserver_name,
         :ensure            => :present,
         :state             => state,

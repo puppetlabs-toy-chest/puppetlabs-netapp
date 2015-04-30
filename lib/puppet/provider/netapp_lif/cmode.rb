@@ -2,10 +2,10 @@ require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Logical Interface (LIF) export rule creation, modification and deletion."
-  
+
   confine :feature => :posix
   defaultfor :feature => :posix
-  
+
   netapp_commands :liflist    => {:api => 'net-interface-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :lifcreate  => 'net-interface-create'
   netapp_commands :lifdel     => 'net-interface-delete'
@@ -43,7 +43,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
         field = field.gsub('-','').to_sym
         Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Adding #{field} = #{value} to hash.") unless value.nil?
 
-        lif_hash[field] = value unless value.nil? 
+        lif_hash[field] = value unless value.nil?
       end
 
       # Process data-protocols array
@@ -79,7 +79,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
   def flush
     Puppet.debug("Puppet::Provider::Netapp_lif.cmode: flushing Netapp LIF #{@resource[:interfacename]}.")
 
-    # Are we updating or destroying? 
+    # Are we updating or destroying?
     Puppet.debug("Puppet::Provider::Netapp_lif.cmode: required resource state = #{@property_hash[:ensure]}")
     case @property_hash[:ensure]
     when :absent
@@ -107,7 +107,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
 
         # Pull value from resource hash, stripping '-' from field.
         value = @resource[field.gsub('-','').to_sym]
-        lif_modify.child_add_string(field, value) unless value.nil? 
+        lif_modify.child_add_string(field, value) unless value.nil?
         Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Added #{field} with value #{value}. ") unless value.nil?
       end
 
@@ -136,7 +136,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
 
       # Pull value from resource hash, stripping '-' from field.
       value = @resource[field.gsub('-','').to_sym]
-      lif_create.child_add_string(field, value) unless value.nil? 
+      lif_create.child_add_string(field, value) unless value.nil?
       Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Added #{field} with value #{value}. ") unless value.nil?
     end
 

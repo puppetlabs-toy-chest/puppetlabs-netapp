@@ -1,20 +1,20 @@
 require 'spec_helper'
- 
+
 describe Puppet::Type.type(:netapp_volume) do
 
-  before do 
+  before do
     @volume_example = {
-      :name        => 'volume', 
+      :name        => 'volume',
       :state       => 'online',
-      :initsize    => '10g',  
-      :aggregate   => 'aggr0', 
+      :initsize    => '10g',
+      :aggregate   => 'aggr0',
       :snapreserve => '0'
     }
     @provider = stub('provider', :class => described_class.defaultprovider, :clear => nil)
     described_class.defaultprovider.stubs(:new).returns(@provider)
   end
 
-  let :volume_resource do 
+  let :volume_resource do
     @volume_example
   end
 
@@ -77,12 +77,12 @@ describe Puppet::Type.type(:netapp_volume) do
       it "should not support spaces" do
         expect { described_class.new(:name => 'volume', :initsize => '1 g', :ensure => :present) }.to raise_error(Puppet::Error, /1 g is not a valid initial volume size./)
       end
-      
+
       it "should support have a default value of '1g'" do
         described_class.new(:name => 'volume', :ensure => :present)[:initsize].should == '1g'
       end
     end
-    
+
     describe "for aggregate" do
       it "should support a valid aggregate name" do
         described_class.new(:name => 'volume', :aggregate => 'aggr1', :ensure => :present)[:aggregate].should == 'aggr1'
@@ -101,12 +101,12 @@ describe Puppet::Type.type(:netapp_volume) do
       it "should not support an invalid language code" do
         expect { described_class.new(:name => 'volume', :languagecode => 'na', :ensure => :present) }.to raise_error(Puppet::Error, /Invalid value "na"/)
       end
-      
+
       it "should have a default value of 'en'" do
         described_class.new(:name => 'volume', :ensure => :present)[:languagecode].should == :en
       end
     end
-    
+
     describe "for spaceres" do
       it "should support none" do
         described_class.new(:name => 'volume', :spaceres => 'none', :ensure => :present)[:spaceres].should == :none
@@ -119,25 +119,25 @@ describe Puppet::Type.type(:netapp_volume) do
       it "should support volume" do
         described_class.new(:name => 'volume', :spaceres => 'volume', :ensure => :present)[:spaceres].should == :volume
       end
-            
+
       it "should not support an invalid value" do
         expect { described_class.new(:name => 'volume', :spaceres => 'invalid', :ensure => :present) }.to raise_error(Puppet::Error, /Invalid value "invalid"/)
       end
-      
+
       it "should have a default value of 'none'" do
         described_class.new(:name => 'volume', :ensure => :present)[:spaceres].should == :none
       end
     end
-    
+
     describe "for snapreserve" do
       it "should support a number" do
         described_class.new(:name => 'volume', :snapreserve => '20', :ensure => :present)[:snapreserve].should == 20
       end
-      
+
       it "should support 0" do
         described_class.new(:name => 'volume', :snapreserve => '0', :ensure => :present)[:snapreserve].should == 0
       end
-      
+
       it "should support 100" do
         described_class.new(:name => 'volume', :snapreserve => '100', :ensure => :present)[:snapreserve].should == 100
       end
@@ -145,111 +145,111 @@ describe Puppet::Type.type(:netapp_volume) do
       it "should not support a negative number" do
         expect { described_class.new(:name => 'volume', :snapreserve => '-20', :ensure => :present) }.to raise_error(Puppet::Error, /-20 is not a valid snapreserve./)
       end
-            
+
       it "should not support a non-numeric value" do
         expect { described_class.new(:name => 'volume', :snapreserve => 'invalid', :ensure => :present) }.to raise_error(Puppet::Error, /invalid is not a valid snapreserve./)
       end
-      
+
       it "should not support a number greater than 100" do
         expect { described_class.new(:name => 'volume', :snapreserve => '101', :ensure => :present) }.to raise_error(Puppet::Error, /Reserved percentage must be between 0 and 100./)
       end
-      
+
       it "should not have a default value" do
         described_class.new(:name => 'volume', :ensure => :present)[:snapreserve].should == nil
       end
     end
-    
+
     describe "for autoincrement" do
       it "should support true" do
         described_class.new(:name => 'volume', :autoincrement => true, :ensure => :present)[:autoincrement].should == :true
       end
-      
+
       it "should support false" do
         described_class.new(:name => 'volume', :autoincrement => false, :ensure => :present)[:autoincrement].should == :false
       end
-      
+
       it "should have a default value of 'true'" do
         described_class.new(:name => 'volume', :ensure => :present)[:autoincrement].should == :true
       end
-    end 
-    
+    end
+
     describe "for options" do
       it "should support a hash" do
         described_class.new(:name => 'volume', :options => {'hash' => 'yes'}, :ensure => :present)[:options][0].should == {"hash"=>"yes"}
       end
-      
+
       it "should not support an array" do
         expect { described_class.new(:name => 'volume', :options => ['array'], :ensure => :present) }.to raise_error(Puppet::Error, /options property must be a hash./)
       end
-      
+
       it "should not support a  string" do
         expect { described_class.new(:name => 'volume', :options => 'string', :ensure => :present) }.to raise_error(Puppet::Error, /options property must be a hash./)
       end
-      
+
       it "should not have a default value" do
         described_class.new(:name => 'volume', :ensure => :present)[:options].should == nil
       end
-      
+
       it "insync? should return false if is isn't a hash" do
         volume = volume_resource.dup
         is_options = 'option'
         volume[:options] = {'option' => 'value'}
         described_class.new(volume).property(:options).insync?(is_options).should be_false
       end
-      
+
       it "insync? should return false if is and should don't match" do
         volume = volume_resource.dup
         is_options = {'option1' => 'value1'}
         volume[:options] = {'option2' => 'value2'}
         described_class.new(volume).property(:options).insync?(is_options).should be_false
       end
-      
+
       it "insync? should return true if is and should match" do
         volume = volume_resource.dup
         is_options = {'option1' => 'value1'}
         volume[:options] = {'option1' => 'value1'}
         described_class.new(volume).property(:options).insync?(is_options).should be_true
       end
-    end 
-    
+    end
+
     describe "for snapschedule" do
       it "should support a hash" do
         described_class.new(:name => 'volume', :snapschedule => {'hash' => 'yes'}, :ensure => :present)[:snapschedule][0].should == {"hash"=>"yes"}
       end
-      
+
       it "should not support an array" do
         expect { described_class.new(:name => 'volume', :snapschedule => ['array'], :ensure => :present) }.to raise_error(Puppet::Error, /snapschedule property must be a hash./)
       end
-      
+
       it "should not support a  string" do
         expect { described_class.new(:name => 'volume', :snapschedule => 'string', :ensure => :present) }.to raise_error(Puppet::Error, /snapschedule property must be a hash./)
       end
-      
+
       it "should not have a default value" do
         described_class.new(:name => 'volume', :ensure => :present)[:snapschedule].should == nil
       end
-      
+
       it "insync? should return false if is isn't a hash" do
         volume = volume_resource.dup
         is_snapsched = 'snapschedule'
         volume[:snapschedule] = {'minutes' => 'value', 'hours' => 'value', 'days' => 'value'}
         described_class.new(volume).property(:snapschedule).insync?(is_snapsched).should be_false
       end
-      
+
       it "insync? should return false if is and should don't match" do
         volume = volume_resource.dup
         is_snapsched = {'minutes' => 'value2', 'hours' => 'value', 'days' => 'value'}
         volume[:snapschedule] = {'minutes' => 'value', 'hours' => 'value', 'days' => 'value'}
         described_class.new(volume).property(:snapschedule).insync?(is_snapsched).should be_false
       end
-      
+
       it "insync? should return true if is and should match" do
         volume = volume_resource.dup
         is_snapsched = {'minutes' => 'value', 'hours' => 'value', 'days' => 'value'}
         volume[:snapschedule] = {'minutes' => 'value', 'hours' => 'value', 'days' => 'value'}
         described_class.new(volume).property(:snapschedule).insync?(is_snapsched).should be_true
       end
-    end 
+    end
   end
-  
+
 end

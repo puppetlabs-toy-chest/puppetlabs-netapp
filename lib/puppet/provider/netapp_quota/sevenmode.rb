@@ -4,7 +4,7 @@ Puppet::Type.type(:netapp_quota).provide(:sevenmode, :parent => Puppet::Provider
 
   confine :feature => :posix
   defaultfor :feature => :posix
-  
+
   netapp_commands :list => 'quota-list-entries'
   netapp_commands :add => 'quota-add-entry'
   netapp_commands :del => 'quota-delete-entry'

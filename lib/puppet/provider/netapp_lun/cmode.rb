@@ -2,10 +2,10 @@ require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Lun creation, modification and deletion."
-  
+
   confine :feature => :posix
   defaultfor :feature => :posix
-  
+
   netapp_commands :lunlist    => {:api => 'lun-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :luncreate  => 'lun-create-by-size'
   netapp_commands :lundestroy => 'lun-destroy'
@@ -37,9 +37,9 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
       # Lun state - Need to map true/false to online/offline
       lun_state = lun.child_get_string('online')
       if lun_state == 'true'
-        lun_hash[:state] = 'online' 
-      else 
-        lun_hash[:state] = 'offline' 
+        lun_hash[:state] = 'online'
+      else
+        lun_hash[:state] = 'offline'
       end
 
       # Get size
@@ -70,7 +70,7 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
   def flush
     Puppet.debug("Puppet::Provider::Netapp_lun.cmode: flushing Netapp Lun #{@resource[:path]}.")
 
-    # Are we updating or destroying? 
+    # Are we updating or destroying?
     Puppet.debug("Puppet::Provider::Netapp_lun.cmode: required resource state = #{@property_hash[:ensure]}")
     if @property_hash[:ensure] == :absent
       Puppet.debug("Puppet::Provider::Netapp_lun.cmode: Ensure is absent. Destroying...")
@@ -126,7 +126,7 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
     luncreate_args << 'ostype' << @resource[:ostype]
     luncreate_args << 'space-reservation-enabled' << @resource[:spaceresenabled]
 
-    # Optional fields 
+    # Optional fields
     luncreate_args << 'prefix-size' << @resource[:prefixsize] unless @resource[:prefixsize].nil?
     luncreate_args << 'qos-policy-group' << @resource[:qospolicygroup] unless @resource[:qospolicygroup].nil?
 

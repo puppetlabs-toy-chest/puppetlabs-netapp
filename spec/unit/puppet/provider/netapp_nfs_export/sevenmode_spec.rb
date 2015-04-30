@@ -10,15 +10,15 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
     described_class.stubs(:suitable?).returns true
     Puppet::Type.type(:netapp_nfs_export).stubs(:defaultprovider).returns described_class
   end
-  
+
   let :nfs_export_volume do
     Puppet::Type.type(:netapp_nfs_export).new(
       :name     => '/vol/volume',
       :ensure   => :present,
       :provider => provider
-    )    
+    )
   end
-  
+
   let :nfs_export_volume_rw do
     Puppet::Type.type(:netapp_nfs_export).new(
       :name      => '/vol/volume',
@@ -26,9 +26,9 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       :readwrite => ['server1','192.168.150.50','192.168.150.51'],
       :readonly => ['all_hosts'],
       :provider  => provider
-    )    
+    )
   end
-  
+
   let :nfs_export_volume_ro do
     Puppet::Type.type(:netapp_nfs_export).new(
       :name      => '/vol/volume',
@@ -36,32 +36,32 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       :readwrite => ['server1','192.168.150.50','192.168.150.51'],
       :readonly  => ['server2','192.168.150.55'],
       :provider  => provider
-    )    
+    )
   end
-  
+
   let :nfs_export_qtree do
     Puppet::Type.type(:netapp_nfs_export).new(
       :name     => '/vol/volume/qtree',
       :ensure   => :present,
       :provider => provider
-    )    
+    )
   end
-  
+
   let :nfs_export_volume_path do
     Puppet::Type.type(:netapp_nfs_export).new(
       :name     => '/vol/volume',
       :ensure   => :present,
       :path     => '/vol/othervolume',
       :provider => provider
-    )    
+    )
   end
-  
+
   let :provider do
     described_class.new(
       :name => '/vol/volume/qtree'
     )
   end
-  
+
   describe "#instances" do
     it "should return an array of current export entries" do
       described_class.expects(:elist).returns YAML.load_file(my_fixture('export-list.yml'))
@@ -79,7 +79,7 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
         {
           :name      => '/vol/volume',
           :ensure    => :present,
-          :path      => :absent, 
+          :path      => :absent,
           :readonly  => ['all_hosts'],
           :readwrite => ['server1','192.168.150.50','192.168.150.51']
         },
@@ -107,14 +107,14 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       ]
     end
   end
-  
+
   describe "#prefetch" do
     it "exists" do
       described_class.expects(:elist).returns YAML.load_file(my_fixture('export-list.yml'))
       described_class.prefetch({})
     end
   end
-  
+
   describe "when asking exists?" do
     it "should return true if resource is present" do
       nfs_export_volume.provider.set(:ensure => :present)
@@ -126,34 +126,34 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       nfs_export_volume.provider.should_not be_exists
     end
   end
-  
+
   describe "when creating a resource" do
-    it "should be able to create a volume export" do    
+    it "should be able to create a volume export" do
       nfs_export_volume.provider.expects(:eadd).with('persistent', 'true', 'verbose', 'true', 'rules', is_a(NaElement)).returns YAML.load_file(my_fixture('export-volume-response.yml'))
       nfs_export_volume.provider.create
     end
-    
-    it "should be able to create a volume export with a readwrite list" do    
+
+    it "should be able to create a volume export with a readwrite list" do
       nfs_export_volume_rw.provider.expects(:eadd).with('persistent', 'true', 'verbose', 'true', 'rules', is_a(NaElement)).returns YAML.load_file(my_fixture('export-volume-response.yml'))
       nfs_export_volume_rw.provider.create
     end
-    
-    it "should be able to create a volume export with a readonly list" do    
+
+    it "should be able to create a volume export with a readonly list" do
       nfs_export_volume_ro.provider.expects(:eadd).with('persistent', 'true', 'verbose', 'true', 'rules', is_a(NaElement)).returns YAML.load_file(my_fixture('export-volume-response.yml'))
       nfs_export_volume_ro.provider.create
     end
-    
-    it "should be able to create a qtree export" do    
+
+    it "should be able to create a qtree export" do
       nfs_export_qtree.provider.expects(:eadd).with('persistent', 'true', 'verbose', 'true', 'rules', is_a(NaElement)).returns YAML.load_file(my_fixture('export-qtree-response.yml'))
       nfs_export_qtree.provider.create
     end
-    
+
     it "should raise an exception if the export creation fails" do
       nfs_export_volume.provider.expects(:eadd).with('persistent', 'true', 'verbose', 'true', 'rules', is_a(NaElement)).returns YAML.load_file(my_fixture('export-failed-response.yml'))
       expect { nfs_export_volume.provider.create }.to raise_error(Puppet::Error, /export rule \/vol\/volume creation failed. Verify settings./)
     end
   end
-  
+
   describe "when destroying a resource" do
     it "should be able to destroy a volume export" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
@@ -162,7 +162,7 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       nfs_export_volume.provider.destroy
       nfs_export_volume.provider.flush
     end
-    
+
     it "should be able to destroy a qtree export" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
       nfs_export_qtree.provider.set(:name => '/vol/volume/qtree', :path => '/vol/volume/qtree')
@@ -171,7 +171,7 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       nfs_export_qtree.provider.flush
     end
   end
-  
+
   describe "when modifying a resource" do
     it "should be able to modify an existing export path" do
       # Need to have a resource present that we can modify
@@ -179,7 +179,7 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       nfs_export_volume_path.provider.expects(:emodify).with('persistent', 'true', 'rule', is_a(NaElement))
       nfs_export_volume_path.provider.flush
     end
-    
+
     it "should be able to modify an existing export readonly list" do
       # Need to have a resource present that we can modify
       nfs_export_volume_path.provider.set(:name => '/vol/volume', :ensure => :present, :path => :absent, :readonly => ['all_hosts'])
@@ -187,7 +187,7 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       nfs_export_volume_path.provider.expects(:emodify).with('persistent', 'true', 'rule', is_a(NaElement))
       nfs_export_volume_path.provider.flush
     end
-    
+
     it "should be able to modify an existing export readwrite list" do
       # Need to have a resource present that we can modify
       nfs_export_volume_path.provider.set(:name => '/vol/volume', :ensure => :present, :path => :absent, :readonly => :absent, :readwrite => ['all_hosts'])
@@ -197,5 +197,5 @@ describe Puppet::Type.type(:netapp_nfs_export).provider(:sevenmode) do
       nfs_export_volume_path.provider.flush
     end
   end
-  
+
 end

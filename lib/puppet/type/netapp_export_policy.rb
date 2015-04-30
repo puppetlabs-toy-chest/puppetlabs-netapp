@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:netapp_export_policy) do 
+Puppet::Type.newtype(:netapp_export_policy) do
   @doc = "Manage Netapp CMode Export Policy creation and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:name) do
     desc "The export policy name."
     isnamevar
@@ -14,5 +14,5 @@ Puppet::Type.newtype(:netapp_export_policy) do
       end
     end
   end
-  
+
 end

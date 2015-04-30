@@ -61,11 +61,11 @@ describe Puppet::Util::NetworkDevice::Netapp::Facts do
       facts["domain"].should == 'example.com'
     end
 
-    it "should seperate domain-name from hostname" do 
+    it "should seperate domain-name from hostname" do
       transport.expects(:invoke).with('system-get-info').returns info2
       transport.expects(:invoke).with('net-ifconfig-get').returns network
-      facts['fqdn'].should == 'filer02.example.com' 
-      facts['hostname'].should == 'filer02' 
+      facts['fqdn'].should == 'filer02.example.com'
+      facts['hostname'].should == 'filer02'
       facts['domain'].should == 'example.com'
     end
 

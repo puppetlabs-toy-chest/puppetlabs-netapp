@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:netapp_export) do 
+Puppet::Type.newtype(:netapp_export) do
   @doc = "Manage Netapp NFS Export creation, modification and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:name) do
     desc "The export path. Valid format is /vol/[volume_name](/[qtree_name])."
     isnamevar
@@ -20,7 +20,7 @@ Puppet::Type.newtype(:netapp_export) do
     newvalues(:true, :false)
     defaultto(:true)
   end
-  
+
   newparam(:path) do
     desc "The filer path to export. If not specified, uses :name value"
     validate do |value|
@@ -29,14 +29,14 @@ Puppet::Type.newtype(:netapp_export) do
       end
     end
   end
-  
-  newproperty(:anon) do 
+
+  newproperty(:anon) do
     desc "Should the export support anonymous root access."
     defaultto '0'
     validate do |value|
       raise ArgumentError, "Anon should be a string." unless value.is_a?String
     end
-    
+
     def insync?(is)
       # Should is an array, so pull first value.
       should = @should.first
@@ -48,7 +48,7 @@ Puppet::Type.newtype(:netapp_export) do
 
     end
   end
-  
+
   newproperty(:readonly, :array_matching => :all) do
     desc "Export read-only hosts."
 
@@ -81,7 +81,7 @@ Puppet::Type.newtype(:netapp_export) do
   newproperty(:readwrite, :array_matching => :all) do
     desc "Export read-write hosts. Defaults to 'all_hosts'."
     defaultto ['all_hosts']
-    
+
     def insync?(is)
       # Check that is is an array
       return false unless is.is_a? Array
@@ -108,13 +108,13 @@ Puppet::Type.newtype(:netapp_export) do
       currentvalue.inspect
     end
   end
-  
-  # Make sure that ReadOnly and ReadWrite aren't the same values. 
+
+  # Make sure that ReadOnly and ReadWrite aren't the same values.
   validate do
     raise ArgumentError, "Readonly and Readwrite params cannot be the same." if self[:readwrite] == self[:readonly]
   end
-  
-  # Autorequire any matching netapp_volume resources. 
+
+  # Autorequire any matching netapp_volume resources.
   autorequire(:netapp_volume) do
     requires = []
     [self[:name], self[:path]].compact.each do |path|
@@ -124,8 +124,8 @@ Puppet::Type.newtype(:netapp_export) do
     end
     requires
   end
-  
-  # Autorequire any matching netapp_qtree resources. 
+
+  # Autorequire any matching netapp_qtree resources.
   autorequire(:netapp_qtree) do
     requires = []
     [self[:name], self[:path]].compact.each do |path|
@@ -136,5 +136,5 @@ Puppet::Type.newtype(:netapp_export) do
     end
     requires
   end
-  
+
 end
