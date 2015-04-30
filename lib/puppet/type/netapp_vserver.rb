@@ -161,9 +161,9 @@ Puppet::Type.newtype(:netapp_vserver) do
   
   ## Validate required params
   validate do
-    raise ArgumentError, 'Rootvol is required' if self[:rootvol].nil?
-    raise ArgumentError, 'Rootvolaggr is required' if self[:rootvolaggr].nil?
-    raise ArgumentError, 'Rootvolsecstyle is required' if self[:rootvolsecstyle].nil?
+    raise ArgumentError, 'Rootvol is required' if self[:rootvol].nil? and self.provider.rootvol.nil?
+    raise ArgumentError, 'Rootvolaggr is required' if self[:rootvolaggr].nil? and self.provider.rootvolaggr.nil?
+    raise ArgumentError, 'Rootvolsecstyle is required' if self[:rootvolsecstyle].nil? and self.provider.rootvolsecstyle.nil?
   end
 
   ## Autorequire resources
@@ -175,7 +175,7 @@ Puppet::Type.newtype(:netapp_vserver) do
     requires << self[:rootvolaggr]
 
     # Itterate aggregatelist and require matching resources
-    self[:aggregatelist].each do |aggregate|
+    Array(self[:aggregatelist]).each do |aggregate|
       requires << aggregate
     end
 
