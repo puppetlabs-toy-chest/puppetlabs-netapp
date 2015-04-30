@@ -1,17 +1,9 @@
-require 'puppet/provider/netapp'
-Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Netapp) do
+require 'puppet/provider/netapp_cmode'
+
+Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
 
   confine :feature => :posix
   defaultfor :feature => :posix
-  
-  # Restrict to CMode
-  confine :true => begin
-    a = Puppet::Node::Facts.indirection
-    a.terminus_class = :network_device
-    a.find(Puppet::Indirector::Request.new(:facts, :find, "clustered", nil))
-  rescue
-    :false
-  end
   
   netapp_commands :list => {:api => 'quota-list-entries-iter', :iter => :true, :result_element => 'attributes-list'}
   netapp_commands :add => 'quota-add-entry'

@@ -1,20 +1,11 @@
-require 'puppet/provider/netapp'
+require 'puppet/provider/netapp_cmode'
 
-Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Netapp) do
+Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Lun creation, modification and deletion."
   
   confine :feature => :posix
   defaultfor :feature => :posix
   
-  # Restrict to cMode
-  confine :true => begin
-    a = Puppet::Node::Facts.indirection
-    a.terminus_class = :network_device
-    a.find(Puppet::Indirector::Request.new(:facts, :find, "clustered", nil))
-  rescue
-    :false
-  end
-
   netapp_commands :lunlist    => {:api => 'lun-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :luncreate  => 'lun-create-by-size'
   netapp_commands :lundestroy => 'lun-destroy'

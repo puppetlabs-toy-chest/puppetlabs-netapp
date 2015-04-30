@@ -38,11 +38,16 @@ class Puppet::Util::NetworkDevice::Netapp::Device
       Puppet.debug("Puppet::Device::Netapp: Version = #{version}")
     end
 
-    if @v
-      # Vserver or vfiler based on if clustered?
-      clustered = result.child_get_string("is-clustered")
-      Puppet.debug("Clustered = #{clustered}.")
+    # Vserver or vfiler based on if clustered?
+    clustered = result.child_get_string("is-clustered")
+    Puppet.debug("Clustered = #{clustered}.")
+    if clustered
+      @transport.set_application_name("puppet_netapp_cmode")
+    else
+      @transport.set_application_name("puppet_netapp_sevenmode")
+    end
 
+    if @v
       if clustered
         Puppet.debug("Puppet::Device::Netapp: Setting vserver context to #{@v}")
         @transport.set_vserver(@v)

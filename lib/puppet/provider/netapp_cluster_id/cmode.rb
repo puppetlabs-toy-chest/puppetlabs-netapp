@@ -1,19 +1,10 @@
-require 'puppet/provider/netapp'
+require 'puppet/provider/netapp_cmode'
 
-Puppet::Type.type(:netapp_cluster_id).provide(:cmode, :parent => Puppet::Provider::Netapp) do
+Puppet::Type.type(:netapp_cluster_id).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Cluster ID management."
 
   confine :feature => :posix
   defaultfor :feature => :posix
-
-  # Restrict to cMode
-  confine :true => begin
-    a = Puppet::Node::Facts.indirection
-    a.terminus_class = :network_device
-    a.find(Puppet::Indirector::Request.new(:facts, :find, "clustered", nil))
-  rescue
-    :false
-  end
 
   netapp_commands :clusteridget => 'cluster-identity-get'
   netapp_commands :clusteridmod => 'cluster-identity-modify'

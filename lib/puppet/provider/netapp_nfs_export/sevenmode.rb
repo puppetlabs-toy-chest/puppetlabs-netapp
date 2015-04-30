@@ -1,20 +1,11 @@
-require 'puppet/provider/netapp'
+require 'puppet/provider/netapp_sevenmode'
 
-Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Provider::Netapp) do
+Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Provider::NetappSevenmode) do
   @doc = "Manage Netapp NFS export creation, modification and deletion on 7Mode."
   
   confine :feature => :posix
   defaultfor :feature => :posix
   
-  # Restrict to 7Mode
-  confine :false => begin
-    a = Puppet::Node::Facts.indirection
-    a.terminus_class = :network_device
-    a.find(Puppet::Indirector::Request.new(:facts, :find, "clustered", nil))
-  rescue
-    :true
-  end
-
   netapp_commands :elist   => 'nfs-exportfs-list-rules-2'
   netapp_commands :edel    => 'nfs-exportfs-delete-rules'
   netapp_commands :eadd    => 'nfs-exportfs-append-rules-2'

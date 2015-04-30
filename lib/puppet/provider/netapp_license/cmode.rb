@@ -1,19 +1,10 @@
-require 'puppet/provider/netapp'
+require 'puppet/provider/netapp_cmode'
 
-Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::Netapp) do
+Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp license management. Only supported by ONTAP 8.2 and newer."
 
   confine :feature => :posix
   defaultfor :feature => :posix
-
-  # Restrict to cMode
-  confine :true => begin
-    a = Puppet::Node::Facts.indirection
-    a.terminus_class = :network_device
-    a.find(Puppet::Indirector::Request.new(:facts, :find, "clustered", nil))
-  rescue
-    :false
-  end
 
   netapp_commands :licenseget => 'license-v2-list-info'
   netapp_commands :licenseadd => 'license-v2-add'

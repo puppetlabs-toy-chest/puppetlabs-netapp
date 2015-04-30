@@ -1,20 +1,11 @@
-require 'puppet/provider/netapp'
+require 'puppet/provider/netapp_sevenmode'
 
-Puppet::Type.type(:netapp_role).provide(:sevenmode, :parent => Puppet::Provider::Netapp) do
+Puppet::Type.type(:netapp_role).provide(:sevenmode, :parent => Puppet::Provider::NetappSevenmode) do
   @doc = "Manage Netapp Role creation, modification and deletion."
   
   confine :feature => :posix
   defaultfor :feature => :posix
   
-  # Restrict to 7Mode
-  confine :false => begin
-    a = Puppet::Node::Facts.indirection
-    a.terminus_class = :network_device
-    a.find(Puppet::Indirector::Request.new(:facts, :find, "clustered", nil))
-  rescue
-    :true
-  end
-
   netapp_commands :rlist   => 'useradmin-role-list'
   netapp_commands :rdel    => 'useradmin-role-delete'
   netapp_commands :radd    => 'useradmin-role-add'
