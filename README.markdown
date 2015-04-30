@@ -81,6 +81,7 @@ In order to run puppet against a single device, you can use the following comman
 
 Example configuration `/etc/puppet/device/pfiler01.example.com.conf`:
 
+XXX The address must match the system-name of the node, minus case
     [pfiler01.example.com]
       type netapp
       url https://root:secret@pfiler01.example.com
