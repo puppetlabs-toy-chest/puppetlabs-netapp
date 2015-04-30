@@ -1,14 +1,9 @@
 require 'puppet/util/network_device/netapp'
 
-#require 'rubygems'
-#require 'debugger'
-#Debugger.start
-
 class Puppet::Util::NetworkDevice::Netapp::Facts
 
   attr_reader :url, :transport
   def initialize(transport)
-    #debugger
     @transport = transport
   end
 
@@ -78,6 +73,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
       end
     end
 
+    Puppet.debug("Facts = #{@facts.inspect}")
     @facts
 
   end
@@ -86,7 +82,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
   def getClusterFacts(host)
 
     #debugger
-    Puppet.debug("Host = #{host}")
+    Puppet.debug("Hostname = #{host}")
 
     # Check if connected to a vserver
     vserver = @transport.get_vserver()
@@ -101,12 +97,14 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
 
       # Pull out attributes-list and itterate
       systems = result.child_get("attributes-list")
-      systems.children_get().each do |system|
+      system_host = systems.children_get().find do |system|
         # Check the system name matches the host we're looking for
-        Puppet.debug("System-name = #{system.child_get_string('system-name')}. DC = #{system.child_get_string("system-name").downcase}")
+        Puppet.debug("System-name = #{system.child_get_string('system-name')}. downcase = #{system.child_get_string("system-name").downcase}")
         Puppet.debug("Match = #{host.downcase == system.child_get_string("system-name").downcase}")
-        next unless host.downcase == system.child_get_string("system-name").downcase
+        host.downcase == system.child_get_string("system-name").downcase
+      end
 
+      if system_host
         # Pull out the required variables
         [
           'system-name',
@@ -122,11 +120,13 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
           'cpu-processor-type',
           'vendor-id',
         ].each do |key|
-          @facts[key] = system.child_get_string("#{key}".to_s)
+          @facts[key] = system_host.child_get_string("#{key}".to_s)
         end
 
         # Facts dump
-        Puppet.debug("Facts = #{@facts.inspect}")
+        Puppet.debug("System info = #{@facts.inspect}")
+      else
+        raise ArgumentError, "No matching system found with the system name #{host}"
       end
 
       # Get DNS domainname for fqdn
