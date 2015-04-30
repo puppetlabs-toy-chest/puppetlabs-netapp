@@ -60,13 +60,17 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       
       # Get volume state
       volume_hash[:state] = volume[:state]
-        
-      # Get volume options
-      volume_hash[:options] = self.get_options(vol_name)
-      
-      # Get volume snapschedule, only if volume is online. 
-      if (volume[:state] == "online")
-        volume_hash[:snapschedule] = self.get_snapschedule(vol_name)
+
+      if ! transport.get_vserver.empty?
+        # Get volume options
+        volume_hash[:options] = self.get_options(vol_name)
+
+        # Get volume snapschedule, only if volume is online. 
+        if (volume[:state] == "online")
+          volume_hash[:snapschedule] = self.get_snapschedule(vol_name)
+        end
+      else
+        Puppet.debug("Puppet::Provider::Netapp_volume.cmode self.instances: Not a vserver; skipping options and snapschedule")
       end
       
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode self.instances: Constructed volume_hash for volume #{vol_name}.")
@@ -149,7 +153,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       vol_state = vol_state_info.child_get_string("state")
       vol_snap_reserve = vol_space_info.child_get_int("percentage-snapshot-reserve")
       vol_raid_status = volume.child_get_string("raid-status")
-      vol_export_policy = volume.child_get("volume-export-attributes").child_get_string("policy")
+      if vol_export_attributes = volume.child_get("volume-export-attributes")
+        vol_export_policy = vol_export_attributes.child_get_string("policy")
+      end
       # Get Auto size settings.
       vol_auto_size = vol_autosize_info.child_get_string("mode")
       # Check if autosize is set
