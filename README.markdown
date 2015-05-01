@@ -1,113 +1,203 @@
-# NetApp network device module
-
-**Please note that the device configuration management has been changed as of v0.4.0 of this module. 
-You will therefore need to update your device configuration file if upgrading from a version < 0.4.0.**
+# NetApp Data ONTAP device module
 
 [![Coverage Status](https://coveralls.io/repos/fatmcgav/fatmcgav-netapp/badge.png?branch=develop)](https://coveralls.io/r/fatmcgav/fatmcgav-netapp?branch=develop)
 
-**Table of Contents**
+####Table of Contents
 
-- [NetApp network device module](#netapp-network-device-module)
-	- [Overview](#overview)
-	- [Features](#features)
-	- [Requirements](#requirements)
-		- [NetApp Manageability SDK](#netapp-manageability-sdk)
-	- [Usage](#usage)
-		- [Device Setup](#device-setup)
-		- [NetApp operations](#netapp-operations)
-		- [Type/Provider Support](#type/provider-support)
-	- [Contributors](#contributors)
-	- [TODO](#todo)
-	- [Development](#development)
-		- [Testing](#testing)
+1. [Overview](#overview)
+1. [Module Description](#module-description)
+1. [Setup](#setup)
+    * [Requirements](#requirements)
+    * [NetApp Manageability SDK](#netapp-manageability-sdk)
+    * [Device Proxy System Setup](#device-proxy-system-setup)
+1. [Usage](#usage)
+  * [Beginning with netapp](#beginning-with-netapp)
+<!--  * [NetApp operations](#netapp-operations) -->
+  * [Classes and Defined Types](#classes-and-defined-types)
+  * [Types and Providers](#types-and-providers)
+1. [Limitations](#limitations)
+  * [TODO](#todo)
+1. [Development](#development)
+  * [Testing](#testing)
+  * [Contributors](#contributors)
 
 ## Overview
-The NetApp network device module is designed to add support for managing NetApp filer configuration using Puppet and its Network Device functionality.
+The NetApp Data ONTAP device module is designed to add support for managing
+NetApp Data ONTAP configuration using Puppet and its Network Device
+functionality.
 
-The Netapp network device module has been written and tested against NetApp ONTAP 8.0.4 7-mode and NetApp ONTAP 8.2 C-Mode
-However it may well be compatible with other ONTAP versions.
+The NetApp Data ONTAP device module has been written and tested against NetApp
+Data ONTAP 8.2 Cluster-mode.
+<!--
+- It may also work on 7-mode.
+- It should be compatible with other ONTAP versions than just 8.2, but not tested
+-->
 
-## Features
+## Module Description
+This module uses the NetApp Manageability SDK to manage various aspects of the
+NetApp Data ONTAP software.
+
 The following items are supported:
 
- * Creation, modification and deletion of volumes, including auto-increment, snapshot schedules and volume options.
+XXX Verify these
+ * Creation, modification and deletion of volumes, including auto-increment,
+   snapshot schedules and volume options.
  * Creation, modification and deletion of QTrees.
- * Creation, modification and deletion of NFS Exports, including NFS export security.
+ * Creation, modification and deletion of NFS Exports, including NFS export
+   security.
  * Creation, modification and deletion of users, groups and roles.
- * Creation, modification and deletion of Quotas. 
+ * Creation, modification and deletion of Quotas.
  * Creation of snapmirror relationships.
  * Creation of snapmirror schedules.
- 
-## Requirements
-Since we can not directly install a puppet agent on the NetApp filers, it can either be managed from the Puppet Master server,
-or through an intermediate proxy system running a puppet agent. The requirement for the proxy system:
 
- * Puppet 2.7.+
+## Setup
+
+## Requirements
+Since we can not directly install Puppet on the NetApp Data ONTAP operating
+system it must be managed through an intermediate proxy system running `puppet
+device`. The requirement for the proxy system:
+
+ * Puppet 3.7.+
  * NetApp Manageability SDK Ruby libraries
+ * Faraday gem
+
+The proxy system must be able to connect to the Puppet master (default port of
+8140) and to the NetApp Data ONTAP (default port of 443)
 
 ### NetApp Manageability SDK
-The NetApp Ruby libraries are contained within the NetApp Manageability SDK, currently at v5.0, which is available to download directly from [NetApp](http://support.netapp.com/NOW/cgi-bin/software?product=NetApp+Manageability+SDK&platform=All+Platforms).
-Please note you need a NetApp NOW account in order to be able to download the SDK.
+Due to licensing, you must download the NetApp Manageability SDK separately.
+The NetApp Ruby libraries are contained within the NetApp Manageability SDK
+which is available for download from [NetApp
+NOW](http://support.netapp.com/NOW/cgi-bin/software?product=NetApp+Manageability+SDK&platform=All+Platforms).
 
-Once you have downloaded and extracted the SDK, the following files need to be copied onto your Puppet Master:
-`../lib/ruby/NetApp > [module dir]/netapp/lib/puppet/netapp_sdk/`
+Please note you need a NetApp NOW account in order to be able to download the
+SDK.
 
-Once the files have been copied into place on your Puppet Master, a patch needs to be applied to *NaServer.rb* and *NaElement.rb*.  
-The patches can be found under the `files` directory.  
-To apply, change into the `netapp` module root directory and run:
-	
-	patch lib/puppet/util/network_device/netapp/NaServer.rb < files/NaServer.patch
-	patch lib/puppet/util/network_device/netapp/NaElement.rb < files/NaElement.patch
+Once you have downloaded and extracted the SDK, the ruby SDK libraries must be
+copied into the module:
+`$ cp netapp-manageability-sdk-5.*/lib/ruby/NetApp/*.rb [module dir]/netapp/lib/puppet/netapp_sdk/`
 
-This should apply the patch without any errors, as below:
+### Device Proxy System Setup
+In order to configure a Data ONTAP device, you must create a proxy system
+able to run `puppet device` and have a device.conf file that refers to the
+NetApp ONTAP system or vserver. Refer to the [device.conf man
+page](https://docs.puppetlabs.com/puppet/latest/reference/config_file_device.html)
+for information on the format of device.conf.
 
-	$ patch lib/puppet/util/network_device/netapp/NaServer.rb < files/NaServer.patch
-	patching file lib/puppet/util/network_device/netapp/NaServer.rb
-	$ patch lib/puppet/util/network_device/netapp/NaElement.rb < files/NaElement.patch
-	patching file lib/puppet/util/network_device/netapp/NaElement.rb
-	$
-	
+The netapp module can manage two different kinds of devices: Data ONTAP cluster
+operating system and Data ONTAP cluster vservers. The device `type` of the
+device.conf entry is always `netapp`.
+
+For example, if you had a Data ONTAP operating system with the node management
+interface addressable by the DNS name of ontap01.example.com and credentials
+of admin & netapp123, the device.conf entry would be:
+```
+[ontap01.example.com]
+type netapp
+url https://admin:netapp123@ontap01.example.com
+```
+
+Note: The device certname must match the hostname of the node.
+
+You can also specify a virtual server to operate on by providing the connection
+information for a physical system which is configured with the vserver and
+specify a path in the url that represents the name of your vserver. For
+example, if the above Data ONTAP node ontap01 is configured with a vserver
+called "vserver01," the device entry could be:
+```
+[vserver01.example.com]
+type netapp
+url https://admin:netapp123@ontap01.example.com/vserver01
+```
+
+Note: The device certname does not need to match the hostname of the node as
+with a system device entry.
+
+You can place the device entries in the default `${confdir}/device.conf` file
+or create a separate config file for each device. For example, the above examples could
+go in `${confdir}/device/ontap01.example.com.conf` and
+`${confdir}/device/vserver01.example.com.conf`. Device configurations in separate files must be specified by `puppet device --deviceconfig /path/to/device-file.conf` to be used by `puppet device` run.
 
 ## Usage
+### Beginning with netapp
 
-### Device Setup
-In order to configure a NetApp network device, the device *type* should be `netapp`.
-You can either configure the device within */etc/puppet/device.conf* or, preferrably, create an individual config file for each device within a subfolder.
-This is preferred as it allows you to run puppet against individual devices, rather than all devices configured...
+Continuing from the example in [Device Proxy System
+Setup](#device-proxy-system-setup), we can define a node definition for
+ontap01.example.com to create a vserver with an aggregate of 6 disks and a LIF:
 
-In order to run puppet against a single device, you can use the following command:
+<!-- similar to https://library.netapp.com/ecmdocs/ECMP1196798/html/GUID-6D897853-FE9E-430C-971E-47096FDD462E.html -->
+```
+node 'ontap01.example.com' {
+  netapp_aggregate { 'aggr1':
+    ensure    => present,
+    diskcount => '6',
+  }
+  netapp_vserver { 'vserver01':
+    ensure      => present,
+    rootvol     => 'vserver01_root',
+    rootvolaggr => 'aggr1',
+  }
+  netapp_lif { 'vserver01_lif':
+    ensure        => present,
+    homeport      => 'e0c',
+    homenode      => 'ontap01',
+    address       => '10.0.207.5',
+    vserver       => 'vserver01',
+    netmask       => '255.255.255.0',
+    dataprotocols => ['nfs'],
+  }
+}
+```
 
-    puppet device --deviceconfig /etc/puppet/device/[device].conf
+Next we should create a node definition for the vserver to add a volume has export policies for NFS:
+```
+node 'vserver01.example.com' {
+  netapp_export_policy { 'nfs_exports':
+    ensure => present,
+  }
+  netapp_export_rule { 'nfs_exports:1':
+    ensure            => present,
+    clientmatch       => '10.0.0.0/8',
+    protocol          => ['nfs'],
+    superusersecurity => 'none',
+    rorule            => ['sys','none'],
+    rwrule            => ['sys','none'],
+  }
+  netapp_volume { 'nfsvol':
+    ensure       => present,
+    aggregate    => 'aggr1',
+    initsize     => '200g',
+    exportpolicy => 'nfs_exports',
+  }
+}
+```
+If the device configuration are both in `$confdir/device.conf`, they can now be
+configured by running `puppet device --verbose --user=root`
 
-Example configuration `/etc/puppet/device/pfiler01.example.com.conf`:
+If the device configurations are is separate files, you can use the following
+command to run puppet against a single device at a time:
+```
+puppet device --verbose --user=root --deviceconfig /etc/puppet/device/ontap01.example.com.conf
+```
 
-XXX The address must match the system-name of the node, minus case
-    [pfiler01.example.com]
-      type netapp
-      url https://root:secret@pfiler01.example.com
+*Note*: As of yet the module does not have the capability to configure junction paths on the volumes/qtrees, or to enable the NFS server, so these steps must now be performed manually before the volume may be exported.
 
-You can also specify a virtual filer or vserver you want to operate on: Simply
-provide the connection information for your physical filer and specify
-an optional path that represents the name of your virtual filer. Example
-configuration `/etc/puppet/device/vfiler01.example.com.conf`:
-
-    [vfiler01.example.com]
-      type netapp
-      url https://root:secret@pfiler01.example.com/vfiler01
-
+<!--
 ### NetApp operations
 As part of this module, there is a defined type called 'netapp::vqe', which can be used to create a volume, add a qtree and create an NFS export.
 An example of this is:
 
-    netapp::vqe { 'volume_name':
-      ensure         => present,
-      size           => '1t',
-      aggr           => 'aggr2',
-      spaceres       => 'volume',
-      snapresv       => 20,
-      autoincrement  => true,
-      persistent     => true
-    }
+```
+netapp::vqe { 'volume_name':
+  ensure     => present,
+  size       => '1t',
+  aggr       => 'aggr2',
+  spaceres   => 'volume',
+  snapresv   => 20,
+  autosize   => 'grow',
+  persistent => true
+}
+```
 
 This will create a NetApp volume called `v_volume_name` with a qtree called `q_volume_name`.
 The volume will have an initial size of 1 Terabyte in Aggregate aggr2.
@@ -115,36 +205,288 @@ The space reservation mode will be set to volume, and snapshot space reserve wil
 The volume will be able to auto increment, and the NFS export will be persistent.
 
 You can also use any of the types individually, or create new defined types as required.
+-->
+### Classes and Defined Types
 
-### Type/Provider Support
-This module supports both NetApp filers operating in both 7-Mode and Cluster-Mode. The table below outlines what modes are supported by what types/providers. 
+None as of this first release. Common operations may be encapsulated in defined resource types.
 
-Resource | 7-Mode supported | CMode supported
---- | --- | ---
-netapp_aggregate | No | Yes
-netapp_cluster_id | No | Yes
-netapp_cluster_peer | No | Yes
-netapp_export_policy | No | Yes
-netapp_group | Yes | No
-netapp_igroup | No | Yes
-netapp_license | No | Yes
-netapp_lif | No | Yes
-netapp_lun | No | Yes
-netapp_lun_map | No | Yes
-netapp_nfs_export | Yes | No
-netapp_notify | Yes | Yes
-netapp_qtree | Yes | Yes
-netapp_quota | Yes | Yes
-netapp_role | Yes | No
-netapp_snapmirror | Yes | Yes
-netapp_user | Yes | No
-netapp_volume | Yes | Yes
-netapp_vserver | No | Yes
-netapp_vserver_option | No | Yes
+### Types and Providers
+[`netapp_aggregate`](#type-netapp_aggregate)
+[`netapp_cluster_id`](#type-netapp_)
+[`netapp_cluster_peer`](#type-netapp_)
+[`netapp_export_policy`](#type-netapp_)
+[`netapp_group`](#type-netapp_)
+[`netapp_igroup`](#type-netapp_)
+[`netapp_license`](#type-netapp_)
+[`netapp_lif`](#type-netapp_)
+[`netapp_lun`](#type-netapp_)
+[`netapp_lun_map`](#type-netapp_)
+[`netapp_nfs_export`](#type-netapp_)
+[`netapp_notify`](#type-netapp_)
+[`netapp_qtree`](#type-netapp_)
+[`netapp_quota`](#type-netapp_)
+[`netapp_role`](#type-netapp_)
+[`netapp_snapmirror`](#type-netapp_)
+[`netapp_user`](#type-netapp_)
+[`netapp_volume`](#type-netapp_)
+[`netapp_vserver`](#type-netapp_)
+[`netapp_vserver_option`](#type-netapp_)
 
-## Contributors
-Thanks to the following people who have helped with this module:
- * Stefan Schulte
+### Type: netapp_aggregate
+Manage Netapp Aggregate creation, modification and deletion.
+
+#### Parameters
+All parameters, except where otherwise noted, are optional.
+
+##### blocktype
+The indirect block format for the aggregate. Default value: '64_bit'. 
+
+Valid values are `64_bit`, `32_bit`.
+
+##### checksumstyle
+Aggregate checksum style. Default value: 'block'.
+
+Valid values are `advanced_zoned`, `block`.
+
+##### diskcount
+Number of disks to place in the aggregate, including parity disks.
+
+##### disksize
+Disk size with unit to assign to aggregate.
+
+##### disktype
+Disk types to use with aggregate. Only required when multiple disk types are connected.
+
+Valid values are `ATA`, `BSAS`, `EATA`, `FCAL`, `FSAS`, `LUN`, `MSATA`, `SAS`, `SATA`, `SCSI`, `SSD`, `XATA`, `XSAS`.
+
+##### ensure
+The basic state that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### groupselectionmode
+How should Data ONTAP add disks to raidgroups.
+
+Valid values are `last`, `one`, `new`, `all`.
+
+##### ismirrored
+Should the aggregate be mirrored (have two plexes). Defaults to false.
+
+Valid values are `true`, `false`.
+
+##### name
+The aggregate name
+
+##### nodes
+Target nodes to create aggregate. May be an array.
+
+##### raidsize
+Maximum number of disks in each RAID group in aggregate.
+
+Valid values are between 2 and 28
+
+##### raidtype
+Raid type to use in the new aggregate. Default: raid4.
+
+Valid values are `raid4`, `raid_dp`.
+
+##### state
+The aggregate state. Default value: 'online'.
+
+Valid values are `online`, `offline`.
+
+##### striping
+Should the new aggregate be striped? Default: not_striped.
+
+Valid values are `striped`, `not_striped`.
+
+#### Type: netapp_cluster_id
+Not yet reviewed.
+#### Type: netapp_cluster_peer
+Not yet reviewed.
+#### Type: netapp_export_policy
+Manage Netapp CMode Export Policy creation and deletion.
+
+#### Parameters
+##### ensure
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### name
+The export policy name.
+
+#### Type: netapp_export_rule
+Manage Netapp CMode Export rule creation, modification and deletion.
+
+#### Parameters
+##### allowdevenabled
+Should the NFS server allow creation of devices. Defaults to true.
+
+Valid values are `true`, `false`.
+
+##### allowsetuid
+Should the NFS server allow setuid. Defaults to true.
+
+Valid values are `true`, `false`.
+
+##### anonuid
+User name or ID to map anonymous users to. Defaults to 65534.
+
+##### clientmatch
+Client match specification for the export rule. May take an fqdn, IP address, IP hyphenated range, or CIDR notation. *Required*
+
+##### ensure
+The basic state that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### exportchownmode
+Change ownership mode. Defaults to 'restricted'.
+
+Valid values are `restricted`, `unrestricted`.
+
+##### name
+The export policy. Composite name based on policy name and rule index. Must take the form of `policy_name:rule_number` where the rule number is an integer and the policy name is an existing export policy.
+
+##### ntfsunixsecops
+Ignore/Fail Unix security operations on NTFS volumes. Defaults to 'fail'.
+
+Valid values are `ignore`, `fail`.
+
+##### protocol
+Client access protocol. Defaults to 'any'.
+
+Valid values are `any`, `nfs2`, `nfs3`, `nfs`, `cifs`, `nfs4`, `flexcache`.
+
+##### rorule
+Property to configure read only rules. Defaults to 'any'.
+
+Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
+
+##### rwrule
+Property to configure read write rules. Defaults to 'any'.
+
+Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
+
+##### superusersecurity
+Superuser security flavor. Defaults to 'any'.
+
+Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
+
+#### Type: netapp_group
+Not yet implemented.
+#### Type: netapp_license
+Not yet reviewed.
+#### Type: netapp_lif
+Manage Netapp Logical Inteface (LIF) creation, modification and deletion.
+
+#### Parameters
+##### address
+LIF IP address. *Required*
+
+##### administrativestatus
+LIF administratative status. Defaults to: 'up'.
+
+Valid values are `up`, `down`.
+
+##### comment
+LIF comment
+
+##### dataprotocols
+LIF data protocols.
+
+Valid values are `nfs`, `cifs`, `iscsi`, `fcp`, `fcache`, `none`.
+
+##### dnsdomainname
+LIF dns domain name.
+
+##### ensure
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### failovergroup
+LIF failover group name
+
+##### failoverpolicy
+LIF failover policy. Defaults to: 'nextavail'.
+
+Valid values are `nextavail`, `priority`, `disabled`.
+
+##### firewallpolicy
+LIF firewall policy. Default is based on the port role.
+
+Valid values are `mgmt`, `cluster`, `intercluster`.
+
+##### homenode
+LIF home node. *Required*
+
+##### homeport
+LIF home port. *Required*
+
+##### interfacename
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+LIF name
+
+##### isautorevert
+Should the LIF revert to it's home node. Defaults to: false.
+
+Valid values are `true`, `false`.
+
+##### netmask
+LIF netmask. *Required* if `netmasklength` is not specified
+
+##### netmasklength
+LIF netmask length. *Required* if `netmask` is not specified
+
+##### role
+LIF Role. Defaults to: 'data'.
+
+Valid values are `undef`, `cluster`, `data`, `node_mgmt`, `intercluster`, `cluster_mgmt`.
+
+##### routinggroupname
+LIF Routing group. Valid format is {dcn}{ip address}/{subnet}.
+
+##### usefailovergroup
+Should failover group be automatically created? Defaults to: 'disabled'.
+
+Valid values are `disabled`, `enabled`, `system_defined`.
+
+##### vserver
+LIF Vserver name. *Required*
+
+#### Type: netapp_lun
+Not yet reviewed.
+#### Type: netapp_lun_map
+Not yet reviewed.
+#### Type: netapp_qtree
+Manage Netapp Qtree creation, modification and deletion.
+
+#### Parameters
+##### ensure
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### exportpolicy
+The export policy with which the qtree is associated. (Note: Not yet implemented)
+
+##### name
+The qtree name
+
+##### volume
+The volume to create the qtree against.
+
+#### Type: netapp_quota
+Not yet reviewed.
+#### Type: netapp_user
+Not yet reviewed.
+#### Type: netapp_volume
+#### Type: netapp_vserver
+#### Type: netapp_vserver_option
+#### Type: netapp_vserver_sis_config
 
 ## TODO
 The following items are yet to be implemented:
@@ -153,6 +495,9 @@ The following items are yet to be implemented:
  * Support adding/deleting/modifying cifs shares
  * LDAP and/or AD configuration
  * ???
+ * insync? for export_rule rorule & rwrule should not be symbols
+ * junction mounts for qtree and volume
+ * nfs server management
 
 ## Development
 
