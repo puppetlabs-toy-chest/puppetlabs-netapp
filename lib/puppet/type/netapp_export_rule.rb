@@ -107,6 +107,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
   newproperty(:rorule, :array_matching => :all) do
     desc "Read only rule. Defaults to 'any'. Possible values: 'any', 'none', 'never', 'krb5', 'ntlm', 'sys', 'spinauth'."
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
+    defaultto(:any)
 
     validate do |value|
       #TODO: Need to validate provided values.
@@ -141,6 +142,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
   newproperty(:rwrule, :array_matching => :all) do
     desc "Read write rule. Defaults to 'any'. Possible values: 'any', 'none', 'never', 'krb5', 'ntlm', 'sys', 'spinauth'."
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
+    defaultto(:any)
 
     validate do |value|
       #TODO: Need to validate provided values.
@@ -209,6 +211,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
   # Make sure that ReadOnly and ReadWrite aren't the same values.
   validate do
     #raise ArgumentError, "Readonly and Readwrite params cannot be the same." if self[:readwrite] == self[:readonly]
+    raise ArgumentError, "clientmatch is required" if ! self[:clientmatch] and ! self.provider.clientmatch
   end
 
   # # Autorequire any matching netapp_volume resources.
