@@ -18,12 +18,10 @@ Puppet::Type.newtype(:netapp_volume) do
   newproperty(:state) do
     desc "The volume state. Valid options are: online, offline, restricted."
     newvalues(:online, :offline, :restricted)
-    defaultto :online
   end
 
   newproperty(:initsize) do
-    desc "The initial volume size. Valid format is 1-9(kmgt)."
-    defaultto "1g"
+    desc "The initial volume size. Valid format is [0-9]+[kmgt]."
     validate do |value|
       unless value =~ /^\d+[kmgt]$/
          raise ArgumentError, "%s is not a valid initial volume size." % value
@@ -43,14 +41,12 @@ Puppet::Type.newtype(:netapp_volume) do
 
   newparam(:languagecode) do
     desc "The language code this volume should use."
-    defaultto "en"
     newvalues(:C, :ar, :cs, :da, :de, :en, :en_US, :es, :fi, :fr, :he, :hr, :hu, :it, :ja, :ja_v1, :ko, :no, :nl, :pl, :pt, :ro, :ru, :sk, :sl, :sv, :tr, :zh, :zh_TW)
   end
 
   newparam(:spaceres) do
     desc "The space reservation mode."
     newvalues(:none, :file, :volume)
-    defaultto :none
   end
 
   newproperty(:snapreserve) do
@@ -74,10 +70,13 @@ Puppet::Type.newtype(:netapp_volume) do
     end
   end
 
-  newproperty(:autoincrement, :boolean => true) do
-    desc "Should volume size auto-increment be enabled? Defaults to `:true`."
-    newvalues(:true, :false)
-    defaultto :true
+  newproperty(:autosize, :boolean => true) do
+    desc "Should volume autosize be grow, grow_shrink, or off?"
+    newvalues(:off, :grow, :grow_shrink)
+  end
+
+  newproperty(:exportpolicy) do
+    desc "The export policy with which the volume is associated."
   end
 
   newproperty(:options, :array_matching => :all) do
@@ -140,4 +139,7 @@ Puppet::Type.newtype(:netapp_volume) do
     end
   end
 
+  autorequire(:netapp_export_policy) do
+    self[:exportpolicy]
+  end
 end

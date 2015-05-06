@@ -10,6 +10,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
   netapp_commands :snapschedlist  => 'snapshot-get-schedule'
   netapp_commands :snapschedset   => 'snapshot-set-schedule'
   netapp_commands :volsizeset     => 'volume-size'
+  netapp_commands :volmodify      => 'volume-modify-iter'
   netapp_commands :snapresset     => 'snapshot-set-reserve'
   netapp_commands :autosizeset    => 'volume-autosize-set'
   netapp_commands :voloptset      => 'volume-set-option'
@@ -55,11 +56,14 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get volume snapreserve
       volume_hash[:snapreserve] = volume[:snap_reserve]
 
-      # Get autoincrement setting
-      volume_hash[:autoincrement] = volume[:auto_size]
+      # Get autosize setting
+      volume_hash[:autosize] = volume[:auto_size]
 
       # Get volume state
       volume_hash[:state] = volume[:state]
+
+      # Get export policy
+      volume_hash[:exportpolicy] = volume[:exportpolicy]
 
       if ! transport.get_vserver.empty?
         # Get volume options
@@ -255,9 +259,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     # Query Netapp to update volume size.
     result = volsizeset("volume", @resource[:name], "new-size", @resource[:initsize])
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode initsize=: Volume size set succesfully for volume #{@resource[:name]}.")
-    # Trigger and autoincrement run if required.
-    if @resource[:autoincrement] == :true
-      self.send('autoincrement=', resource['autoincrement'.to_sym]) if resource['autoincrement'.to_sym]
+    # Trigger and autosize run if required.
+    if @resource[:autosize] == :true
+      self.send('autosize=', resource['autosize'.to_sym]) if resource['autosize'.to_sym]
     end
     return true
   end
@@ -272,19 +276,19 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     return true
   end
 
-  # Autoincrement setter
-  def autoincrement=(value)
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: setting auto-increment for Volume #{@resource[:name]}")
+  # autosize setter
+  def autosize=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: setting auto-increment for Volume #{@resource[:name]} to #{@resource[:autosize]}")
 
-    # Enabling or disabling autoincrement
-    if @resource[:autoincrement] == :true
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Enabling autoincrement.")
+    # Enabling or disabling autosize
+    if @resource[:autosize] != :off
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Enabling autosize.")
 
       # Need to work out a sensible auto-increment size
       # Max growth of 20%, increment of 5%
-      size, unit = @resource[:initsize].match(/^(\d+)([A-Z])$/i).captures
+      size, unit = (@resource[:initsize] || self.initsize).match(/^(\d+)([A-Z])$/i).captures
 
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Volume size = #{size}, unit = #{unit}.")
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Volume size = #{size}, unit = #{unit}.")
 
       # Need to convert size into MB...
       if unit == 'g'
@@ -292,21 +296,21 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       elsif unit == 't'
         size = size.to_i * 1024 * 1024
       end
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Volume size in m = #{size}.")
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Volume size in m = #{size}.")
 
       # Set max-size
       maxsize = (size.to_i*1.2).to_i
       incrsize = (size.to_i*0.05).to_i
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Maxsize = #{maxsize}, incrsize = #{incrsize}.")
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Maxsize = #{maxsize}, incrsize = #{incrsize}.")
 
       # Query Netapp to set autosize status.
-      result = autosizeset("volume", @resource[:name], "is-enabled", @resource[:autoincrement], "maximum-size", maxsize.to_s + "m", "increment-size", incrsize.to_s + "m")
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Auto-increment set succesfully for volume #{@resource[:name]}.")
+      result = autosizeset("volume", @resource[:name], "mode", @resource[:autosize], "maximum-size", maxsize.to_s + "m", "increment-size", incrsize.to_s + "m")
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Auto-increment set succesfully for volume #{@resource[:name]}.")
     else
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Disabling autoincrement.")
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Disabling autosize.")
       # Query Netapp to set autosize status.
-      result = autosizeset("volume", @resource[:name], "is-enabled", @resource[:autoincrement])
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autoincrement=: Auto-increment disabled succesfully for volume #{@resource[:name]}.")
+      result = autosizeset("volume", @resource[:name], "mode", @resource[:autosize])
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode autosize=: Auto-increment disabled succesfully for volume #{@resource[:name]}.")
     end
     return true
   end
@@ -377,6 +381,36 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     return true
   end
 
+  # Export policy setter
+  def exportpolicy=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode exportpolicy=: setting export policy value for Volume #{@resource[:name]} to #{@resource[:exportpolicy].inspect}")
+
+    # Build up the attributes to set
+    volume_export_attributes = NaElement.new('volume-export-attributes')
+    volume_export_attributes.child_add_string('policy', @resource[:exportpolicy])
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_export_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    # I don't know why I can't just pass the attributes and query directly, so
+    # I have to make an invoke_elem NaElement call instead
+    #result = volmodify("attributes", volume_attributes, "query", volume_query)
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+    result = volmodify(volume_modify)
+    return true
+  end
+
   # Volume create.
   def create
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode: creating Netapp Volume #{@resource[:name]} of initial size #{@resource[:initsize]} in Aggregate #{@resource[:aggregate]} using space reserve of #{@resource[:spaceres]}, with a state of #{@resource[:state]}.")
@@ -386,7 +420,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
     # Update other attributes after resource creation.
     methods = [
-      'autoincrement',
+      'autosize',
       'options',
       'snapreserve',
       'snapschedule'
