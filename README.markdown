@@ -149,7 +149,7 @@ node 'ontap01.example.com' {
 }
 ```
 
-Next we should create a node definition for the vserver to add a volume has export policies for NFS:
+Next we should create a node definition for the vserver with a volume that has export policies for NFS, and a qtree on the volume:
 ```
 node 'vserver01.example.com' {
   netapp_export_policy { 'nfs_exports':
@@ -169,6 +169,10 @@ node 'vserver01.example.com' {
     initsize     => '200g',
     exportpolicy => 'nfs_exports',
   }
+  netapp_qtree { 'qtree1':
+    ensure => present,
+    volume => 'nfsvol',
+  }
 }
 ```
 If the device configuration are both in `$confdir/device.conf`, they can now be
@@ -180,7 +184,7 @@ command to run puppet against a single device at a time:
 puppet device --verbose --user=root --deviceconfig /etc/puppet/device/ontap01.example.com.conf
 ```
 
-*Note*: As of yet the module does not have the capability to configure junction paths on the volumes/qtrees, or to enable the NFS server, so these steps must now be performed manually before the volume may be exported.
+*Note*: As of yet the module does not have the capability to configure junction paths on the volumes or to enable the NFS server, so these steps must now be performed manually before the volume/qtree may be mounted.
 
 <!--
 ### NetApp operations
@@ -477,16 +481,189 @@ The export policy with which the qtree is associated. (Note: Not yet implemented
 The qtree name
 
 ##### volume
-The volume to create the qtree against.
+The volume to create the qtree against. *Required.*
 
 #### Type: netapp_quota
 Not yet reviewed.
 #### Type: netapp_user
 Not yet reviewed.
 #### Type: netapp_volume
+Manage Netapp Volume creation, modification and deletion.
+
+#### Parameters
+##### aggregate
+The aggregate this volume should be created in. *Required.*
+
+##### autosize
+Should volume autosize be grow, grow/shrink, or off?
+
+Valid values are `off`, `grow`, `grow_shrink`.
+
+##### ensure
+The basic state that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### exportpolicy
+The export policy with which the volume is associated.
+
+##### initsize
+The initial volume size. *Required.* Valid format is /[0-9]+[kmgt]/.
+
+##### languagecode
+The language code this volume should use.
+
+Valid values are `C`, `ar`, `cs`, `da`, `de`, `en`, `en_US`, `es`, `fi`, `fr`, `he`, `hr`, `hu`, `it`, `ja`, `ja_v1`, `ko`, `no`, `nl`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `zh`, `zh_TW`.
+
+##### name
+The volume name. Valid characters are a-z, 1-9 & underscore.
+
+##### options
+The volume options hash. XXX Needs more details
+
+##### snapreserve
+The percentage of space to reserve for snapshots.
+
+##### snapschedule
+The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'. XXX Needs an example
+
+##### spaceres
+The space reservation mode.
+
+Valid values are `none`, `file`, `volume`.
+
+##### state
+The volume state.
+
+Valid values are `online`, `offline`, `restricted`.
+
 #### Type: netapp_vserver
+Manage Netapp Vserver creation, modification and deletion.
+
+#### Parameters
+##### aggregatelist
+Vserver aggregate list. May be an array.
+
+##### allowedprotos
+Vserver allowed protocols
+
+Valid values are `nfs`, `cifs`, `fcp`, `iscsi`, `ndmpd`.
+
+##### comment
+Vserver comment
+
+##### ensure
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### language
+Vserver language. Defaults to `c.UTF-8`
+
+Valid values are `c`, `c.UTF-8`, `ar`, `cs`, `da`, `de`, `en`, `en_us`, `es`, `fi`, `fr`, `he`, `hr`, `hu`, `it`, `ja`, `ja_v1`, `ja_jp.pck`, `ja_jp.932`, `ja_jp.pck_v2`, `ko`, `no`, `nl`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `zh`, `zh.gbk`, `zh_tw`.
+
+##### maxvolumes
+Vserver maximum allowed volumes.
+
+##### name
+The vserver name
+
+##### namemappingswitch
+Vserver name mapping switch. Defaults to 'file'.
+
+Valid values are `file`, `ldap`.
+
+##### nameserverswitch
+Vserver name server switch.
+
+Valid values are `file`, `ldap`, `nis`.
+
+##### quotapolicy
+Vserver quota policy
+
+##### rootvol
+The vserver root volume. *Required.*
+
+##### rootvolaggr
+Vserver root volume aggregate. *Required.*
+
+##### rootvolsecstyle
+Vserver root volume security style. *Required.*
+
+Valid values are `unix`, `ntfs`, `mixed`, `unified`.
+
+##### snapshotpolicy
+Vserver snapshot policy
+
+##### state
+The vserver state
+
+Valid values are `stopped`, `running`.
+
 #### Type: netapp_vserver_option
+Manage Netapp Vserver option modification.
+
+#### Parameters
+##### ensure
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### name
+The vserver option name
+
+##### value
+The vserver option value
+
 #### Type: netapp_vserver_sis_config
+Manage Netapp Vserver sis config modification.
+
+#### Parameters
+##### compression
+Enable compression on the sis volume.
+
+Valid options: `true`, `false`
+
+##### enabled
+Enable sis on a volume.
+
+Valid options: `true`, `false`
+
+##### ensure
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### idd
+Enables file level incompressible data detection and quick check incompressible data detection for large files.
+
+Valid options: `true`, `false`
+
+##### inline_compression
+Enable inline compression on the sis volume.
+
+Valid options: `true`, `false`
+
+##### path
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The full path of the sis volume, /vol/<vol_name>.
+
+##### policy
+The sis policy name to be attached to the volume.
+
+##### quick_check_fsize
+Quick check file size for Incompressible Data Detection. Accepts integers
+
+Values can match `/^\d+$/`.
+
+##### sis_schedule
+The schedule string for the sis operation.
+
+The format of the schedule:
+
+  `day_list[@hour_list]` or `hour_list[@day_list]` or `-` or `auto` or `manual`
+
 
 ## TODO
 The following items are yet to be implemented:
