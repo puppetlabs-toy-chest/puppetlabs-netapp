@@ -18,7 +18,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
     lifs = []
 
     #Get a list of all LIF's
-    results = liflist()
+    results = liflist() || []
 
     # Itterate through the results
     results.each do |lif|
@@ -48,10 +48,13 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
 
       # Process data-protocols array
       data_protocols = []
-      lif.child_get('data-protocols').children_get().each do |lif_dp|
-        data_protocols << lif_dp.content()
+      dp_element = lif.child_get('data-protocols')
+      if dp_element
+        dp_element.children_get().each do |lif_dp|
+          data_protocols << lif_dp.content()
+        end
+        lif_hash[:dataprotocols] = data_protocols
       end
-      lif_hash[:dataprotocols] = data_protocols
 
       # Create the instance and add to lifs array
       Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Creating instance for #{lif_name}\n Contents = #{lif_hash.inspect}.")
@@ -68,8 +71,8 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
     Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Got to self.prefetch.")
     # Itterate instances and match provider where relevant.
     instances.each do |prov|
-      Puppet.debug("Prov.interfacename = #{resources[prov.interfacename]}. ")
-      if resource = resources[prov.interfacename]
+      Puppet.debug("Prov.name = #{resources[prov.name]}. ")
+      if resource = resources[prov.name]
         resource.provider = prov
       end
     end

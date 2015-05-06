@@ -22,7 +22,7 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
     aggregates = []
 
     # Get the aggregates
-    results = aggrget()
+    results = aggrget() || []
 
     results.each do |aggregate|
       # Pull out relevant fields

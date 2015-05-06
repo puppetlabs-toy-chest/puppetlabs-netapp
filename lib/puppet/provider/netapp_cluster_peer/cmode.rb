@@ -18,7 +18,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
     peers = []
 
     # Get a list of peers
-    result = clusterpeerlist()
+    result = clusterpeerlist() || []
 
     # Itterate the results
     result.each do |peer|

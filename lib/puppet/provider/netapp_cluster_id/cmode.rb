@@ -19,23 +19,25 @@ Puppet::Type.type(:netapp_cluster_id).provide(:cmode, :parent => Puppet::Provide
     # Get the cluster ID
     result = clusteridget()
 
-    #Puppet.debug("Result looks like #{result.sprintf()}")
-    # Pull out relevant fields
-    cluster_id = result.child_get('attributes').child_get('cluster-identity-info')
-    cluster_name = cluster_id.child_get_string('cluster-name')
-    cluster_location = cluster_id.child_get_string('cluster-location')
-    cluster_contact = cluster_id.child_get_string('cluster-contact')
+    if result
+      #Puppet.debug("Result looks like #{result.sprintf()}")
+      # Pull out relevant fields
+      cluster_id = result.child_get('attributes').child_get('cluster-identity-info')
+      cluster_name = cluster_id.child_get_string('cluster-name')
+      cluster_location = cluster_id.child_get_string('cluster-location')
+      cluster_contact = cluster_id.child_get_string('cluster-contact')
 
-    # Construct the cluster_info hash
-    cluster_info = {
-      :name => cluster_name,
-      :ensure => :present,
-      :location => cluster_location,
-      :contact => cluster_contact
-    }
+      # Construct the cluster_info hash
+      cluster_info = {
+        :name => cluster_name,
+        :ensure => :present,
+        :location => cluster_location,
+        :contact => cluster_contact
+      }
 
-    Puppet.debug("Puppet::Provider::Netapp_cluster_id.cmode self.instances: cluster_info = #{cluster_info}.")
-    clusters << new(cluster_info)
+      Puppet.debug("Puppet::Provider::Netapp_cluster_id.cmode self.instances: cluster_info = #{cluster_info}.")
+      clusters << new(cluster_info)
+    end
 
     clusters
   end

@@ -17,7 +17,7 @@ Puppet::Type.type(:netapp_export_policy).provide(:cmode, :parent => Puppet::Prov
     export_policies = []
 
     # Get a list of all export policies
-    result = eplist
+    result = eplist || []
 
     # Itterate through each 'export-policy-info' block.
     result.each do |policy|

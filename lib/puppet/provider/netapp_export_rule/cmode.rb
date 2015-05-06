@@ -18,7 +18,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     export_rules = []
 
     # Get a list of all nfs export rules
-    result = elist
+    result = elist || []
 
     # Itterate through each 'export-rule-info' block.
     result.each do |rule|

@@ -17,7 +17,7 @@ Puppet::Type.type(:netapp_qtree).provide(:cmode, :parent => Puppet::Provider::Ne
     qtree_instances = []
 
     # Query Netapp for qtree-list against volume.
-    results = qlist()
+    results = qlist() || []
 
     # Get a list of qtrees
     qtrees = results
