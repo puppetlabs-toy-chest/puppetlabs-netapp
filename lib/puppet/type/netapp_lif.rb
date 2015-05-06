@@ -41,12 +41,6 @@ Puppet::Type.newtype(:netapp_lif) do
   newparam(:dataprotocols, :array_matching => :all) do
     desc "LIF data protocols. Possible values: 'nfs', 'cifs', 'iscsi', 'fcp', 'fcache', 'none'"
     newvalues(:nfs, :cifs, :iscsi, :fcp, :fcache, :none)
-    validate do |value|
-      raise ArgumentError, "dataprotocols must be an array." unless value.is_a?Array
-      if value.include?('none') and value.length > 1
-        raise ArgumentError, ":none cannot be combined with other data protocols."
-      end
-    end
   end
 
   newproperty(:dnsdomainname) do
@@ -134,10 +128,14 @@ Puppet::Type.newtype(:netapp_lif) do
 
   # Validate input values
   validate do
+    if Array(self[:dataprotocols]).include?('none') and Array(self[:dataprotocols]).length > 1
+      raise ArgumentError, "'none' cannot be combined with other data protocols."
+    end
     raise ArgumentError, "Address is required" if (self[:address] || self.provider.address).nil?
     raise ArgumentError, "Vserver is required" if (self[:vserver] || self.provider.vserver).nil?
     raise ArgumentError, "Netmask or Netmasklength are required" if (self[:netmask] || self.provider.netmask).nil? and (self[:netmasklength] || self.provider.netmasklength).nil?
     raise ArgumentError, "Netmask and Netmasklength are mutually exclusive" if self[:netmask] and self[:netmasklength]
+    #XXX homenode, homeport, role?, vserver, interface-name, address are required
   end
 
 
