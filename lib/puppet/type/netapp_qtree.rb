@@ -26,7 +26,14 @@ Puppet::Type.newtype(:netapp_qtree) do
     end
   end
 
+  newproperty(:exportpolicy) do
+    desc "The export policy with which the qtree is associated."
+  end
+
   autorequire(:netapp_volume) do
     self[:volume]
+  end
+  autorequire(:netapp_export_policy) do
+    self[:exportpolicy]
   end
 end
