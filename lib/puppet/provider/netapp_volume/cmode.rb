@@ -19,6 +19,8 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
   netapp_commands :voloffline     => 'volume-offline'
   netapp_commands :volonline      => 'volume-online'
   netapp_commands :voldestroy     => 'volume-destroy'
+  netapp_commands :volmount       => 'volume-mount'
+  netapp_commands :volunmount     => 'volume-unmount'
 
   mk_resource_methods
 
@@ -64,6 +66,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
       # Get export policy
       volume_hash[:exportpolicy] = volume[:exportpolicy]
+
+      # Get junction path
+      volume_hash[:junctionpath] = volume[:junctionpath]
 
       if ! transport.get_vserver.empty?
         # Get volume options
@@ -162,6 +167,13 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       end
       # Get Auto size settings.
       vol_auto_size = vol_autosize_info.child_get_string("mode")
+
+      # Get junction path
+      if jp = vol_id_info.child_get("junction-path")
+        vol_junction_path = jp.content
+      else
+        vol_junction_path = false
+      end
       # Check if autosize is set
       #if (vol_auto_size =~ /^grow/)
       #  Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: vol_auto_size is not set to 'off'. Getting 'is-enabled' status.")
@@ -181,12 +193,15 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Vol_name = #{vol_name}, vol_size_bytes = #{vol_size_bytes}, vol_state = #{vol_state}, vol_snap_reserve = #{vol_snap_reserve} vol_export_policy = #{vol_export_policy}, vol_auto_size = #{vol_auto_size}.")
 
       # Construct hash
-      vol_info = { :name         => vol_name,
-                   :size_bytes   => vol_size_bytes,
-                   :state        => vol_state,
-                   :snap_reserve => vol_snap_reserve,
-                   :exportpolicy => vol_export_policy,
-                   :auto_size    => vol_auto_size }
+      vol_info = {
+        :name         => vol_name,
+        :size_bytes   => vol_size_bytes,
+        :state        => vol_state,
+        :snap_reserve => vol_snap_reserve,
+        :exportpolicy => vol_export_policy,
+        :auto_size    => vol_auto_size,
+        :junctionpath => vol_junction_path,
+      }
 
       Puppet.debug("Vol_info looks like: #{vol_info.inspect}")
       # Add to array
@@ -251,6 +266,16 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
   #
   ## Setters
   #
+
+  # Volume junction-path setter
+  def junctionpath=(value)
+    if ! value
+      result = volunmount("volume-name", @resource[:name])
+    else
+      result = volmount("volume-name", @resource[:name], "junction-path", value)
+    end
+    return true
+  end
 
   # Volume initsize setter
   def initsize=(value)

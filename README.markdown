@@ -184,7 +184,7 @@ command to run puppet against a single device at a time:
 puppet device --verbose --user=root --deviceconfig /etc/puppet/device/ontap01.example.com.conf
 ```
 
-*Note*: As of yet the module does not have the capability to configure junction paths on the volumes or to enable the NFS server, so these steps must now be performed manually before the volume/qtree may be mounted.
+*Note*: As of yet the module does not have the capability to enable the NFS server, so this must now be performed manually before the volume/qtree may be mounted.
 
 <!--
 ### NetApp operations
@@ -510,6 +510,11 @@ The export policy with which the volume is associated.
 ##### initsize
 The initial volume size. *Required.* Valid format is /[0-9]+[kmgt]/.
 
+##### junctionpath
+The fully-qualified pathname in the owning Vserver's namespace at which a volume is mounted.
+
+Valid values are absolute file paths or `false`
+
 ##### languagecode
 The language code this volume should use.
 
@@ -673,7 +678,6 @@ The following items are yet to be implemented:
  * LDAP and/or AD configuration
  * ???
  * insync? for export_rule rorule & rwrule should not be symbols
- * junction mounts for qtree and volume
  * nfs server management
 
 ## Development

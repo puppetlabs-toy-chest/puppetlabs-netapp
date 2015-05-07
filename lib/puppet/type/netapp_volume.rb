@@ -70,6 +70,19 @@ Puppet::Type.newtype(:netapp_volume) do
     end
   end
 
+  newproperty(:junctionpath) do
+    desc "The fully-qualified pathname in the owning Vserver's namespace at which a volume is mounted."
+    newvalues(/^\//,false)
+    munge do |value|
+      case value
+      when false, :false, "false"
+        false
+      else
+        value
+      end
+    end
+  end
+
   newproperty(:autosize, :boolean => true) do
     desc "Should volume autosize be grow, grow_shrink, or off?"
     newvalues(:off, :grow, :grow_shrink)
