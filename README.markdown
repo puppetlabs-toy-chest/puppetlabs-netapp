@@ -133,9 +133,10 @@ node 'ontap01.example.com' {
     diskcount => '6',
   }
   netapp_vserver { 'vserver01':
-    ensure      => present,
-    rootvol     => 'vserver01_root',
-    rootvolaggr => 'aggr1',
+    ensure          => present,
+    rootvol         => 'vserver01_root',
+    rootvolaggr     => 'aggr1',
+    rootvolsecstyle => 'unix',
   }
   netapp_lif { 'vserver01_lif':
     ensure        => present,
@@ -163,15 +164,25 @@ node 'vserver01.example.com' {
     rorule            => ['sys','none'],
     rwrule            => ['sys','none'],
   }
+  netapp_volume { 'vserver01_root':
+    exportpolicy => 'nfs_exports',
+  }
   netapp_volume { 'nfsvol':
     ensure       => present,
     aggregate    => 'aggr1',
     initsize     => '200g',
     exportpolicy => 'nfs_exports',
+    junctionpath => '/nfsvol',
   }
   netapp_qtree { 'qtree1':
     ensure => present,
     volume => 'nfsvol',
+  }
+  netapp_nfs { 'vserver01':
+    ensure => present,
+    state  => 'on',
+    v3     => 'disabled',
+    v40    => 'enabled',
   }
 }
 ```
@@ -183,8 +194,6 @@ command to run puppet against a single device at a time:
 ```
 puppet device --verbose --user=root --deviceconfig /etc/puppet/device/ontap01.example.com.conf
 ```
-
-*Note*: As of yet the module does not have the capability to enable the NFS server, so this must now be performed manually before the volume/qtree may be mounted.
 
 <!--
 ### NetApp operations
@@ -216,25 +225,26 @@ None as of this first release. Common operations may be encapsulated in defined 
 
 ### Types and Providers
 [`netapp_aggregate`](#type-netapp_aggregate)
-[`netapp_cluster_id`](#type-netapp_)
-[`netapp_cluster_peer`](#type-netapp_)
-[`netapp_export_policy`](#type-netapp_)
-[`netapp_group`](#type-netapp_)
-[`netapp_igroup`](#type-netapp_)
-[`netapp_license`](#type-netapp_)
-[`netapp_lif`](#type-netapp_)
-[`netapp_lun`](#type-netapp_)
-[`netapp_lun_map`](#type-netapp_)
-[`netapp_nfs_export`](#type-netapp_)
-[`netapp_notify`](#type-netapp_)
-[`netapp_qtree`](#type-netapp_)
-[`netapp_quota`](#type-netapp_)
-[`netapp_role`](#type-netapp_)
-[`netapp_snapmirror`](#type-netapp_)
-[`netapp_user`](#type-netapp_)
-[`netapp_volume`](#type-netapp_)
-[`netapp_vserver`](#type-netapp_)
-[`netapp_vserver_option`](#type-netapp_)
+[`netapp_cluster_id`](#type-netapp_cluster_id)
+[`netapp_cluster_peer`](#type-netapp_cluster_peer)
+[`netapp_export_policy`](#type-netapp_export_policy)
+[`netapp_export_rule`](#type-netapp_export_rule)
+[`netapp_group`](#type-netapp_group)
+[`netapp_license`](#type-netapp_license)
+[`netapp_lif`](#type-netapp_lif)
+[`netapp_lun`](#type-netapp_lun)
+[`netapp_lun_map`](#type-netapp_lun_map)
+[`netapp_nfs`](#type-netapp_nfs)
+[`netapp_notify`](#type-netapp_notify)
+[`netapp_qtree`](#type-netapp_qtree)
+[`netapp_quota`](#type-netapp_quota)
+[`netapp_role`](#type-netapp_role)
+[`netapp_snapmirror`](#type-netapp_snapmirror)
+[`netapp_user`](#type-netapp_user)
+[`netapp_volume`](#type-netapp_volume)
+[`netapp_vserver`](#type-netapp_vserver)
+[`netapp_vserver_option`](#type-netapp_vserver_option)
+[`netapp_vserver_sis_config`](#type-netapp_vserver_sis_config)
 
 ### Type: netapp_aggregate
 Manage Netapp Aggregate creation, modification and deletion.
@@ -304,11 +314,13 @@ Should the new aggregate be striped? Default: not_striped.
 
 Valid values are `striped`, `not_striped`.
 
-#### Type: netapp_cluster_id
+### Type: netapp_cluster_id
 Not yet reviewed.
-#### Type: netapp_cluster_peer
+
+### Type: netapp_cluster_peer
 Not yet reviewed.
-#### Type: netapp_export_policy
+
+### Type: netapp_export_policy
 Manage Netapp CMode Export Policy creation and deletion.
 
 #### Parameters
@@ -320,7 +332,7 @@ Valid values are `present`, `absent`.
 ##### name
 The export policy name.
 
-#### Type: netapp_export_rule
+### Type: netapp_export_rule
 Manage Netapp CMode Export rule creation, modification and deletion.
 
 #### Parameters
@@ -378,11 +390,13 @@ Superuser security flavor. Defaults to 'any'.
 
 Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
 
-#### Type: netapp_group
+### Type: netapp_group
 Not yet implemented.
-#### Type: netapp_license
+
+### Type: netapp_license
 Not yet reviewed.
-#### Type: netapp_lif
+
+### Type: netapp_lif
 Manage Netapp Logical Inteface (LIF) creation, modification and deletion.
 
 #### Parameters
@@ -461,11 +475,44 @@ Valid values are `disabled`, `enabled`, `system_defined`.
 ##### vserver
 LIF Vserver name. *Required*
 
-#### Type: netapp_lun
+### Type: netapp_lun
 Not yet reviewed.
-#### Type: netapp_lun_map
+
+### Type: netapp_lun_map
 Not yet reviewed.
-#### Type: netapp_qtree
+
+### Type: netapp_nfs
+Manage NetApp NFS service
+
+#### Parameters
+##### vserver
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+NFS service SVM. This resource can only be applied to vservers, so the title is redundant.
+
+##### state
+NFS Service State
+
+Valid values are `on`, `off`.
+
+##### v3
+Control NFS v3 access
+
+Valid values are `enabled`, `disabled`.
+
+##### v40
+Control NFS v4.0 access
+
+Valid values are `enabled`, `disabled`.
+
+##### v41
+Control NFS v4.1 access
+
+Valid values are `enabled`, `disabled`.
+
+### Type: netapp_notify
+Not yet reviewed.
+
+### Type: netapp_qtree
 Manage Netapp Qtree creation, modification and deletion.
 
 #### Parameters
@@ -483,11 +530,19 @@ The qtree name
 ##### volume
 The volume to create the qtree against. *Required.*
 
-#### Type: netapp_quota
+### Type: netapp_quota
 Not yet reviewed.
-#### Type: netapp_user
+
+### Type: netapp_role
 Not yet reviewed.
-#### Type: netapp_volume
+
+### Type: netapp_snapmirror
+Not yet reviewed.
+
+### Type: netapp_user
+Not yet reviewed.
+
+### Type: netapp_volume
 Manage Netapp Volume creation, modification and deletion.
 
 #### Parameters
@@ -542,7 +597,7 @@ The volume state.
 
 Valid values are `online`, `offline`, `restricted`.
 
-#### Type: netapp_vserver
+### Type: netapp_vserver
 Manage Netapp Vserver creation, modification and deletion.
 
 #### Parameters
@@ -605,7 +660,7 @@ The vserver state
 
 Valid values are `stopped`, `running`.
 
-#### Type: netapp_vserver_option
+### Type: netapp_vserver_option
 Manage Netapp Vserver option modification.
 
 #### Parameters
@@ -620,7 +675,7 @@ The vserver option name
 ##### value
 The vserver option value
 
-#### Type: netapp_vserver_sis_config
+### Type: netapp_vserver_sis_config
 Manage Netapp Vserver sis config modification.
 
 #### Parameters
@@ -676,9 +731,7 @@ The following items are yet to be implemented:
  * Data Fabric Manager support
  * Support adding/deleting/modifying cifs shares
  * LDAP and/or AD configuration
- * ???
- * insync? for export_rule rorule & rwrule should not be symbols
- * nfs server management
+ * QA remaining resources
 
 ## Development
 
