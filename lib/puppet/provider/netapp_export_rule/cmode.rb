@@ -59,7 +59,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       ro_security = []
       ro_rules = rule.child_get('ro-rule').children_get()
       ro_rules.each do |ro_rule|
-        ro_security << ro_rule.content()
+        ro_security << ro_rule.content().to_sym
       end
       # Add it to the export_rule hash
       export_rule[:rorule] = ro_security
@@ -68,7 +68,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       rw_security = []
       rw_rules = rule.child_get('rw-rule').children_get()
       rw_rules.each do |rw_rule|
-        rw_security << rw_rule.content()
+        rw_security << rw_rule.content().to_sym
       end
       # Add it to the export_rule hash
       export_rule[:rwrule] = rw_security

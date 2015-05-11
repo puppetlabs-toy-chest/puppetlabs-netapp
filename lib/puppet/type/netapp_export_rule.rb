@@ -105,7 +105,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
   end
 
   newproperty(:rorule, :array_matching => :all) do
-    desc "Read only rule. Defaults to 'any'. Possible values: 'any', 'none', 'never', 'krb5', 'ntlm', 'sys', 'spinauth'."
+    desc "Configure read-only rules. Defaults to 'any'."
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
     defaultto(:any)
 
@@ -114,33 +114,12 @@ Puppet::Type.newtype(:netapp_export_rule) do
     end
 
     def insync?(is)
-      # Check that is is an array
-      return false unless is.is_a? Array
-
-      # Check the first value to see if 'all_hosts'.
-      if is.first == 'all_hosts' && @should.first == 'all_hosts'
-        return true
-      else
-        # If they were different lengths, they are not equal.
-        return false unless is.length == @should.length
-
-        # Check that is and @should are the same...
-        return (is == @should or is == @should.map(&:to_s))
-
-      end
-    end
-
-    def should_to_s(newvalue)
-      newvalue.inspect
-    end
-
-    def is_to_s(currentvalue)
-      currentvalue.inspect
+      return is.sort == Array(should).sort
     end
   end
 
   newproperty(:rwrule, :array_matching => :all) do
-    desc "Read write rule. Defaults to 'any'. Possible values: 'any', 'none', 'never', 'krb5', 'ntlm', 'sys', 'spinauth'."
+    desc "Read write rule. Defaults to 'any'."
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
     defaultto(:any)
 
@@ -149,28 +128,7 @@ Puppet::Type.newtype(:netapp_export_rule) do
     end
 
     def insync?(is)
-      # Check that is is an array
-      return false unless is.is_a? Array
-
-      # Check the first value to see if 'all_hosts'.
-      if is.first == 'all_hosts' && @should.first == 'all_hosts'
-        return true
-      else
-        # If they were different lengths, they are not equal.
-        return false unless is.length == @should.length
-
-        # Check that is and @should are the same...
-        return (is == @should or is == @should.map(&:to_s))
-
-      end
-    end
-
-    def should_to_s(newvalue)
-      newvalue.inspect
-    end
-
-    def is_to_s(currentvalue)
-      currentvalue.inspect
+      return is.sort == Array(should).sort
     end
   end
 
