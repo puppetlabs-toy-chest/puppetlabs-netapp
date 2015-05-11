@@ -15,9 +15,10 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     # Invoke "system-get-version" to gather system version.
     result = @transport.invoke("system-get-version")
 
+    return {} if result.attr_get("status") == "failed"
     # Pull out version
     sys_version = result.child_get_string("version")
-    @facts['version'] = sys_version
+    @facts['version'] = sys_version if sys_version
 
     if sys_clustered = result.child_get_string("is-clustered") and !sys_clustered.empty?
       Puppet.debug("Device is clustered.")
@@ -25,7 +26,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     end
 
     # cMode has differnt API's to 7Mode.
-    if @facts['clustered']
+    if @facts['clustered'] and ! @facts.empty?
       # Get cluster Mode facts
       getClusterFacts(host)
     else
@@ -138,7 +139,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
   end
 
   # Helper method to get 7-Mode facts
-  def self.getSevenFacts()
+  def getSevenFacts()
 
     # Invoke "system-get-info" call to gather system information.
     result = @transport.invoke("system-get-info")
