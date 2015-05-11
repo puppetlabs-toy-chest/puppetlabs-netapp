@@ -3,6 +3,15 @@ require 'puppet/provider/netapp_cmode'
 Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Cluster aggregate management."
 
+  def initialize(value={})
+    super(value)
+    if value.is_a? Hash
+      @original_values = value.clone
+    else
+      @original_values = Hash.new
+    end
+  end
+
   confine :feature => :posix
   defaultfor :feature => :posix
 
@@ -91,7 +100,11 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: Ensure is present. Modifying...")
 
       # Add disks to the existing aggregate
-      result = aggradd('aggregate', @resource[:name], 'disk-count', @resource[:diskcount])
+      newdisks = Integer(@resource[:diskcount]) - Integer(@original_values[:diskcount])
+      if newdisks < 0
+        raise ArgumentError, "aggregate diskcount cannot be reduced without destroying and recreating the aggregate"
+      end
+      result = aggradd('aggregate', @resource[:name], 'disk-count', newdisks)
 
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: Aggregate #{@resource[:name]} has been modified.")
       return true
@@ -149,9 +162,27 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
 
     # Add the aggregate
     result = aggrcreate(aggr_create)
+    Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode create: Aggregate #{@resource[:name]} is being created... waiting for it to finish")
+    for tries in 1..12
+      state = nil
+      (aggrget() || []).each do |aggr|
+        aggr_name = aggr.child_get_string('aggregate-name')
+        next if aggr_name != @resource[:name]
+        state = aggr.child_get('aggr-raid-attributes').child_get_string('state')
+      end
+      if state != "creating"
+        break
+      elsif state.nil?
+        require'pry';binding.pry
+      elsif tries == 12
+        raise "aggregate is taking too long to create"
+      end
+      sleep_time = 2 ** tries
+      Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: State is #{state.inspect}; sleeping #{sleep_time} seconds for attempt #{tries}.")
+      sleep sleep_time
+    end
 
     # Passed above, so must have created aggregate successfully
-    Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode create: Aggregate #{@resource[:name]} created successfully.")
     return true
   end
 
@@ -164,5 +195,4 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
     Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode exists?: checking existance of Netapp aggregate #{@resource[:name]}")
     @property_hash[:ensure] == :present
   end
-
 end
