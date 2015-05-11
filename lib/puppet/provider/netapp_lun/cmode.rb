@@ -20,7 +20,7 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
     luns = []
 
     #Get a list of all Lun's
-    results = lunlist()
+    results = lunlist() || []
 
     # Itterate through the results
     results.each do |lun|
@@ -29,7 +29,7 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
 
       # Construct initial hash for lun
       lun_hash = {
-        :path   => lun_path,
+        :name   => lun_path,
         :ensure => :present
       }
 
@@ -59,8 +59,8 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
     Puppet.debug("Puppet::Provider::Netapp_lun.cmode: Got to self.prefetch.")
     # Itterate instances and match provider where relevant.
     instances.each do |prov|
-      Puppet.debug("Prov.path = #{resources[prov.path]}. ")
-      if resource = resources[prov.path]
+      Puppet.debug("Prov.path = #{resources[prov.name]}. ")
+      if resource = resources[prov.name]
         resource.provider = prov
       end
     end
