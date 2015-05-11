@@ -145,7 +145,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
 
     # Add required dataprotocols
     dataprotocols_element = NaElement.new('data-protocols')
-    @resource[:dataprotocols].each do |dp|
+    Array(@resource[:dataprotocols]).each do |dp|
       dataprotocols_element.child_add_string('data-protocol', dp)
     end unless @resource[:dataprotocols].nil?
     lif_create.child_add(dataprotocols_element)
