@@ -110,21 +110,18 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
     if @property_hash[:ensure] == :absent
       # Check if volume is online.
-      vi_result = vollist('volume', @resource[:name])
-      volumes = vi_result.child_get("volumes")
-      volume_info = volumes.child_get("volume-info")
-      state = volume_info.child_get_string("state")
-      # Is the volume 'Online'?
-      if(state == "online")
-        # Need to 'offline' the volume
-        Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{@resource[:name]} is currently online. Offlining... ")
-        off_result = voloffline('name', @resource[:name])
-        Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume taken offline successfully.")
+      self.class.get_volinfo.each do |volume|
+        next unless volume[:name] == resource[:name]
+        if volume[:junctionpath] and volume[:vserver_root] != "true"
+          Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{volume[:name]} is currently mounted. Unmounting... ")
+          volunmount("volume-name", resource[:name])
+        end
+        if volume[:state] == "online"
+          Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{volume[:name]} is currently online. Offlining... ")
+          voloffline('name', resource[:name])
+        end
+        voldestroy('name', resource[:name])
       end
-      # Can now destroy the volume...
-      destroy_result = voldestroy('name', @resource[:name])
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume destroyed successfully.")
-      return true
     end
 
     @property_hash.clear
@@ -139,13 +136,12 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: getting volume info for all volumes.")
 
     # Pull back current volume-size.
-    result = vollist("verbose", "true")
+    result = vollist("verbose", "true") || []
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Pulling back volumes array.")
     volumes = Array.new
-    volume_info = result
 
     # Itterate through the volume-info blocks
-    volume_info.each do |volume|
+    result.each do |volume|
       #Puppet.debug("Volume = #{volume.inspect}")
 
       # Pull out relevant info blocks
@@ -160,6 +156,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
       vol_size_bytes = vol_space_info.child_get_int("size")
       vol_state = vol_state_info.child_get_string("state")
+      vol_root = vol_state_info.child_get_string("is-vserver-root")
       vol_snap_reserve = vol_space_info.child_get_int("percentage-snapshot-reserve")
       vol_raid_status = volume.child_get_string("raid-status")
       if vol_export_attributes = volume.child_get("volume-export-attributes")
@@ -201,6 +198,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
         :exportpolicy => vol_export_policy,
         :auto_size    => vol_auto_size,
         :junctionpath => vol_junction_path,
+        :vserver_root => vol_root,
       }
 
       Puppet.debug("Vol_info looks like: #{vol_info.inspect}")
@@ -438,10 +436,15 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
   # Volume create.
   def create
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: creating Netapp Volume #{@resource[:name]} of initial size #{@resource[:initsize]} in Aggregate #{@resource[:aggregate]} using space reserve of #{@resource[:spaceres]}, with a state of #{@resource[:state]}.")
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: creating Netapp Volume #{resource[:name]} of initial size #{resource[:initsize]} in Aggregate #{resource[:aggregate]} using space reserve of #{resource[:spaceres]}, with a state of #{resource[:state]}.")
     # Call webservice to create volume.
-    result = volcreate("volume", @resource[:name], "size", @resource[:initsize], "containing-aggr-name", @resource[:aggregate], "language-code", @resource[:languagecode], "space-reserve", @resource[:spaceres])
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{@resource[:name]} created successfully. Setting options...")
+    arguments =  ["volume", resource[:name]]
+    arguments += ["containing-aggr-name", resource[:aggregate]]
+    arguments += ["size", resource[:initsize]] if resource[:initsize]
+    arguments += ["language-code", resource[:languagecode]] if resource[:languagecode]
+    arguments += ["space-reserve", resource[:spaceres]] if resource[:spaceres]
+    result = volcreate(*arguments)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{resource[:name]} created successfully. Setting options...")
 
     # Update other attributes after resource creation.
     methods = [

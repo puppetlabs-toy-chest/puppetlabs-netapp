@@ -51,7 +51,6 @@ Puppet::Type.newtype(:netapp_volume) do
 
   newproperty(:snapreserve) do
     desc "The percentage of space to reserve for snapshots."
-    isrequired
 
     validate do |value|
       raise ArgumentError, "%s is not a valid snapreserve." % value unless value =~ /^\d+$/
@@ -154,5 +153,10 @@ Puppet::Type.newtype(:netapp_volume) do
 
   autorequire(:netapp_export_policy) do
     self[:exportpolicy]
+  end
+
+  ## Validate required params
+  validate do
+    raise ArgumentError, 'aggregate is required' if self[:aggregate].nil? and self.provider.aggregate.nil?
   end
 end
