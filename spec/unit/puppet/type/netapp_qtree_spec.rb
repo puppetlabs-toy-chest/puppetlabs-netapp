@@ -1,5 +1,5 @@
 require 'spec_helper'
- 
+
 describe Puppet::Type.type(:netapp_qtree) do
 
   before :each do

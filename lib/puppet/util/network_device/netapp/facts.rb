@@ -2,13 +2,12 @@ require 'puppet/util/network_device/netapp'
 
 class Puppet::Util::NetworkDevice::Netapp::Facts
 
-  attr_reader :transport
-
+  attr_reader :url, :transport
   def initialize(transport)
     @transport = transport
   end
 
-  def retrieve
+  def retrieve(host)
 
     # Create empty hash
     @facts = {}
@@ -16,13 +15,131 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     # Invoke "system-get-version" to gather system version.
     result = @transport.invoke("system-get-version")
 
+    return {} if result.attr_get("status") == "failed"
     # Pull out version
     sys_version = result.child_get_string("version")
-    @facts['version'] = sys_version
+    @facts['version'] = sys_version if sys_version
 
     if sys_clustered = result.child_get_string("is-clustered") and !sys_clustered.empty?
-      @facts['is_clustered'] = sys_clustered
+      Puppet.debug("Device is clustered.")
+      @facts['clustered'] = sys_clustered
     end
+
+    # cMode has differnt API's to 7Mode.
+    if @facts['clustered'] and ! @facts.empty?
+      # Get cluster Mode facts
+      getClusterFacts(host)
+    else
+      # Get 7-Mode facts
+      getSevenFacts
+    end
+
+    # cleanup of netapp output to match existing facter key values.
+    map = {
+      'system-name'          => 'hostname',
+      'memory-size'          => 'memorysize_mb',
+      'system-model'         => 'productname',
+      'cpu-processor-type'   => 'hardwareisa',
+      'vendor-id'            => 'manufacturer',
+      'number-of-processors' => 'processorcount',
+      'system-serial-number' => 'serialnumber',
+      'system-id'            => 'uniqueid'
+    }
+    @facts = Hash[@facts.map {|k, v| [map[k] || k, v] }]\
+
+    # Need to replace '-' with '_'
+    @facts = Hash[@facts.map {|k, v| [k.to_s.gsub('-','_'), v] }]
+    @facts['memorysize'] = "#{@facts['memorysize_mb']} MB"
+
+    # Set operatingsystem details if present
+    if @facts['version'] then
+      if @facts['version'] =~ /^NetApp Release (\d.\d(.\d)?\w*)/i
+        @facts['operatingsystem'] = 'OnTAP'
+        @facts['operatingsystemrelease'] = $1
+      end
+    end
+
+    # Downcase hostname for easier usage
+    @facts['hostname'].downcase! if @facts['hostname']
+
+    # Handle FQDN
+    if @facts['domain']
+      if @facts['hostname'].include?(@facts['domain'])
+        # Hostname contains the domain, therefore must be FQDN
+        @facts['fqdn'] = @facts['hostname']
+        @facts['hostname'] = @facts['fqdn'].split('.',2).shift
+      else
+        # Hostname doesnt include domain.
+        @facts['fqdn'] = "#{@facts['hostname']}.#{@facts['domain']}"
+      end
+    end
+
+    Puppet.debug("Facts = #{@facts.inspect}")
+    @facts
+
+  end
+
+  # Helper method to get clusterMode facts
+  def getClusterFacts(host)
+
+    #debugger
+    Puppet.debug("Hostname = #{host}")
+
+    # Check if connected to a vserver
+    vserver = @transport.get_vserver()
+    Puppet.debug("Current vserver = #{vserver}")
+
+    if vserver.empty?
+      Puppet.debug("Not connected to a vserver, so gather system facts")
+
+      # Pull out node system-info
+      result = @transport.invoke("system-get-node-info-iter")
+      Puppet.debug("Result = #{result.inspect}")
+
+      # Pull out attributes-list and itterate
+      systems = result.child_get("attributes-list")
+      system_host = systems.children_get().find do |system|
+        # Check the system name matches the host we're looking for
+        Puppet.debug("System-name = #{system.child_get_string('system-name')}. downcase = #{system.child_get_string("system-name").downcase}")
+        Puppet.debug("Match = #{host.downcase == system.child_get_string("system-name").downcase}")
+        host.downcase == system.child_get_string("system-name").downcase
+      end
+
+      if system_host
+        # Pull out the required variables
+        [
+          'system-name',
+          'system-id',
+          'system-model',
+          'system-machine-type',
+          'system-serial-number',
+          'partner-system-id',
+          'partner-serial-number',
+          'system-revision',
+          'number-of-processors',
+          'memory-size',
+          'cpu-processor-type',
+          'vendor-id',
+        ].each do |key|
+          @facts[key] = system_host.child_get_string("#{key}".to_s)
+        end
+
+        # Facts dump
+        Puppet.debug("System info = #{@facts.inspect}")
+      else
+        raise ArgumentError, "No matching system found with the system name #{host}"
+      end
+
+      # Get DNS domainname for fqdn
+      #result = @transport.invoke("options-get-iter")
+    end
+
+    @facts
+
+  end
+
+  # Helper method to get 7-Mode facts
+  def getSevenFacts()
 
     # Invoke "system-get-info" call to gather system information.
     result = @transport.invoke("system-get-info")
@@ -51,7 +168,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     # Get DNS domainname to build up fqdn
     result = @transport.invoke("options-get", "name", "dns.domainname")
     domain_name = result.child_get_string("value")
-    @facts['domain'] = domain_name.downcase
+    @facts['domain'] = domain_name.downcase if domain_name
 
     # Get the network config
     result = @transport.invoke("net-ifconfig-get")
@@ -97,45 +214,6 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
       @facts['macaddress'] = @facts['macaddress_e0M'] if @facts['macaddress_e0M']
       @facts['netmask']    = @facts['netmask_e0M'] if @facts['netmask_e0M']
     end
-
-    # cleanup of netapp output to match existing facter key values.
-    map = {
-      'system-name'          => 'hostname',
-      'memory-size'          => 'memorysize_mb',
-      'system-model'         => 'productname',
-      'cpu-processor-type'   => 'hardwareisa',
-      'vendor-id'            => 'manufacturer',
-      'number-of-processors' => 'processorcount',
-      'system-serial-number' => 'serialnumber',
-      'system-id'            => 'uniqueid'
-    }
-    @facts = Hash[@facts.map {|k, v| [map[k] || k, v] }]\
-
-    # Need to replace '-' with '_'
-    @facts = Hash[@facts.map {|k, v| [k.to_s.gsub('-','_'), v] }]
-    @facts['memorysize'] = "#{@facts['memorysize_mb']} MB"
-
-    # Set operatingsystem details if present
-    if @facts['version'] then
-      if @facts['version'] =~ /^NetApp Release (\d.\d(.\d)?\w*)/i
-        @facts['operatingsystem'] = 'OnTAP'
-        @facts['operatingsystemrelease'] = $1
-      end
-    end
-
-    # Handle FQDN
-    @facts['hostname'].downcase!
-    if @facts['hostname'].include? @facts['domain']
-      # Hostname contains the domain, therefore must be FQDN
-      @facts['fqdn'] = @facts['hostname']
-      @facts['hostname'] = @facts['fqdn'].split('.',1).shift
-    else
-      # Hostname doesnt include domain.
-      @facts['fqdn'] = "#{@facts['hostname']}.#{@facts['domain']}"
-    end
-
-    # Return array to calling class.
-    @facts
   end
 
 end

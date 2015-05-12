@@ -19,8 +19,8 @@
 # [*snapresv*]
 #   The amount of space to reserve for snapshots, in percent.
 #
-# [*autoincrement*]
-#   Should the volume auto-increment? True/False.
+# [*autosize*]
+#   Should the volume auto-increment? grow/grow_shrink/off.
 #
 # [*options*]
 #   Hash of options to set on volume. Keyshould match option name.
@@ -42,28 +42,28 @@
 # size will be 1 TeraByte.
 #
 #     netapp::vqe { 'test_volume':
-#       size           => "1t",
-#       aggr           => "aggr1",
-#       spaceres       => "file",
-#       snapresv       => 20,
-#       autoincrement  => false,
-#       persistent     => false
+#       size       => "1t",
+#       aggr       => "aggr1",
+#       spaceres   => "file",
+#       snapresv   => 20,
+#       autosize   => false,
+#       persistent => false
 #     }
 #
 #
 define netapp::vqe (
   $size,
-  $ensure        = 'present',
-  $aggr          = 'aggr1',
-  $spaceres      = 'none',
-  $snapresv      = 0,
-  $autoincrement = true,
-  $options       = {
+  $ensure       = 'present',
+  $aggr         = 'aggr1',
+  $spaceres     = 'none',
+  $snapresv     = 0,
+  $autosize     = true,
+  $options      = {
     'convert_ucode'   => 'on',
     'no_atime_update' => 'on',
     'try_first'       => 'volume_grow'
   },
-  $snapschedule  = {
+  $snapschedule = {
     'minutes'       => 0,
     'hours'         => 0,
     'days'          => 0,
@@ -71,19 +71,19 @@ define netapp::vqe (
     'which-hours'   => 0,
     'which-minutes' => 0
   },
-  $persistent = true
+  $persistent   = true
 ) {
 
 
   netapp_volume { "v_${name}":
-    ensure        => $ensure,
-    initsize      => $size,
-    aggregate     => $aggr,
-    spaceres      => $spaceres,
-    snapreserve   => $snapresv,
-    autoincrement => $autoincrement,
-    options       => $options,
-    snapschedule  => $snapschedule,
+    ensure       => $ensure,
+    initsize     => $size,
+    aggregate    => $aggr,
+    spaceres     => $spaceres,
+    snapreserve  => $snapresv,
+    autosize     => $autosize,
+    options      => $options,
+    snapschedule => $snapschedule,
   }
 
   netapp_qtree { "q_${name}":

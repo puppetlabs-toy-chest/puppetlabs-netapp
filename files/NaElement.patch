@@ -1,0 +1,14 @@
+--- lib/puppet/util/network_device/netapp/NaElement.rb.orig	2014-10-03 10:59:42.797113116 +0100
++++ lib/puppet/util/network_device/netapp/NaElement.rb	2014-10-03 10:20:06.525428440 +0100
+@@ -105,6 +105,11 @@
+       @content = content
+   end
+ 
++  #Get the elements value from 'content'. 
++
++  def get_content()
++    @content
++  end
+ 
+   #Add the element's value to 'content'.  This is
+   #not needed in normal development.

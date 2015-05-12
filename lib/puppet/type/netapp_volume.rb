@@ -1,10 +1,10 @@
-Puppet::Type.newtype(:netapp_volume) do 
+Puppet::Type.newtype(:netapp_volume) do
   @doc = "Manage Netapp Volume creation, modification and deletion."
-  
+
   apply_to_device
-  
+
   ensurable
-  
+
   newparam(:name) do
     desc "The volume name. Valid characters are a-z, 1-9 & underscore."
     isnamevar
@@ -18,21 +18,19 @@ Puppet::Type.newtype(:netapp_volume) do
   newproperty(:state) do
     desc "The volume state. Valid options are: online, offline, restricted."
     newvalues(:online, :offline, :restricted)
-    defaultto :online
   end
-  
+
   newproperty(:initsize) do
-    desc "The initial volume size. Valid format is 1-9(kmgt)."
-    defaultto "1g"
+    desc "The initial volume size. Valid format is [0-9]+[kmgt]."
     validate do |value|
       unless value =~ /^\d+[kmgt]$/
          raise ArgumentError, "%s is not a valid initial volume size." % value
       end
     end
   end
-  
+
   newparam(:aggregate) do
-    desc "The aggregate this volume should be created in." 
+    desc "The aggregate this volume should be created in."
     isrequired
     validate do |value|
       unless value =~ /^\w+$/
@@ -40,28 +38,25 @@ Puppet::Type.newtype(:netapp_volume) do
       end
     end
   end
-  
+
   newparam(:languagecode) do
     desc "The language code this volume should use."
-    defaultto "en" 
     newvalues(:C, :ar, :cs, :da, :de, :en, :en_US, :es, :fi, :fr, :he, :hr, :hu, :it, :ja, :ja_v1, :ko, :no, :nl, :pl, :pt, :ro, :ru, :sk, :sl, :sv, :tr, :zh, :zh_TW)
   end
-  
+
   newparam(:spaceres) do
     desc "The space reservation mode."
     newvalues(:none, :file, :volume)
-    defaultto :none
   end
-  
-  newproperty(:snapreserve) do 
+
+  newproperty(:snapreserve) do
     desc "The percentage of space to reserve for snapshots."
-    isrequired
-    
+
     validate do |value|
       raise ArgumentError, "%s is not a valid snapreserve." % value unless value =~ /^\d+$/
       raise ArgumentError, "Puppet::Type::Netapp_volume: Reserved percentage must be between 0 and 100." unless value.to_i.between?(0,100)
-    end 
-    
+    end
+
     munge do |value|
       case value
       when String
@@ -73,19 +68,35 @@ Puppet::Type.newtype(:netapp_volume) do
       return value
     end
   end
-  
-  newproperty(:autoincrement, :boolean => true) do 
-    desc "Should volume size auto-increment be enabled? Defaults to `:true`."
-    newvalues(:true, :false)
-    defaultto :true
+
+  newproperty(:junctionpath) do
+    desc "The fully-qualified pathname in the owning Vserver's namespace at which a volume is mounted."
+    newvalues(/^\//,false)
+    munge do |value|
+      case value
+      when false, :false, "false"
+        false
+      else
+        value
+      end
+    end
   end
-  
-  newproperty(:options, :array_matching => :all) do 
+
+  newproperty(:autosize, :boolean => true) do
+    desc "Should volume autosize be grow, grow_shrink, or off?"
+    newvalues(:off, :grow, :grow_shrink)
+  end
+
+  newproperty(:exportpolicy) do
+    desc "The export policy with which the volume is associated."
+  end
+
+  newproperty(:options, :array_matching => :all) do
     desc "The volume options hash."
     validate do |value|
       raise ArgumentError, "Puppet::Type::Netapp_volume: options property must be a hash." unless value.is_a? Hash
     end
-    
+
     def insync?(is)
       # @should is an Array. see lib/puppet/type.rb insync?
       should = @should.first
@@ -97,9 +108,9 @@ Puppet::Type.newtype(:netapp_volume) do
       end
       true
     end
-    
+
     def should_to_s(newvalue)
-      # Newvalue is an array, but we're only interested in first record. 
+      # Newvalue is an array, but we're only interested in first record.
       newvalue = newvalue.first
       newvalue.inspect
     end
@@ -108,13 +119,13 @@ Puppet::Type.newtype(:netapp_volume) do
       currentvalue.inspect
     end
   end
-  
-  newproperty(:snapschedule, :array_matching=> :all) do 
+
+  newproperty(:snapschedule, :array_matching=> :all) do
     desc "The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'. "
     validate do |value|
       raise ArgumentError, "Puppet::Type::Netapp_volume: snapschedule property must be a hash." unless value.is_a? Hash
     end
-    
+
     def insync?(is)
       # @should is an Array. see lib/puppet/type.rb insync?
       should = @should.first
@@ -128,9 +139,9 @@ Puppet::Type.newtype(:netapp_volume) do
       end
       true
     end
-    
+
     def should_to_s(newvalue)
-      # Newvalue is an array, but we're only interested in first record. 
+      # Newvalue is an array, but we're only interested in first record.
       newvalue = newvalue.first
       newvalue.inspect
     end
@@ -139,5 +150,13 @@ Puppet::Type.newtype(:netapp_volume) do
       currentvalue.inspect
     end
   end
-  
+
+  autorequire(:netapp_export_policy) do
+    self[:exportpolicy]
+  end
+
+  ## Validate required params
+  validate do
+    raise ArgumentError, 'aggregate is required' if self[:aggregate].nil? and self.provider.aggregate.nil?
+  end
 end
