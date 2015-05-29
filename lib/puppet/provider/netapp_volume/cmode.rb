@@ -82,21 +82,14 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
         Puppet.debug("Puppet::Provider::Netapp_volume.cmode self.instances: Not a vserver; skipping options and snapschedule")
       end
 
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode self.instances: Constructed volume_hash for volume #{vol_name}.")
-
       # Create the instance and add to volumes array.
       volumes << new(volume_hash)
     end
-
-    Puppet.debug("Returning volumes array.")
     volumes
   end
 
   def self.prefetch(resources)
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Got to self.prefetch.")
-    # Itterate instances and match provider where relevant.
     instances.each do |prov|
-      Puppet.debug("Prov.name = #{resources[prov.name]}. ")
       if resource = resources[prov.name]
         resource.provider = prov
       end
@@ -104,10 +97,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
   end
 
   def flush
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Got to flush for resource #{@resource[:name]}.")
-
-    # Check required resource state
-    Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
     if @property_hash[:ensure] == :absent
       # Check if volume is online.
       self.class.get_volinfo.each do |volume|
@@ -158,7 +147,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       vol_state = vol_state_info.child_get_string("state")
       vol_root = vol_state_info.child_get_string("is-vserver-root")
       vol_snap_reserve = vol_space_info.child_get_int("percentage-snapshot-reserve")
-      vol_raid_status = volume.child_get_string("raid-status")
+      #vol_raid_status = volume.child_get_string("raid-status")
       if vol_export_attributes = volume.child_get("volume-export-attributes")
         vol_export_policy = vol_export_attributes.child_get_string("policy")
       end
@@ -280,7 +269,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode initsize=: setting volume size for Volume #{@resource[:name]}")
 
     # Query Netapp to update volume size.
-    result = volsizeset("volume", @resource[:name], "new-size", @resource[:initsize])
+    volsizeset("volume", @resource[:name], "new-size", @resource[:initsize])
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode initsize=: Volume size set succesfully for volume #{@resource[:name]}.")
     # Trigger and autosize run if required.
     if @resource[:autosize] == :true
@@ -291,12 +280,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
   # Snap reserve setter
   def snapreserve=(value)
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapreserve=: setting snap reservation value for Volume #{@resource[:name]}")
-
-    # Query Netapp to set snap-reserve value.
-    result = snapresset("volume", @resource[:name], "percentage", @resource[:snapreserve])
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapreserve=: Snap reserve set succesfully for volume #{@resource[:name]}.")
-    return true
+    snapresset("volume", @resource[:name], "percentage", @resource[:snapreserve])
   end
 
   # autosize setter
@@ -339,16 +323,13 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
   end
 
   # Volume options setter.
-  def options=(value)
-
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode options=: Got to options= setter...")
-    # Value is an array, so pull out first value.
-    opts = value.first
+  def options=(opts_array)
+    opts = opts_array.first
     opts.each do |setting,value|
       # Itterate through each options pair.
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode options=: Setting = #{setting}, Value = #{value}")
       # Call webservice to set volume option.
-      result = voloptset("volume", @resource[:name], "option-name", setting, "option-value", value)
+      voloptset("volume", @resource[:name], "option-name", setting, "option-value", value)
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode  options=: Volume Option #{setting} set against Volume #{@resource[:name]}.")
     end
     # All volume options set successfully.
@@ -364,7 +345,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     snapschedule = value.first
 
     # Set the snapshot schedule
-    result = snapschedset(
+    snapschedset(
       'volume', @resource[:name],
       'weeks', snapschedule['weeks'].to_s,
       'days', snapschedule['days'].to_s,
@@ -372,9 +353,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       'minutes', snapschedule['minutes'].to_s,
       'which-hours', snapschedule['which-hours'].to_s,
       'which-minutes', snapschedule['which-minutes'].to_s )
-
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapschedule=: Snapshedule successfully set against Volume #{@resource[:name]}.")
-    return true
   end
 
   # Volume state setter.
@@ -430,8 +408,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     volume_get = NaElement.new('query')
     volume_get.child_add(volume_query)
     volume_modify.child_add(volume_get)
-    result = volmodify(volume_modify)
-    return true
+    volmodify(volume_modify)
   end
 
   # Volume create.
@@ -443,18 +420,18 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     arguments += ["size", resource[:initsize]] if resource[:initsize]
     arguments += ["language-code", resource[:languagecode]] if resource[:languagecode]
     arguments += ["space-reserve", resource[:spaceres]] if resource[:spaceres]
-    result = volcreate(*arguments)
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{resource[:name]} created successfully. Setting options...")
+    volcreate(*arguments)
 
     # Update other attributes after resource creation.
     methods = [
       'autosize',
+      'exportpolicy',
+      'junctionpath',
       'options',
       'snapreserve',
-      'snapschedule'
-      ]
+      'snapschedule',
+    ]
 
-    # Itterate through methods.
     methods.each do |method|
       self.send("#{method}=", resource[method.to_sym]) if resource[method.to_sym]
     end
@@ -473,9 +450,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
   end
 
   def exists?
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode: checking existance of Netapp Volume #{@resource[:name]}")
-    Puppet.debug("Value = #{@property_hash[:ensure]}")
     @property_hash[:ensure] == :present
   end
-
 end
