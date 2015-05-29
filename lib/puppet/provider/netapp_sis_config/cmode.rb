@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
-Puppet::Type.type(:netapp_vserver_sis_config).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Vserver sis config."
+Puppet::Type.type(:netapp_sis_config).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
+  @doc = "Manage Netapp sis config."
 
   confine :feature => :posix
   defaultfor :feature => :posix
@@ -22,7 +22,7 @@ Puppet::Type.type(:netapp_vserver_sis_config).provide(:cmode, :parent => Puppet:
     Puppet.debug("Puppet::Provider::Netapp_vserver_sis_config.cmode: got to self.instances for cMode provider.")
 
     # Get vserver info
-    results = sislist()
+    results = sislist() || []
     Puppet.debug("Puppet::Provider::Netapp_vserver_sis_config.cmode instances: processing configs")
 
     sis_configs = []
@@ -92,22 +92,19 @@ Puppet::Type.type(:netapp_vserver_sis_config).provide(:cmode, :parent => Puppet:
   def flush
     if exists?
       args = Array.new
-      #args += ['compression-type',          @property_hash[:compression_type]]
-      args += ['enable-compression',        @property_hash[:compression]]
-      args += ['enable-idd',                @property_hash[:idd]]
-      args += ['enable-inline-compression', @property_hash[:inline_compression]]
-      args += ['path',                      @property_hash[:name]]
-      args += ['policy-name',               @property_flush[:policy]] if @property_flush[:policy]
-      args += ['schedule',                  @property_flush[:sis_schedule]] if @property_flush[:sis_schedule]
-      args += ['quick-check-fsize',         @property_hash[:quick_check_fsize]]
+      args += ['path',                      @resource[:name]]
+      #args += ['compression-type',          @resource[:compression_type]] if @resource[:compression_type]
+      args += ['enable-compression',        @resource[:compression]] if @resource[:compression]
+      args += ['enable-idd',                @resource[:idd]] if @resource[:idd]
+      args += ['enable-inline-compression', @resource[:inline_compression]] if @resource[:inline_compression]
+      args += ['quick-check-fsize',         @resource[:quick_check_fsize]] if @resource[:quick_check_fsize]
+      args += ['policy-name',               @resource[:policy]] if @resource[:policy]
+      args += ['schedule',                  @resource[:sis_schedule]] if @resource[:sis_schedule]
       Puppet.debug("Puppet::Provider::Netapp_vserver_sis_config.cmode flush: Sending to sis_set_config: #{args.inspect}")
-      result = sissetconfig(*args)
-
-      return true
+      sissetconfig(*args)
     end
   end
 
-  # Volume create.
   def enabled=(value)
     if value == true
       result = sisenable("path", @resource[:name])
@@ -124,7 +121,8 @@ Puppet::Type.type(:netapp_vserver_sis_config).provide(:cmode, :parent => Puppet:
   end
 
   def create
-    Puppet.debug("Puppet::Provider::Netapp_vserver_sis_config.cmode: Can't create sis configs, only manage existing ones.")
+    self.enabled=(@resource[:enabled])
+    @property_hash[:ensure] = :present
 
     return true
   end

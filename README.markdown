@@ -701,7 +701,7 @@ The vserver option name
 ##### value
 The vserver option value
 
-### Type: netapp_vserver_sis_config
+### Type: netapp_sis_config
 Manage Netapp Vserver sis config modification.
 
 #### Parameters
