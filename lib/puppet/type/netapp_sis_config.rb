@@ -1,7 +1,7 @@
 require 'puppet/property/netapp_truthy'
 
-Puppet::Type.newtype(:netapp_vserver_sis_config) do
-  @doc = "Manage Netapp Vserver sis config modification."
+Puppet::Type.newtype(:netapp_sis_config) do
+  @doc = "Manage Netapp sis config modification."
 
   apply_to_device
 
@@ -52,5 +52,13 @@ Puppet::Type.newtype(:netapp_vserver_sis_config) do
     if self[:policy] and self[:sis_schedule]
       raise ArgumentError, "Cannot specify both sis_schedule and policy for a sis config resource"
     end
+  end
+
+  autorequire(:netapp_sis_policy) do
+    [self[:policy]]
+  end
+
+  autorequire(:netapp_volume) do
+    [File.basename(self[:path])]
   end
 end
