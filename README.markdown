@@ -536,6 +536,32 @@ Not yet reviewed.
 ### Type: netapp_role
 Not yet reviewed.
 
+### Type: netapp_sis_policy
+Manage Netapp sis policies.
+
+#### Parameters
+##### type
+The type of policy.
+
+Valid values are `threshold`, `scheduled`.
+
+##### job_schedule
+Job schedule name. Eg: 'daily'
+
+##### duration
+Job duration in hours.
+
+##### enabled
+Manage whether the sis policy is enabled.
+
+Valid values are `true`, `false`, `yes`, `no`, `enabled`, `disabled`
+
+##### comment
+Comment for the policy.
+
+##### qos_policy
+QoS policy name. Eg: 'best\_effort'
+
 ### Type: netapp_snapmirror
 Not yet reviewed.
 
