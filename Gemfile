@@ -19,7 +19,7 @@ group :test do
   gem 'librarian-puppet'
   gem 'simplecov', :require => false, :platforms => [:ruby_19, :ruby_20]
   gem 'pry'
-  gem 'pry-debugger'
+  gem 'pry-byebug'
   #if ENV.key?('TEAMCITY_VERSION')
   #  gem 'simplecov-teamcity-summary', :require => false, :platforms => [:ruby_19, :ruby_20]
   #end
