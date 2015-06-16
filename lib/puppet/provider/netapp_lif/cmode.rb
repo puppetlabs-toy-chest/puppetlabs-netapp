@@ -115,7 +115,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
       end
 
       # Create the lif
-      result = lifmodify(lif_modify)
+      lifmodify(lif_modify)
 
       # Passed above, therefore must of worked.
       Puppet.debug("Puppet::Provider::Netapp_lif.cmode: lif #{@resource[:interfacename]} modified successfully. \n")
@@ -151,7 +151,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
     lif_create.child_add(dataprotocols_element)
 
     # Create the lif
-    result = lifcreate(lif_create)
+    lifcreate(lif_create)
 
     # LIF created successfully
     Puppet.debug("Puppet::Provider::Netapp_lif.cmode: LIF #{@resource[:interfacename]} created successfully.")
