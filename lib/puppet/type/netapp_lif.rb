@@ -29,17 +29,16 @@ Puppet::Type.newtype(:netapp_lif) do
   end
 
   newproperty(:administrativestatus) do
-    desc "LIF administratative status. Defaults to: 'up'. Possible values: 'up', 'down'."
+    desc "LIF administratative status."
     newvalues(:up, :down)
-    defaultto(:up)
   end
 
   newproperty(:comment) do
     desc "LIF comment"
   end
 
-  newparam(:dataprotocols, :array_matching => :all) do
-    desc "LIF data protocols. Possible values: 'nfs', 'cifs', 'iscsi', 'fcp', 'fcache', 'none'"
+  newproperty(:dataprotocols, :array_matching => :all) do
+    desc "LIF data protocols."
     newvalues(:nfs, :cifs, :iscsi, :fcp, :fcache, :none)
   end
 
@@ -55,13 +54,12 @@ Puppet::Type.newtype(:netapp_lif) do
   end
 
   newproperty(:failoverpolicy) do
-    desc "LIF failover policy. Defaults to: 'nextavail'. Possible values: 'nextavail', 'priority', 'disabled'."
+    desc "LIF failover policy."
     newvalues(:nextavail, :priority, :disabled)
-    defaultto(:nextavail)
   end
 
   newproperty(:firewallpolicy) do
-    desc "LIF firewall policy. Default is based on the port role. Possible values: 'mgmt', 'cluster', 'intercluster'."
+    desc "LIF firewall policy."
     newvalues(:mgmt, :cluster, :intercluster)
   end
 
@@ -74,9 +72,8 @@ Puppet::Type.newtype(:netapp_lif) do
   end
 
   newproperty(:isautorevert) do
-    desc "Should the LIF revert to it's home node. Defaults to: false."
+    desc "Should the LIF revert to it's home node."
     newvalues(:true, :false)
-    defaultto(:false)
   end
 
   newproperty(:netmask) do
@@ -101,7 +98,7 @@ Puppet::Type.newtype(:netapp_lif) do
   end
 
   newparam(:role) do
-    desc "LIF Role. Defaults to: 'data'. Possible values: 'undef', 'cluster', 'data', 'node_mgmt', 'intercluster', 'cluster_mgmt'."
+    desc "LIF Role."
     newvalues(:undef, :cluster, :data, :node_mgmt, :intercluster, :cluster_mgmt)
     defaultto(:data)
   end
@@ -116,9 +113,8 @@ Puppet::Type.newtype(:netapp_lif) do
   end
 
   newproperty(:usefailovergroup) do
-    desc "Should failover group be automatically created? Defaults to: 'disabled'. Possible values: 'system_defined', 'disabled', 'enabled'."
+    desc "Should failover group be automatically created?"
     newvalues(:disabled, :enabled, :system_defined)
-    defaultto(:disabled)
   end
 
   newparam(:vserver) do

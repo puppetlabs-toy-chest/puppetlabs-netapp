@@ -6,8 +6,7 @@ Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::Neta
   confine :feature => :posix
   defaultfor :feature => :posix
 
-  #netapp_commands :nfslist    => {:api => 'nfs-service-get-iter', :iter => true, :result_element => 'attributes-list'}
-  netapp_commands :nfslist    => 'nfs-service-get'
+  netapp_commands :nfslist    => {:api => 'nfs-service-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :nfscreate  => 'nfs-service-create'
   netapp_commands :nfsdestroy => 'nfs-service-destroy'
   netapp_commands :nfsmodify  => 'nfs-service-modify'
@@ -18,8 +17,8 @@ Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::Neta
 
   def self.instances
     nfss = []
-    nfs = nfslist() || nil
-    if nfs = nfs.child_get('attributes') and nfs = nfs.child_get('nfs-info')
+    results = nfslist() || []
+    results.each do |nfs|
       vserver = nfs.child_get_string('vserver')
       nfs_hash = {
         :name   => vserver,
@@ -68,7 +67,7 @@ Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::Neta
 
   def create
     nfscreate(*get_args)
-    @propert_hash.clear
+    @property_hash.clear
   end
 
   def destroy
