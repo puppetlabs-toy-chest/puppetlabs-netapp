@@ -22,6 +22,7 @@
   * [Contributors](#contributors)
 
 ## Overview
+
 The NetApp Data ONTAP device module is designed to add support for managing
 NetApp Data ONTAP configuration using Puppet and its Network Device
 functionality.
@@ -34,6 +35,7 @@ Data ONTAP 8.2 Cluster-mode.
 -->
 
 ## Module Description
+
 This module uses the NetApp Manageability SDK to manage various aspects of the
 NetApp Data ONTAP software.
 
@@ -53,32 +55,36 @@ XXX Verify these
 ## Setup
 
 ## Requirements
-Since we can not directly install Puppet on the NetApp Data ONTAP operating
-system it must be managed through an intermediate proxy system running `puppet
-device`. The requirement for the proxy system:
 
- * Puppet 3.7.+
+Because we can not directly install Puppet on the NetApp Data ONTAP operating
+system, it must be managed through an intermediate proxy system running `puppet
+device`. The requirements for the proxy system are:
+
+ * Puppet 3.7 or greater
  * NetApp Manageability SDK Ruby libraries
  * Faraday gem
 
 The proxy system must be able to connect to the Puppet master (default port of
-8140) and to the NetApp Data ONTAP (default port of 443)
+8140) and to the NetApp Data ONTAP (default port of 443).
 
 ### NetApp Manageability SDK
+
 Due to licensing, you must download the NetApp Manageability SDK separately.
-The NetApp Ruby libraries are contained within the NetApp Manageability SDK
+The NetApp Ruby libraries are contained within the NetApp Manageability SDK,
 which is available for download from [NetApp
 NOW](http://support.netapp.com/NOW/cgi-bin/software?product=NetApp+Manageability+SDK&platform=All+Platforms).
 
-Please note you need a NetApp NOW account in order to be able to download the
+Please note that you need a NetApp NOW account to download the
 SDK.
 
-Once you have downloaded and extracted the SDK, the ruby SDK libraries must be
+Once you have downloaded and extracted the SDK, the Ruby SDK libraries must be
 copied into the module:
+
 `$ cp netapp-manageability-sdk-5.*/lib/ruby/NetApp/*.rb [module dir]/netapp/lib/puppet/netapp_sdk/`
 
 ### Device Proxy System Setup
-In order to configure a Data ONTAP device, you must create a proxy system
+
+To configure a Data ONTAP device, you must create a proxy system
 able to run `puppet device` and have a device.conf file that refers to the
 NetApp ONTAP system or vserver. Refer to the [device.conf man
 page](https://docs.puppetlabs.com/puppet/latest/reference/config_file_device.html)
@@ -91,11 +97,12 @@ device.conf entry is always `netapp`.
 For example, if you had a Data ONTAP operating system with the node management
 interface addressable by the DNS name of ontap01.example.com and credentials
 of admin & netapp123, the device.conf entry would be:
-```
+
+~~~
 [ontap01.example.com]
 type netapp
 url https://admin:netapp123@ontap01.example.com
-```
+~~~
 
 Note: The device certname must match the hostname of the node.
 
@@ -104,11 +111,12 @@ information for a physical system which is configured with the vserver and
 specify a path in the url that represents the name of your vserver. For
 example, if the above Data ONTAP node ontap01 is configured with a vserver
 called "vserver01," the device entry could be:
-```
+
+~~~
 [vserver01.example.com]
 type netapp
 url https://admin:netapp123@ontap01.example.com/vserver01
-```
+~~~
 
 Note: The device certname does not need to match the hostname of the node as
 with a system device entry.
@@ -119,6 +127,7 @@ go in `${confdir}/device/ontap01.example.com.conf` and
 `${confdir}/device/vserver01.example.com.conf`. Device configurations in separate files must be specified by `puppet device --deviceconfig /path/to/device-file.conf` to be used by `puppet device` run.
 
 ## Usage
+
 ### Beginning with netapp
 
 Continuing from the example in [Device Proxy System
@@ -126,7 +135,8 @@ Setup](#device-proxy-system-setup), we can define a node definition for
 ontap01.example.com to create a vserver with an aggregate of 6 disks and a LIF:
 
 <!-- similar to https://library.netapp.com/ecmdocs/ECMP1196798/html/GUID-6D897853-FE9E-430C-971E-47096FDD462E.html -->
-```
+
+~~~
 node 'ontap01.example.com' {
   netapp_aggregate { 'aggr1':
     ensure    => present,
@@ -148,10 +158,11 @@ node 'ontap01.example.com' {
     dataprotocols => ['nfs'],
   }
 }
-```
+~~~
 
 Next we should create a node definition for the vserver with a volume that has export policies for NFS, and a qtree on the volume:
-```
+
+~~~
 node 'vserver01.example.com' {
   netapp_export_policy { 'nfs_exports':
     ensure => present,
@@ -185,22 +196,25 @@ node 'vserver01.example.com' {
     v40    => 'enabled',
   }
 }
-```
+~~~
+
 If the device configuration are both in `$confdir/device.conf`, they can now be
-configured by running `puppet device --verbose --user=root`
+configured by running `puppet device --verbose --user=root`.
 
 If the device configurations are is separate files, you can use the following
 command to run puppet against a single device at a time:
-```
+
+~~~
 puppet device --verbose --user=root --deviceconfig /etc/puppet/device/ontap01.example.com.conf
-```
+~~~
 
 <!--
 ### NetApp operations
-As part of this module, there is a defined type called 'netapp::vqe', which can be used to create a volume, add a qtree and create an NFS export.
+As part of this module, there is a define called 'netapp::vqe', which can be used to create a volume, add a qtree and create an NFS export.
+
 An example of this is:
 
-```
+~~~
 netapp::vqe { 'volume_name':
   ensure     => present,
   size       => '1t',
@@ -210,7 +224,7 @@ netapp::vqe { 'volume_name':
   autosize   => 'grow',
   persistent => true
 }
-```
+~~~
 
 This will create a NetApp volume called `v_volume_name` with a qtree called `q_volume_name`.
 The volume will have an initial size of 1 Terabyte in Aggregate aggr2.
@@ -218,12 +232,14 @@ The space reservation mode will be set to volume, and snapshot space reserve wil
 The volume will be able to auto increment, and the NFS export will be persistent.
 
 You can also use any of the types individually, or create new defined types as required.
--->
+-->\
+
 ### Classes and Defined Types
 
 None as of this first release. Common operations may be encapsulated in defined resource types.
 
 ### Types and Providers
+
 [`netapp_aggregate`](#type-netapp_aggregate)
 [`netapp_cluster_id`](#type-netapp_cluster_id)
 [`netapp_cluster_peer`](#type-netapp_cluster_peer)
@@ -252,64 +268,78 @@ Manage Netapp Aggregate creation, modification and deletion.
 #### Parameters
 All parameters, except where otherwise noted, are optional.
 
-##### blocktype
+##### `blocktype`
+
 The indirect block format for the aggregate. Default value: '64_bit'. 
 
 Valid values are `64_bit`, `32_bit`.
 
-##### checksumstyle
+##### `checksumstyle`
+
 Aggregate checksum style. Default value: 'block'.
 
 Valid values are `advanced_zoned`, `block`.
 
-##### diskcount
+##### `diskcount`
+
 Number of disks to place in the aggregate, including parity disks.
 
-##### disksize
+##### `disksize`
+
 Disk size with unit to assign to aggregate.
 
-##### disktype
+##### `disktype`
+
 Disk types to use with aggregate. Only required when multiple disk types are connected.
 
 Valid values are `ATA`, `BSAS`, `EATA`, `FCAL`, `FSAS`, `LUN`, `MSATA`, `SAS`, `SATA`, `SCSI`, `SSD`, `XATA`, `XSAS`.
 
-##### ensure
+##### `ensure`
+
 The basic state that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### groupselectionmode
+##### `groupselectionmode`
+
 How should Data ONTAP add disks to raidgroups.
 
 Valid values are `last`, `one`, `new`, `all`.
 
-##### ismirrored
+##### `ismirrored`
+
 Should the aggregate be mirrored (have two plexes). Defaults to false.
 
 Valid values are `true`, `false`.
 
-##### name
+##### `name`
+
 The aggregate name
 
-##### nodes
+##### `nodes`
+
 Target nodes to create aggregate. May be an array.
 
-##### raidsize
+##### `raidsize`
+
 Maximum number of disks in each RAID group in aggregate.
 
 Valid values are between 2 and 28
 
-##### raidtype
+##### `raidtype`
+
 Raid type to use in the new aggregate. Default: raid4.
 
 Valid values are `raid4`, `raid_dp`.
 
-##### state
+##### `state`
+
 The aggregate state. Default value: 'online'.
 
 Valid values are `online`, `offline`.
 
-##### striping
+##### `striping`
+
 Should the new aggregate be striped? Default: not_striped.
 
 Valid values are `striped`, `not_striped`.
@@ -321,71 +351,89 @@ Not yet reviewed.
 Not yet reviewed.
 
 ### Type: netapp_export_policy
+
 Manage Netapp CMode Export Policy creation and deletion.
 
 #### Parameters
-##### ensure
+
+##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### name
+##### `name`
+
 The export policy name.
 
 ### Type: netapp_export_rule
+
 Manage Netapp CMode Export rule creation, modification and deletion.
 
 #### Parameters
-##### allowdevenabled
+
+##### `allowdevenabled`
+
 Should the NFS server allow creation of devices. Defaults to true.
 
 Valid values are `true`, `false`.
 
-##### allowsetuid
+##### `allowsetuid`
+
 Should the NFS server allow setuid. Defaults to true.
 
 Valid values are `true`, `false`.
 
-##### anonuid
+##### `anonuid`
+
 User name or ID to map anonymous users to. Defaults to 65534.
 
-##### clientmatch
-Client match specification for the export rule. May take an fqdn, IP address, IP hyphenated range, or CIDR notation. *Required*
+##### `clientmatch`
 
-##### ensure
+*Required*. Client match specification for the export rule. May take an fqdn, IP address, IP hyphenated range, or CIDR notation. 
+
+##### `ensure`
+
 The basic state that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### exportchownmode
+##### `exportchownmode`
+
 Change ownership mode. Defaults to 'restricted'.
 
 Valid values are `restricted`, `unrestricted`.
 
-##### name
+##### `name`
+
 The export policy. Composite name based on policy name and rule index. Must take the form of `policy_name:rule_number` where the rule number is an integer and the policy name is an existing export policy.
 
-##### ntfsunixsecops
+##### `ntfsunixsecops`
+
 Ignore/Fail Unix security operations on NTFS volumes. Defaults to 'fail'.
 
 Valid values are `ignore`, `fail`.
 
-##### protocol
+##### `protocol`
+
 Client access protocol. Defaults to 'any'.
 
 Valid values are `any`, `nfs2`, `nfs3`, `nfs`, `cifs`, `nfs4`, `flexcache`.
 
-##### rorule
+##### `rorule`
+
 Property to configure read only rules. Defaults to 'any'.
 
 Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
 
-##### rwrule
+##### `rwrule`
+
 Property to configure read write rules. Defaults to 'any'.
 
 Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
 
-##### superusersecurity
+##### `superusersecurity`
+
 Superuser security flavor. Defaults to 'any'.
 
 Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
@@ -448,83 +496,102 @@ Valid values are 12-16 hexidecimal digits.
 Not yet reviewed.
 
 ### Type: netapp_lif
+
 Manage Netapp Logical Inteface (LIF) creation, modification and deletion.
 
 #### Parameters
-##### address
+
+##### `address`
+
 LIF IP address. *Required*
 
-##### administrativestatus
+##### `administrativestatus`
+
 LIF administratative status. Defaults to: 'up'.
 
 Valid values are `up`, `down`.
 
-##### comment
-LIF comment
+##### `comment`
 
-##### dataprotocols
+LIF comment.
+
+##### `dataprotocols`
+
 LIF data protocols.
 
 Valid values are `nfs`, `cifs`, `iscsi`, `fcp`, `fcache`, `none`.
 
-##### dnsdomainname
+##### `dnsdomainname`
+
 LIF dns domain name.
 
-##### ensure
+##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### failovergroup
-LIF failover group name
+##### `failovergroup`
 
-##### failoverpolicy
+LIF failover group name.
+
+##### `failoverpolicy`
+
 LIF failover policy. Defaults to: 'nextavail'.
 
 Valid values are `nextavail`, `priority`, `disabled`.
 
-##### firewallpolicy
+##### `firewallpolicy`
+
 LIF firewall policy. Default is based on the port role.
 
 Valid values are `mgmt`, `cluster`, `intercluster`.
 
-##### homenode
-LIF home node. *Required*
+##### `homenode`
 
-##### homeport
-LIF home port. *Required*
+*Required*. LIF home node.
 
-##### interfacename
-**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+##### `homeport`
 
-LIF name
+*Required*. LIF home port.
 
-##### isautorevert
-Should the LIF revert to it's home node. Defaults to: false.
+##### `interfacename`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title. LIF name.
+
+##### `isautorevert`
+
+Should the LIF revert to its home node. Defaults to: `false`.
 
 Valid values are `true`, `false`.
 
-##### netmask
-LIF netmask. *Required* if `netmasklength` is not specified
+##### `netmask`
 
-##### netmasklength
-LIF netmask length. *Required* if `netmask` is not specified
+LIF netmask. *Required* if `netmasklength` is not specified.
 
-##### role
+##### `netmasklength`
+
+LIF netmask length. *Required* if `netmask` is not specified.
+
+##### `role`
+
 LIF Role. Defaults to: 'data'.
 
 Valid values are `undef`, `cluster`, `data`, `node_mgmt`, `intercluster`, `cluster_mgmt`.
 
-##### routinggroupname
+##### `routinggroupname`
+
 LIF Routing group. Valid format is {dcn}{ip address}/{subnet}.
 
-##### usefailovergroup
-Should failover group be automatically created? Defaults to: 'disabled'.
+##### `usefailovergroup`
+
+Whether the failover group should be automatically created. Defaults to: 'disabled'.
 
 Valid values are `disabled`, `enabled`, `system_defined`.
 
-##### vserver
-LIF Vserver name. *Required*
+##### `vserver`
+
+*Required*. LIF Vserver name.
 
 ### Type: netapp_lun
 Not yet reviewed.
@@ -533,29 +600,35 @@ Not yet reviewed.
 Not yet reviewed.
 
 ### Type: netapp_nfs
+
 Manage NetApp NFS service
 
 #### Parameters
-##### vserver
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
-NFS service SVM. This resource can only be applied to vservers, so the title is redundant.
 
-##### state
+##### `vserver`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title. NFS service SVM. This resource can only be applied to vservers, so the title is redundant.
+
+##### `state`
+
 NFS Service State
 
 Valid values are `on`, `off`.
 
-##### v3
+##### `v3`
+
 Control NFS v3 access
 
 Valid values are `enabled`, `disabled`.
 
-##### v40
+##### `v40`
+
 Control NFS v4.0 access
 
 Valid values are `enabled`, `disabled`.
 
-##### v41
+##### `v41`
+
 Control NFS v4.1 access
 
 Valid values are `enabled`, `disabled`.
@@ -564,22 +637,28 @@ Valid values are `enabled`, `disabled`.
 Not yet reviewed.
 
 ### Type: netapp_qtree
+
 Manage Netapp Qtree creation, modification and deletion.
 
 #### Parameters
-##### ensure
+
+##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### exportpolicy
+##### `exportpolicy`
+
 The export policy with which the qtree is associated. (Note: Not yet implemented)
 
-##### name
-The qtree name
+##### `name`
 
-##### volume
-The volume to create the qtree against. *Required.*
+The qtree name.
+
+##### `volume`
+
+*Required.*. The volume to create the qtree against. 
 
 ### Type: netapp_quota
 Not yet reviewed.
@@ -588,30 +667,38 @@ Not yet reviewed.
 Not yet reviewed.
 
 ### Type: netapp_sis_policy
+
 Manage Netapp sis policies.
 
 #### Parameters
-##### type
+
+##### `type`
+
 The type of policy.
 
 Valid values are `threshold`, `scheduled`.
 
-##### job_schedule
-Job schedule name. Eg: 'daily'
+##### `job_schedule`
 
-##### duration
+Job schedule name. E.g., 'daily'.
+
+##### `duration`
+
 Job duration in hours.
 
-##### enabled
+##### `enabled`
+
 Manage whether the sis policy is enabled.
 
 Valid values are `true`, `false`, `yes`, `no`, `enabled`, `disabled`
 
-##### comment
+##### `comment`
+
 Comment for the policy.
 
-##### qos_policy
-QoS policy name. Eg: 'best\_effort'
+##### `qos_policy`
+
+QoS policy name. E.g., 'best\_effort'
 
 ### Type: netapp_snapmirror
 Not yet reviewed.
@@ -620,187 +707,236 @@ Not yet reviewed.
 Not yet reviewed.
 
 ### Type: netapp_volume
+
 Manage Netapp Volume creation, modification and deletion.
 
 #### Parameters
-##### aggregate
-The aggregate this volume should be created in. *Required.*
 
-##### autosize
-Should volume autosize be grow, grow/shrink, or off?
+##### `aggregate`
+
+*Required.*. The aggregate this volume should be created in. 
+
+##### `autosize`
+
+Whether volume autosize should be grow, grow/shrink, or off.
 
 Valid values are `off`, `grow`, `grow_shrink`.
 
-##### ensure
+##### `ensure`
+
 The basic state that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### exportpolicy
+##### `exportpolicy`
+
 The export policy with which the volume is associated.
 
-##### initsize
+##### `initsize`
+
 The initial volume size. *Required.* Valid format is /[0-9]+[kmgt]/.
 
-##### junctionpath
-The fully-qualified pathname in the owning Vserver's namespace at which a volume is mounted.
+##### `junctionpath`
 
-Valid values are absolute file paths or `false`
+The fully-qualified pathname in the owning vserver's namespace at which a volume is mounted.
 
-##### languagecode
+Valid values are absolute file paths or `false`.
+
+##### `languagecode`
+
 The language code this volume should use.
 
 Valid values are `C`, `ar`, `cs`, `da`, `de`, `en`, `en_US`, `es`, `fi`, `fr`, `he`, `hr`, `hu`, `it`, `ja`, `ja_v1`, `ko`, `no`, `nl`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `zh`, `zh_TW`.
 
-##### name
+##### `name`
+
 The volume name. Valid characters are a-z, 1-9 & underscore.
 
-##### options
+##### `options`
+
 The volume options hash. XXX Needs more details
 
-##### snapreserve
+##### `snapreserve`
+
 The percentage of space to reserve for snapshots.
 
-##### snapschedule
+##### `snapschedule`
+
 The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'. XXX Needs an example
 
-##### spaceres
+##### `spaceres`
+
 The space reservation mode.
 
 Valid values are `none`, `file`, `volume`.
 
-##### state
+##### `state`
+
 The volume state.
 
 Valid values are `online`, `offline`, `restricted`.
 
 ### Type: netapp_vserver
+
 Manage Netapp Vserver creation, modification and deletion.
 
 #### Parameters
-##### aggregatelist
+
+##### `aggregatelist`
+
 Vserver aggregate list. May be an array.
 
-##### allowedprotos
-Vserver allowed protocols
+##### `allowedprotos`
+
+Vserver allowed protocols.
 
 Valid values are `nfs`, `cifs`, `fcp`, `iscsi`, `ndmpd`.
 
-##### comment
-Vserver comment
+##### `comment`
 
-##### ensure
+Vserver comment.
+
+##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### language
+##### `language`
+
 Vserver language. Defaults to `c.UTF-8`
 
 Valid values are `c`, `c.UTF-8`, `ar`, `cs`, `da`, `de`, `en`, `en_us`, `es`, `fi`, `fr`, `he`, `hr`, `hu`, `it`, `ja`, `ja_v1`, `ja_jp.pck`, `ja_jp.932`, `ja_jp.pck_v2`, `ko`, `no`, `nl`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `zh`, `zh.gbk`, `zh_tw`.
 
-##### maxvolumes
+##### `maxvolumes`
+
 Vserver maximum allowed volumes.
 
-##### name
+##### `name`
+
 The vserver name
 
-##### namemappingswitch
+##### `namemappingswitch`
+
 Vserver name mapping switch. Defaults to 'file'.
 
 Valid values are `file`, `ldap`.
 
-##### nameserverswitch
+##### `nameserverswitch`
+
 Vserver name server switch.
 
 Valid values are `file`, `ldap`, `nis`.
 
-##### quotapolicy
-Vserver quota policy
+##### `quotapolicy`
 
-##### rootvol
-The vserver root volume. *Required.*
+Vserver quota policy.
 
-##### rootvolaggr
-Vserver root volume aggregate. *Required.*
+##### `rootvol`
 
-##### rootvolsecstyle
-Vserver root volume security style. *Required.*
+*Required.* The vserver root volume.
+
+##### `rootvolaggr`
+
+*Required.* Vserver root volume aggregate.
+
+##### `rootvolsecstyle`
+
+*Required.* Vserver root volume security style.
 
 Valid values are `unix`, `ntfs`, `mixed`, `unified`.
 
-##### snapshotpolicy
-Vserver snapshot policy
+##### `snapshotpolicy`
 
-##### state
-The vserver state
+Vserver snapshot policy.
+
+##### `state`
+
+The vserver state.
 
 Valid values are `stopped`, `running`.
 
 ### Type: netapp_vserver_option
+
 Manage Netapp Vserver option modification.
 
 #### Parameters
-##### ensure
+
+##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### name
-The vserver option name
+##### `name`
 
-##### value
-The vserver option value
+The vserver option name.
+
+##### `value`
+
+The vserver option value.
 
 ### Type: netapp_sis_config
+
 Manage Netapp Vserver sis config modification.
 
 #### Parameters
-##### compression
+
+##### `compression`
+
 Enable compression on the sis volume.
 
-Valid options: `true`, `false`
+Valid options: `true`, `false`.
 
-##### enabled
+##### `enabled`
+
 Enable sis on a volume.
 
-Valid options: `true`, `false`
+Valid options: `true`, `false`.
 
-##### ensure
+##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### idd
+##### `idd`
+
 Enables file level incompressible data detection and quick check incompressible data detection for large files.
 
-Valid options: `true`, `false`
+Valid options: `true`, `false`.
 
-##### inline_compression
+##### `inline_compression`
+
 Enable inline compression on the sis volume.
 
-Valid options: `true`, `false`
+Valid options: `true`, `false`.
 
-##### path
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+##### `path`
 
-The full path of the sis volume, /vol/<vol_name>.
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.) The full path of the sis volume, `/vol/<vol_name>`.
 
-##### policy
+##### `policy`
+
 The sis policy name to be attached to the volume.
 
-##### quick_check_fsize
+##### `quick_check_fsize`
+
 Quick check file size for Incompressible Data Detection. Accepts integers
 
 Values can match `/^\d+$/`.
 
-##### sis_schedule
+##### `sis_schedule`
+
 The schedule string for the sis operation.
 
-The format of the schedule:
+Accepts the following formats:
 
-  `day_list[@hour_list]` or `hour_list[@day_list]` or `-` or `auto` or `manual`
-
+* `day_list[@hour_list]`
+* `hour_list[@day_list]`
+* `-`
+* `auto`
+* `manual`
 
 ## TODO
 The following items are yet to be implemented:
@@ -817,4 +953,5 @@ The following section applies to developers of this module only.
 ### Testing
 
 You will need to install the NetApp Manageability SDK Ruby libraries for most of the tests to work.
+
 How to obtain these files is detailed in the NetApp Manageability SDK section above.
