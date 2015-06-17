@@ -393,6 +393,57 @@ Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinau
 ### Type: netapp_group
 Not yet implemented.
 
+### Type: netapp_iscsi
+Manage Netapp ISCSI service. There may only ever be one of these declared per VServer.
+
+#### Parameters
+##### svm
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+ISCSI service SVM.
+
+##### target_alias
+ISCSI WWPN alias. May be any string that is a valid ISCSI target WWPN.
+
+##### state
+ISCSI service state.
+
+Valid values are `on`, `off`.
+
+### Type: netapp_iscsi_security
+Manage Netapp ISCSI initiator (client) authentication.
+
+#### Parameters
+##### initiator
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+ISCSI initiator name.
+##### auth_type
+ISCSI initiator authentication type.
+
+Valid values are `chap`, `none`, `deny`.
+
+##### radius
+ISCSI radius CHAP setting.
+
+Valid values are `true`, `false`.
+
+##### username
+ISCSI initiator inbound CHAP username.
+
+##### password
+ISCSI initiator inbound CHAP password.
+
+Valid values are 12-16 hexidecimal digits.
+
+##### outbound_username
+ISCSI initiator outbound CHAP username.
+
+##### outbound_password
+ISCSI initiator outbound CHAP password.
+
+Valid values are 12-16 hexidecimal digits.
+
 ### Type: netapp_license
 Not yet reviewed.
 
