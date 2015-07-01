@@ -393,6 +393,32 @@ Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinau
 ### Type: netapp_group
 Not yet implemented.
 
+### Type: netapp_igroup
+Manage Netapp initiator groups
+
+#### Parameters
+##### name
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+Initiator group name.
+
+##### group_type
+Initiator group type.
+
+Valid values are `fcp`, `iscsi`, `mixed`.
+
+##### members
+An array of initiator WWPNs or aliases to be members of the initiator group.
+
+##### os_type
+OS type of the initiators within the group. The os type applies to all initiators within the group and governs the finer details of SCSI protocol interaction with these initiators. Required.
+
+Valid values are `solaris`, `windows`, `hpux`, `aix`, `linux`, `netware`, `vmware`, `openvms`, `xen`, `hyper_v`.
+
+##### portset
+The name of the portset to which the igroup should be bound. A value of `false` will unbind the portset.
+
+Valid values are a string or the boolean `false`
 ### Type: netapp_iscsi
 Manage Netapp ISCSI service. There may only ever be one of these declared per VServer.
 
