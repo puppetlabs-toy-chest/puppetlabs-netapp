@@ -17,9 +17,8 @@ Puppet::Type.type(:netapp_iscsi_interface_accesslist).provide(:cmode, :parent =>
     results = iscsiinterfaceaccesslistlist() || []
     results.each do |iscsiinterfaceaccesslist|
       iscsiinterfaceaccesslist_hash = {
-        :name      => iscsiinterfaceaccesslist.child_get_string('interface-name'),
-        :initiator => iscsiinterfaceaccesslist.child_get_string('initiator'),
-        :ensure    => :present,
+        :name   => "#{iscsiinterfaceaccesslist.child_get_string('interface-name')}/#{iscsiinterfaceaccesslist.child_get_string('initiator')}",
+        :ensure => :present,
       }
       iscsiinterfaceaccesslists << new(iscsiinterfaceaccesslist_hash)
     end
@@ -55,9 +54,10 @@ Puppet::Type.type(:netapp_iscsi_interface_accesslist).provide(:cmode, :parent =>
   end
 
   def get_args
+    interface_name, initiator = resource[:name].split('/')
     args = Array.new
-    args += ['interface-name', resource[:name]]
-    args += ['initiator', resource[:initiator]]
+    args += ['interface-name', interface_name]
+    args += ['initiator', initiator]
     args
   end
 end
