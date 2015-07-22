@@ -155,12 +155,12 @@ Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Pro
       unless @resource[:readwrite].nil?
         readwrite = NaElement.new("read-write")
         Puppet.debug("Got a readwrite array. Checking if all_hosts... First record = #{@resource[:readwrite].first} \n")
-        if @resource[:readwrite].first == 'all_hosts'
+        if Array(@resource[:readwrite]).first == 'all_hosts'
           hostname_info = NaElement.new("exports-hostname-info")
           hostname_info.child_add_string("all-hosts", "true")
           readwrite.child_add(hostname_info)
         else
-          @resource[:readwrite].each do |host|
+          Array(@resource[:readwrite]).each do |host|
             hostname_info = NaElement.new("exports-hostname-info")
             hostname_info.child_add_string("name", host)
             readwrite.child_add(hostname_info)
@@ -172,12 +172,12 @@ Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Pro
       unless @resource[:readonly].nil?
         readonly = NaElement.new("read-only")
         Puppet.debug("Got a readonly array. Checking if all_hosts... First record = #{@resource[:readonly].first} \n")
-        if @resource[:readonly].first == 'all_hosts'
+        if Array(@resource[:readonly]).first == 'all_hosts'
           hostname_info = NaElement.new("exports-hostname-info")
           hostname_info.child_add_string("all-hosts", "true")
           readonly.child_add(hostname_info)
         else
-          @resource[:readonly].each do |host|
+          Array(@resource[:readonly]).each do |host|
             hostname_info = NaElement.new("exports-hostname-info")
             hostname_info.child_add_string("name", host)
             readonly.child_add(hostname_info)
@@ -219,12 +219,12 @@ Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Pro
     # Read-write
     unless @resource[:readwrite].nil?
       readwrite = NaElement.new("read-write")
-      if @resource[:readwrite].first == 'all_hosts'
+      if Array(@resource[:readwrite]).first == 'all_hosts'
         hostname_info = NaElement.new("exports-hostname-info")
         hostname_info.child_add_string("all-hosts", "true")
         readwrite.child_add(hostname_info)
       else
-        @resource[:readwrite].each do |host|
+        Array(@resource[:readwrite]).each do |host|
           hostname_info = NaElement.new("exports-hostname-info")
           hostname_info.child_add_string("name", host)
           readwrite.child_add(hostname_info)
@@ -236,12 +236,12 @@ Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Pro
     unless @resource[:readonly].nil?
       readonly = NaElement.new("read-only")
       Puppet.debug("Got a readonly array. Checking if all_hosts... First record = #{@resource[:readonly].first} \n")
-      if @resource[:readonly].first == 'all_hosts'
+      if Array(@resource[:readonly]).first == 'all_hosts'
         hostname_info = NaElement.new("exports-hostname-info")
         hostname_info.child_add_string("all-hosts", "true")
         readonly.child_add(hostname_info)
       else
-        @resource[:readonly].each do |host|
+        Array(@resource[:readonly]).each do |host|
           hostname_info = NaElement.new("exports-hostname-info")
           hostname_info.child_add_string("name", host)
           readonly.child_add(hostname_info)

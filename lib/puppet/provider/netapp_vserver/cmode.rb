@@ -148,7 +148,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       if !@resource[:namemappingswitch].nil?
         nms_element = NaElement.new("name-mapping-switch")
 
-        @resource[:namemappingswitch].each do |value|
+        Array(@resource[:namemappingswitch]).each do |value|
           nms_element.child_add_string("nmswitch", value)
         end
         vserver_modify.child_add(nms_element)
@@ -158,7 +158,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       if !@resource[:nameserverswitch].nil?
         nss_element = NaElement.new("name-server-switch")
 
-        @resource[:nameserverswitch].each do |value|
+        Array(@resource[:nameserverswitch]).each do |value|
           nss_element.child_add_string("nsswitch", value)
         end
         vserver_modify.child_add(nss_element)
@@ -168,7 +168,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       if !@resource[:aggregatelist].nil?
         aggrlist_element = NaElement.new("aggr-list")
 
-        @resource[:aggregatelist].each do |value|
+        Array(@resource[:aggregatelist]).each do |value|
           aggrlist_element.child_add_string("aggr-name", value)
         end
         vserver_modify.child_add(aggrlist_element)
@@ -178,7 +178,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       if !@resource[:allowedprotos].nil?
         allowedprotos_element = NaElement.new('allowed-protocols')
 
-        @resource[:allowedprotos].each do |value|
+        Array(@resource[:allowedprotos]).each do |value|
           allowedprotos_element.child_add_string('protocol', value)
         end
         vserver_modify.child_add(allowedprotos_element)
@@ -245,7 +245,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     if !@resource[:namemappingswitch].nil?
       nms_element = NaElement.new("name-mapping-switch")
 
-      @resource[:namemappingswitch].each do |value|
+      Array(@resource[:namemappingswitch]).each do |value|
         nms_element.child_add_string("nmswitch", value)
       end
       vserver_create.child_add(nms_element)
@@ -255,7 +255,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     if !@resource[:nameserverswitch].nil?
       nss_element = NaElement.new("name-server-switch")
 
-      @resource[:nameserverswitch].each do |value|
+      Array(@resource[:nameserverswitch]).each do |value|
         nss_element.child_add_string("nsswitch", value)
       end
       vserver_create.child_add(nss_element)
@@ -265,7 +265,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     # if !@resource[:aggregatelist].nil?
     #   aggrlist_element = NaElement.new("aggr-list")
 
-    #   @resource[:aggregatelist].each do |value|
+    #   Array(@resource[:aggregatelist]).each do |value|
     #     aggrlist_element.child_add_string("aggr-name", value)
     #   end
     #   vserver_create.child_add(aggrlist_element)

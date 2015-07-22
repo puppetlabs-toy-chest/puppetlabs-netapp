@@ -89,7 +89,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
 
       # Add peeraddress array
       peeraddresses_element = NaElement.new('peer-addresses')
-      @resource[:peeraddresses].each do |peer_address|
+      Array(@resource[:peeraddresses]).each do |peer_address|
         peeraddresses_element.child_add_string('remote-inet-address', peer_address)
       end
       peer_modify.child_add(peeraddresses_element)
@@ -116,7 +116,7 @@ Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provi
 
     # Add peeraddresses array
     peeraddresses_element = NaElement.new('peer-addresses')
-    @resource[:peeraddresses].each do |peer_address|
+    Array(@resource[:peeraddresses]).each do |peer_address|
       peeraddresses_element.child_add_string('remote-inet-address', peer_address)
     end
     peer_create.child_add(peeraddresses_element)
