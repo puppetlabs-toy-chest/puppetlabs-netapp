@@ -127,7 +127,7 @@ Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provid
     # Add servers array
     unless @resource[:servers].nil?
       addresses_element = NaElement.new('servers')
-      @resource[:servers].each do |server|
+      Array(@resource[:servers]).each do |server|
         addresses_element.child_add_string('ip-address', server)
       end
       args.child_add(addresses_element)
@@ -135,7 +135,7 @@ Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provid
     # Add preffered_servers array
     unless @resource[:preffered_ad_servers].nil?
       preffered_addresses_element = NaElement.new('preffered-ad-servers')
-      @resource[:preffered_ad_servers].each do |server|
+      Array(@resource[:preffered_ad_servers]).each do |server|
         preffered_addresses_element.child_add_string('ip-address', server)
       end
       args.child_add(preffered_addresses_element)

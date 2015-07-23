@@ -155,9 +155,11 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
 
     # Add nodes object
     nodes = NaElement.new('nodes')
-    @resource[:nodes].each do |node|
-      node.child_add_string('node-name', node)
+    node_names = NaElement.new('node-name')
+    Array(@resource[:nodes]).each do |node|
+      node_names.child_add(NaElement.new(node))
     end unless @resource[:nodes].nil?
+    nodes.child_add(node_names)
     aggr_create.child_add(nodes)
 
     # Add the aggregate

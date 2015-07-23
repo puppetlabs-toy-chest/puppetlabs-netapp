@@ -68,7 +68,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       rw_security = []
       rw_rules = rule.child_get('rw-rule').children_get()
       rw_rules.each do |rw_rule|
-        rw_security << rw_rule.content().to_sym
+        rw_security << rw_rule.content()
       end
       # Add it to the export_rule hash
       export_rule[:rwrule] = rw_security
@@ -143,28 +143,28 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
 
       # Process protocol array
       protocol_element = NaElement.new('protocol')
-      @resource[:protocol].each do |protocol|
+      Array(@resource[:protocol]).each do |protocol|
         protocol_element.child_add_string('access-protocol', protocol)
       end
       export_rule_modify.child_add(protocol_element)
 
       # Process rorule array
       rorule_element = NaElement.new('ro-rule')
-      @resource[:rorule].each do |rorule|
+      Array(@resource[:rorule]).each do |rorule|
         rorule_element.child_add_string('security-flavor', rorule)
       end unless @resource[:rorule].nil?
       export_rule_modify.child_add(rorule_element)
 
       # Process rwrule array
       rwrule_element = NaElement.new('rw-rule')
-      @resource[:rwrule].each do |rwrule|
+      Array(@resource[:rwrule]).each do |rwrule|
         rwrule_element.child_add_string('security-flavor', rwrule)
       end unless @resource[:rwrule].nil?
       export_rule_modify.child_add(rwrule_element)
 
       # Process superusersecurity array
       susecrule_element = NaElement.new('super-user-security')
-      @resource[:superusersecurity].each do |susecrule|
+      Array(@resource[:superusersecurity]).each do |susecrule|
         susecrule_element.child_add_string('security-flavor', susecrule)
       end unless @resource[:superusersecurity].nil?
       export_rule_modify.child_add(susecrule_element)
@@ -201,28 +201,28 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
 
     # Process protocol array
     protocol_element = NaElement.new('protocol')
-    @resource[:protocol].each do |protocol|
+    Array(@resource[:protocol]).each do |protocol|
       protocol_element.child_add_string('access-protocol', protocol)
     end
     export_rule_create.child_add(protocol_element)
 
     # Process rorule array
     rorule_element = NaElement.new('ro-rule')
-    @resource[:rorule].each do |rorule|
+    Array(@resource[:rorule]).each do |rorule|
       rorule_element.child_add_string('security-flavor', rorule)
     end unless @resource[:rorule].nil?
     export_rule_create.child_add(rorule_element)
 
     # Process rwrule array
     rwrule_element = NaElement.new('rw-rule')
-    @resource[:rwrule].each do |rwrule|
+    Array(@resource[:rwrule]).each do |rwrule|
       rwrule_element.child_add_string('security-flavor', rwrule)
     end unless @resource[:rwrule].nil?
     export_rule_create.child_add(rwrule_element)
 
     # Process superusersecurity array
     susecrule_element = NaElement.new('super-user-security')
-    @resource[:superusersecurity].each do |susecrule|
+    Array(@resource[:superusersecurity]).each do |susecrule|
       susecrule_element.child_add_string('security-flavor', susecrule)
     end unless @resource[:superusersecurity].nil?
     export_rule_create.child_add(susecrule_element)
