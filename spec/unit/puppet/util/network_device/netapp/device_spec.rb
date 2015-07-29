@@ -75,6 +75,24 @@ describe Puppet::Util::NetworkDevice::Netapp::Device do
       expect { described_class.new('https://root:secret@pfiler.example.com') }.to raise_error(Puppet::Error, 'invoke system-get-version failed: No response received')
     end
 
+    it "should send ems log entry" do
+
+      transport = mock 'netapp server'
+      Puppet.expects(:debug).with regexp_matches(%r{connecting to Netapp device https://root:\*\*\*\*@pfiler\.example\.com})
+      NaServer.expects(:new).with('pfiler.example.com', 1, 15).returns transport
+      transport.expects(:set_admin_user).with('root', 'secret')
+      transport.expects(:set_transport_type).with('HTTPS')
+      transport.expects(:set_port).with(443)
+      transport.expects(:invoke).with('system-get-version').returns version
+      Puppet.expects(:debug).with regexp_matches(/^Puppet::Device::Netapp: Version = /)
+      Puppet.expects(:debug).with regexp_matches(/^Clustered = false./)
+      transport.expects(:set_application_name).with('puppet_netapp_cmode')
+      Puppet.expects(:debug).with regexp_matches(/^Puppet::Device::Netapp: Adding usage log to EMS service/)
+      transport.expects(:invoke_elem).once.with(instance_of(NaElement))
+
+      described_class.new('https://root:secret@pfiler.example.com')
+    end
+
     it "should generate facts" do
       pending
     end
