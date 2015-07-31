@@ -57,6 +57,21 @@ class Puppet::Util::NetworkDevice::Netapp::Device
       end
     end
 
+    # report existence of Puppet to ASUP service
+    ems_log = NaElement.new('ems-autosupport-log')
+
+    # Start adding values
+    ems_log.child_add_string('computer-name', Facter.value(:fqdn))
+    ems_log.child_add_string('event-id', '0')
+    ems_log.child_add_string('event-source', 'Puppet::Device::NetApp')
+    ems_log.child_add_string('app-version', Facter.value(:puppetversion))
+    ems_log.child_add_string('category', 'provisioning')
+    ems_log.child_add_string('event-description', "Puppet module managing #{redacted_url}")
+    ems_log.child_add_string('log-level', '6')
+    ems_log.child_add_string('auto-support', 'false')
+
+    Puppet.debug("Puppet::Device::Netapp: Adding usage log to EMS service")
+    @transport.invoke_elem(ems_log)
   end
 
   def facts
