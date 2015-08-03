@@ -54,7 +54,7 @@ Puppet::Type.type(:netapp_iscsi).provide(:cmode, :parent => Puppet::Provider::Ne
     elsif ! @property_hash.empty?
       [:target_alias].each do |property|
         if @property_hash[property] and @property_hash[property] != @original_values[property]
-          err "Cannot change #{property} after creation"
+          fail ArgumentError, "Cannot change #{property} after creation"
         end
       end
       iscsimodify(*get_args)
@@ -85,8 +85,8 @@ Puppet::Type.type(:netapp_iscsi).provide(:cmode, :parent => Puppet::Provider::Ne
 
   def get_args
     args = Array.new
-    # Alias-name is write-only
-    #args += ['alias-name', resource[:target_alias]] if resource[:target_alias]
+    # Alias-name is only settable on create
+    args += ['alias-name', resource[:target_alias]] if resource[:target_alias]
     args
   end
 end
