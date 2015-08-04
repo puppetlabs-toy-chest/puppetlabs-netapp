@@ -10,7 +10,7 @@ Puppet::Type.newtype(:netapp_security_login) do
     isnamevar
   end
 
-  newproperty(:password) do
+  newparam(:password) do
     desc "Password for the user account. This is ignored for creating snmp users. This is required for creating non-snmp users."
   end
 
@@ -19,14 +19,16 @@ Puppet::Type.newtype(:netapp_security_login) do
   end
 
   newproperty(:role_name) do
-    desc "The default value is 'admin' for Admin vserver and 'vsadmin' for data vserver. This field is required for versions of Data ONTAP prior to 8.3.1"
+    desc "The default value is 'admin' for Admin vserver and 'vsadmin' for data vserver. This field is required."
   end
 
   newproperty(:is_locked) do
     desc "Whether the login is locked"
   end
 
-  newproperty(:snmpv3_login_info) do
-    desc "The default value is 'admin' for Admin vserver and 'vsadmin' for data vserver. This field is required for versions of Data ONTAP prior to 8.3.1"
+  validate do
+    if self[:ensure] == :present and ! self[:role_name]
+      raise ArgumentError, "role_name is required"
+    end
   end
 end
