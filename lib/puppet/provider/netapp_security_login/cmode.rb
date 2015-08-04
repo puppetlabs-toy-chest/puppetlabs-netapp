@@ -6,12 +6,13 @@ Puppet::Type.type(:netapp_security_login).provide(:cmode, :parent => Puppet::Pro
   confine :feature => :posix
   defaultfor :feature => :posix
 
-  netapp_commands :securityloginlist    => {:api => 'security-login-get-iter', :iter => true, :result_element => 'attributes-list'}
-  netapp_commands :securitylogincreate  => 'security-login-create'
-  netapp_commands :securitylogindestroy => 'security-login-delete'
-  netapp_commands :securityloginmodify  => 'security-login-modify'
-  netapp_commands :securityloginlock    => 'security-login-lock'
-  netapp_commands :securityloginunlock  => 'security-login-unlock'
+  netapp_commands :securityloginlist           => {:api => 'security-login-get-iter', :iter => true, :result_element => 'attributes-list'}
+  netapp_commands :securitylogincreate         => 'security-login-create'
+  netapp_commands :securitylogindestroy        => 'security-login-delete'
+  netapp_commands :securityloginmodify         => 'security-login-modify'
+  netapp_commands :securityloginmodifypassword => 'security-login-modify-password'
+  netapp_commands :securityloginlock           => 'security-login-lock'
+  netapp_commands :securityloginunlock         => 'security-login-unlock'
 
   mk_resource_methods
 
@@ -25,10 +26,8 @@ Puppet::Type.type(:netapp_security_login).provide(:cmode, :parent => Puppet::Pro
       vserver = securitylogin.child_get_string('vserver')
       securitylogin_hash = {
         :name              => "#{application}:#{authentication_method}:#{username}:#{vserver}",
-        :password          => securitylogin.child_get_string('password'),
         :comment           => securitylogin.child_get_string('comment'),
         :role_name         => securitylogin.child_get_string('role-name'),
-        :snmpv3_login_info => securitylogin.child_get_string('snmpv3-login-info'),
         :is_locked         => securitylogin.child_get_string('is-locked'),
         :ensure            => :present,
       }
@@ -68,6 +67,8 @@ Puppet::Type.type(:netapp_security_login).provide(:cmode, :parent => Puppet::Pro
       end
 
       securityloginmodify(*get_args)
+      # The security-login-modify-password api does not seem to work.
+      #securityloginmodifypassword('user-name',username,'new-password',resource[:password])
     end
   end
 
@@ -88,9 +89,9 @@ Puppet::Type.type(:netapp_security_login).provide(:cmode, :parent => Puppet::Pro
     args = Array.new
     application, authentication_method, username, vserver = resource[:name].split(':')
     args += ['user-name', username]
+    args += ['password', resource[:password]] if @property_hash.empty?
     args += ['authentication-method', authentication_method]
     args += ['role-name', resource[:role_name]]
-    args += ['snmpv3-login-info', resource[:snmpv3_login_info]] unless resource[:snmpv3_login_info].nil?
     args += ['application', application]
     args += ['vserver', vserver]
     args += ['comment', resource[:comment]]
