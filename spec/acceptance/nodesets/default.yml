@@ -1,0 +1,12 @@
+HOSTS:
+  "puppet":
+    roles:
+      - "master"
+      - "default"
+    platform: "debian-7-amd64"
+    hypervisor: "none"
+    template: "debian-7-x86_64"
+    ip: '172.16.206.156'
+CONFIG:
+  ssh:
+    keys: "spec/fixtures/vagrant_key.pub"
