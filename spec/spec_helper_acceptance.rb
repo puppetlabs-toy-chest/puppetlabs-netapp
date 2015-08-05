@@ -1,5 +1,5 @@
 require 'beaker-rspec'
-require 'beaker-puppet_install_helper'
+require 'beaker/puppet_install_helper'
 
 run_puppet_install_helper
 
@@ -9,20 +9,20 @@ RSpec.configure do |c|
     # Install module and dependencies
     copy_module_to(master, :source => proj_root, :module_name => 'netapp')
     device_conf=<<-EOS
-[vsim-01.test.com]
+[vsim-01]
 type netapp
 url https://vagrant:netapp123@vsim-01
-[vserver-01.test.com]
+[vserver-01]
 type netapp
 url https://vagrant:netapp123@vsim-01/vserver-01
 EOS
     create_remote_file(master, File.join(master[:puppetpath], "device.conf"), device_conf)
     on master, puppet('plugin','download','--server',master.to_s)
-    on master, puppet('device','-v','--waitforcert','0','--server',master.to_s), {:acceptable_exit_codes => [0,1] }
-    on master, puppet('cert','sign','vsim-01.test.com'), {:acceptable_exit_codes => [0,24] }
-    on master, puppet('device','-v','--waitforcert','0','--server',master.to_s), {:acceptable_exit_codes => [0,1] }
-    on master, puppet('cert','sign','vserver-01.test.com'), {:acceptable_exit_codes => [0,24] }
-    on master, puppet('device','-v','--waitforcert','0','--server',master.to_s), {:acceptable_exit_codes => [0,1] }
+    on master, puppet('device','--user','root','-v','--waitforcert','0','--server',master.to_s), {:acceptable_exit_codes => [0,1] }
+    on master, puppet('cert','sign','vsim-01'), {:acceptable_exit_codes => [0,24] }
+    on master, puppet('device','--user','root','-v','--waitforcert','0','--server',master.to_s), {:acceptable_exit_codes => [0,1] }
+    on master, puppet('cert','sign','vserver-01'), {:acceptable_exit_codes => [0,24] }
+    on master, puppet('device','--user','root','-v','--waitforcert','0','--server',master.to_s), {:acceptable_exit_codes => [0,1] }
   end
 end
 
