@@ -1,0 +1,18 @@
+HOSTS:
+  "servicevm":
+    roles:
+      - "master"
+      - "dashboard"
+      - "database"
+      - "default"
+    platform: "debian-7-amd64"
+    hypervisor: "none"
+    template: "debian-7-x86_64"
+    ip: '10.0.207.253'
+    ssh:
+      auth_methods:
+      - 'password'
+      password: 'vagrant'
+      user: 'vagrant'
+CONFIG:
+  type: "pe"
