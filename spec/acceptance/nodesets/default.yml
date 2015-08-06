@@ -13,6 +13,5 @@ HOSTS:
       auth_methods:
       - 'password'
       password: 'vagrant'
-      user: 'vagrant'
 CONFIG:
-  type: "pe"
+  type: "foss"
