@@ -17,7 +17,7 @@ Puppet::Type.newtype(:netapp_snapmirror) do
     end
   end
 
-  newparam(:source_location) do
+  newproperty(:source_location) do
     desc "The source location."
   end
 
@@ -34,8 +34,17 @@ Puppet::Type.newtype(:netapp_snapmirror) do
     desc "The destination snapshot."
   end
 
-  newparam(:max_transfer_rate) do
+  newproperty(:max_transfer_rate) do
     desc "The max transfer rate, in KB/s. Defaults to unlimited."
   end
 
+  newproperty(:relationship_type) do
+    desc "Specifies the type of the SnapMirror relationship. An extended data protection relationship with a policy of type vault is equivalent to a 'vault' relationship. On Data ONTAP 8.3.1 or later, in the case of a Vserver SnapMirror relationship the type of the relationship is always data_protection. Possible values:
+data_protection ,
+load_sharing ,
+vault ,
+restore ,
+transition_data_protection ,
+extended_data_protection"
+  end
 end
