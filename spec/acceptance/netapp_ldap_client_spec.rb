@@ -30,21 +30,22 @@ node 'vsim-01' {
   }
 }
 node 'vserver-01' {
-  netapp_ldap_client { 'ldapclient1':
-    ensure                => 'present',
-    base_dn               => 'DC=',
-    base_scope            => 'subtree',
-    bind_as_cifs_server   => 'true',
-    group_scope           => 'subtree',
-    min_bind_level        => 'sasl',
-    netgroup_byhost_scope => 'subtree',
-    netgroup_scope        => 'subtree',
-    query_timeout         => '3',
-    schema                => 'RFC-2307',
-    servers               => ['1.1.1.1', '2.2.2.2', '3.3.3.3'],
-    tcp_port              => '389',
-    use_start_tls         => 'false',
-    user_scope            => 'subtree',
+  netapp_ldap_client { 'ldapclient10':
+    ensure                     => 'present',
+    base_dn                    => 'DC=',
+    base_scope                 => 'subtree',
+    bind_as_cifs_server        => 'true',
+    group_scope                => 'subtree',
+    min_bind_level             => 'sasl',
+    netgroup_byhost_scope      => 'subtree',
+    is_netgroup_byhost_enabled => 'false',
+    netgroup_scope             => 'subtree',
+    query_timeout              => '3',
+    schema                     => 'RFC-2307',
+    servers                    => ['1.1.1.1', '2.2.2.2', '3.3.3.3'],
+    tcp_port                   => '389',
+    use_start_tls              => 'false',
+    user_scope                 => 'subtree',
   }
 }
     EOS
@@ -58,21 +59,22 @@ node 'vserver-01' {
 node 'vsim-01' {
 }
 node 'vserver-01' {
-  netapp_ldap_client { 'ldapclient1':
-    ensure                => 'present',
-    base_dn               => 'DC=',
-    base_scope            => 'subtree',
-    bind_as_cifs_server   => 'true',
-    group_scope           => 'subtree',
-    min_bind_level        => 'sasl',
-    netgroup_byhost_scope => 'subtree',
-    netgroup_scope        => 'subtree',
-    query_timeout         => '3',
-    schema                => 'RFC-2307',
-    servers               => ['1.1.1.1', '2.2.2.2'],
-    tcp_port              => '389',
-    use_start_tls         => 'false',
-    user_scope            => 'subtree',
+  netapp_ldap_client { 'ldapclient10':
+    ensure                     => 'present',
+    base_dn                    => 'DC=',
+    base_scope                 => 'subtree',
+    bind_as_cifs_server        => 'true',
+    group_scope                => 'subtree',
+    min_bind_level             => 'sasl',
+    netgroup_byhost_scope      => 'subtree',
+    netgroup_scope             => 'subtree',
+    query_timeout              => '3',
+    schema                     => 'RFC-2307',
+    servers                    => ['1.1.1.1', '2.2.2.2'],
+    tcp_port                   => '389',
+    use_start_tls              => 'false',
+    user_scope                 => 'subtree',
+    is_netgroup_byhost_enabled => 'false',
   }
 }
     EOS
@@ -86,21 +88,22 @@ node 'vserver-01' {
 node 'vsim-01' {
 }
 node 'vserver-01' {
-  netapp_ldap_client { 'ldapclient1':
-    ensure                => 'absent',
-    base_dn               => 'DC=',
-    base_scope            => 'subtree',
-    bind_as_cifs_server   => 'true',
-    group_scope           => 'subtree',
-    min_bind_level        => 'sasl',
-    netgroup_byhost_scope => 'subtree',
-    netgroup_scope        => 'subtree',
-    query_timeout         => '3',
-    schema                => 'RFC-2307',
-    servers               => ['1.1.1.1', '2.2.2.2'],
-    tcp_port              => '389',
-    use_start_tls         => 'false',
-    user_scope            => 'subtree',
+  netapp_ldap_client { 'ldapclient10':
+    ensure                     => 'absent',
+    base_dn                    => 'DC=',
+    base_scope                 => 'subtree',
+    bind_as_cifs_server        => 'true',
+    group_scope                => 'subtree',
+    min_bind_level             => 'sasl',
+    netgroup_byhost_scope      => 'subtree',
+    netgroup_scope             => 'subtree',
+    query_timeout              => '3',
+    schema                     => 'RFC-2307',
+    servers                    => ['1.1.1.1', '2.2.2.2'],
+    tcp_port                   => '389',
+    use_start_tls              => 'false',
+    user_scope                 => 'subtree',
+    is_netgroup_byhost_enabled => 'false',
   }
 }
     EOS
