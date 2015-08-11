@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 describe 'kerberos_config' do
-  it 'makes a kerberos_config' do
+  it 'modify a kerberos_config' do
     pp=<<-EOS
 node 'vsim-01' {
   netapp_vserver { 'vserver-01':
@@ -30,40 +30,15 @@ node 'vsim-01' {
   }
 }
 node 'vserver-01' {
-  netapp_kerberos_config { 'vserver01_lif':
+  netapp_nfs { 'vserver-01':
     ensure => 'present',
-    is_kerberos_enabled => 'true',
+    state  => 'on',
+    v3     => 'enabled',
+    v40    => 'disabled',
+    v41    => 'disabled',
   }
-}
-    EOS
-    make_site_pp(pp)
-    run_device(:allow_changes => true)
-    run_device(:allow_changes => false)
-  end
-
-  it 'edit a kerberos_config' do
-    pp=<<-EOS
-node 'vsim-01' {
-}
-node 'vserver-01' {
-  netapp_kerberos_config { 'vserver01_lif':
-    ensure => 'present',
-    is_kerberos_enabled => 'false',
-  }
-}
-    EOS
-    make_site_pp(pp)
-    run_device(:allow_changes => true)
-    run_device(:allow_changes => false)
-  end
-
- it 'delete a kerberos_config' do
-    pp=<<-EOS
-node 'vsim-01' {
-}
-node 'vserver-01' {
-  netapp_kerberos_config { 'vserver01_lif':
-    ensure => 'absent',
+  netapp_kerberos_config { 'nfs_lif':
+    ensure              => 'present',
     is_kerberos_enabled => 'false',
   }
 }
