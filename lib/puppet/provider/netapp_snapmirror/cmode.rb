@@ -6,10 +6,11 @@ Puppet::Type.type(:netapp_snapmirror).provide(:cmode, :parent => Puppet::Provide
   confine :feature => :posix
   defaultfor :feature => :posix
 
-  netapp_commands :snapmirrorlist     => {:api => 'snapmirror-get-iter', :iter => true, :result_element => 'attributes-list'}
-  netapp_commands :snapmirrorcreate   => 'snapmirror-create'
-  netapp_commands :snapmirrordestroy  => 'snapmirror-destroy'
-  netapp_commands :snapmirrormodify   => 'snapmirror-modify'
+  netapp_commands :snapmirrorlist       => {:api => 'snapmirror-get-iter', :iter => true, :result_element => 'attributes-list'}
+  netapp_commands :snapmirrorcreate     => 'snapmirror-create'
+  netapp_commands :snapmirrorinitialize => 'snapmirror-initialize'
+  netapp_commands :snapmirrordestroy    => 'snapmirror-destroy'
+  netapp_commands :snapmirrormodify     => 'snapmirror-modify'
 
   mk_resource_methods
 
@@ -53,6 +54,7 @@ Puppet::Type.type(:netapp_snapmirror).provide(:cmode, :parent => Puppet::Provide
 
   def create
     snapmirrorcreate(*get_args('create'))
+    snapmirrorinitialize(*get_args('initialize'))
   end
 
   def destroy
@@ -67,8 +69,10 @@ Puppet::Type.type(:netapp_snapmirror).provide(:cmode, :parent => Puppet::Provide
     args = NaElement.new("snapmirror-#{method}")
     args.child_add_string('destination-location', @resource[:name])
     args.child_add_string('source-location', @resource[:source_location])
-    args.child_add_string('relationship-type', @resource[:relationship_type])
-    args.child_add_string('max-transfer-rate', @resource[:max_transfer_rate])
+    if method != 'initialize'
+      args.child_add_string('relationship-type', @resource[:relationship_type])
+      args.child_add_string('max-transfer-rate', @resource[:max_transfer_rate])
+    end
 
     args
   end
