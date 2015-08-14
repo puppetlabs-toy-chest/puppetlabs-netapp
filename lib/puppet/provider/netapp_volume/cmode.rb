@@ -71,11 +71,10 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       volume_hash[:junctionpath] = volume[:junctionpath]
 
       if ! transport.get_vserver.empty?
-        # Get volume options
-        volume_hash[:options] = self.get_options(vol_name)
-
-        # Get volume snapschedule, only if volume is online.
+        # Get volume snapschedule and options, only if volume is online.
         if (volume[:state] == "online")
+          # Get volume options
+          volume_hash[:options] = self.get_options(vol_name)
           volume_hash[:snapschedule] = self.get_snapschedule(vol_name)
         end
       else
@@ -152,7 +151,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
         vol_export_policy = vol_export_attributes.child_get_string("policy")
       end
       # Get Auto size settings.
-      vol_auto_size = vol_autosize_info.child_get_string("mode")
+      if vol_state != 'offline'
+        vol_auto_size = vol_autosize_info.child_get_string("mode")
+      end
 
       # Get junction path
       if jp = vol_id_info.child_get("junction-path")

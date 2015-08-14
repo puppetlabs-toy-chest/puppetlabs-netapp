@@ -40,7 +40,7 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
 
       # Construct the aggr_info hash
       aggr_info = {
-        :name => aggregate_name,
+        :name   => aggregate_name,
         :ensure => :present
       }
 
@@ -154,13 +154,13 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
     aggr_create.child_add_string('striping', @resource[:striping])
 
     # Add nodes object
-    nodes = NaElement.new('nodes')
-    node_names = NaElement.new('node-name')
-    Array(@resource[:nodes]).each do |node|
-      node_names.child_add(NaElement.new(node))
-    end unless @resource[:nodes].nil?
-    nodes.child_add(node_names)
-    aggr_create.child_add(nodes)
+    unless @resource[:nodes].nil?
+      nodes_element = NaElement.new('nodes')
+      Array(@resource[:nodes]).each do |node|
+        nodes_element.child_add_string('node-name', node)
+      end
+      aggr_create.child_add(nodes_element)
+    end
 
     # Add the aggregate
     result = aggrcreate(aggr_create)
@@ -175,7 +175,7 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       if state != "creating"
         break
       elsif state.nil?
-        require'pry';binding.pry
+        raise "aggregate state is nill"
       elsif tries == 12
         raise "aggregate is taking too long to create"
       end

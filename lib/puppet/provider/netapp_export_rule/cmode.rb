@@ -22,15 +22,14 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
 
     # Itterate through each 'export-rule-info' block.
     result.each do |rule|
-      policyname = rule.child_get_string("policy-name")
-      ruleindex = rule.child_get_int("rule-index")
-      name = "#{policyname}:#{ruleindex}"
+      name = rule.child_get_string("policy-name")
       Puppet.debug("Puppet::Provider::Netapp_export.cmode.prefetch: Processing rule for export #{name}. \n")
 
       # Construct an export hash for rule
-      export_rule = { :name => name,
-                 :ensure => :present }
+      export_rule = { :name   => name,
+                      :ensure => :present }
 
+      export_rule[:rule_index] = rule.child_get_int("rule-index")
       # Add the anon UID if present.
       export_rule[:anonuid] = rule.child_get_string("anonymous-user-id") unless rule.child_get_string("anonymous-user-id").nil?
       # Add the client match string if present.
@@ -68,7 +67,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       rw_security = []
       rw_rules = rule.child_get('rw-rule').children_get()
       rw_rules.each do |rw_rule|
-        rw_security << rw_rule.content()
+        rw_security << rw_rule.content().to_sym
       end
       # Add it to the export_rule hash
       export_rule[:rwrule] = rw_security
@@ -111,8 +110,13 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
 
-    # Split the name on '/'
-    policy_name, rule_index = @resource[:name].split(':')
+    policy_name = @resource[:name]
+    if @resource[:rule_index]
+      rule_index = @resource[:rule_index]
+    else
+      rule_index = @original_values[:rule_index]
+    end
+
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: Flushing for rule index #{rule_index} on Policy #{policy_name}")
 
     case @property_hash[:ensure]
@@ -182,10 +186,6 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
   def create
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: creating Netapp export rule #{@resource[:name]}.")
 
-    # Split the name on '/'
-    policy_name, rule_index = @resource[:name].split(':')
-    Puppet.debug("Puppet::Provider::Netapp_export.cmode: Flushing for rule index #{rule_index} on Policy #{policy_name}")
-
     # Need to construct the export-rule-create request
     export_rule_create = NaElement.new('export-rule-create')
 
@@ -196,8 +196,10 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     export_rule_create.child_add_string("export-ntfs-unix-security-ops", @resource[:ntfsunixsecops])
     export_rule_create.child_add_string("is-allow-dev-is-enabled", @resource[:allowdevenabled])
     export_rule_create.child_add_string("is-allow-set-uid-enabled", @resource[:allowsetuid])
-    export_rule_create.child_add_string("policy-name", policy_name)
-    export_rule_create.child_add_string("rule-index", rule_index)
+    export_rule_create.child_add_string("policy-name", @resource[:name])
+    unless @resource[:rule_index].nil?
+      export_rule_create.child_add_string("rule-index", @resource[:rule_index])
+    end
 
     # Process protocol array
     protocol_element = NaElement.new('protocol')
@@ -244,6 +246,4 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: checking existance of Netapp export rule #{@resource[:name]}.")
     @property_hash[:ensure] == :present
   end
-
-
 end
