@@ -87,7 +87,6 @@ Puppet::Type.type(:netapp_vserver_peer).provide(:cmode, :parent => Puppet::Provi
       end
       args.child_add(element)
     end
-#require 'pry'; binding.pry
     args
   end
 end

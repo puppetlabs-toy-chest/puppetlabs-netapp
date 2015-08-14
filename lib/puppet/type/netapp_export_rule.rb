@@ -8,14 +8,12 @@ Puppet::Type.newtype(:netapp_export_rule) do
   ensurable
 
   newparam(:name) do
-    desc "The export policy. Composite name based on policy name and rule index."
+    desc "The export policy name."
     isnamevar
-    #TODO: Add validation
-#    validate do |value|
-#    	unless value =~ /^(\/[\w]+){2,3}$/
-#        raise ArgumentError, "%s is not a valid export name." % value
-#     end
-#    end
+  end
+
+  newproperty(:rule_index) do
+    desc "The rule index."
   end
 
   newproperty(:anonuid) do
@@ -109,10 +107,6 @@ Puppet::Type.newtype(:netapp_export_rule) do
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
     defaultto(:any)
 
-    validate do |value|
-      #TODO: Need to validate provided values.
-    end
-
     def insync?(is)
       return is.sort == Array(should).sort
     end
@@ -122,10 +116,6 @@ Puppet::Type.newtype(:netapp_export_rule) do
     desc "Read write rule. Defaults to 'any'."
     newvalues(:any, :none, :never, :never, :krb5, :ntlm, :sys, :spinauth)
     defaultto(:any)
-
-    validate do |value|
-      #TODO: Need to validate provided values.
-    end
 
     def insync?(is)
       return is.sort == Array(should).sort
@@ -182,6 +172,4 @@ Puppet::Type.newtype(:netapp_export_rule) do
   #   end
   #   requires
   # end
-
-
 end
