@@ -1,6 +1,10 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2015-08-18
+### Summary
+This is the first stable release of the netapp module.
+
 ## [0.6.0] - 2015-08-18
 ### Summary:
 This is includes new features, bugfixes, readme changes and a test automations script as well as a suite of tests.
