@@ -1,6 +1,34 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2015-08-18
+### Summary:
+This is includes new features, bugfixes, readme changes and a test automations script as well as a suite of tests.
+
+####Features
+- Added netapp_sis_policy resource
+- Added netapp_iscsi and netapp_iscsi_security resources
+- Added igroup
+- Added ldap config and ldap client
+- Added kerberos config and kerberos realm
+- Added netapp_iscsi_interface_accesslist
+- Add ASUP tracking to device information 
+- Added security login and security role
+- Add snapmirror and vserver_peer resources
+
+####Bugfixes
+- netapp_sis_config fix
+- netapp_volume fix
+- netapp_nfs and netapp_cifs fix
+- Ensure properties are arrays in multiple resources
+- Fail resource on target_alias change for netapp_iscsi
+- Fixes for aggregate creation, volume creation, export policies and LIF operations
+
+####Improvements
+- Docs update
+- Add spec helper code
+- Add acceptance tests
+
 ## [0.5.0] - 2015-05-12
 ### Summary:
 This is the initial rewrite to convert the module to use the modern Cluster

@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-netapp",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "Puppet Labs",
   "summary": "Manages resources on NetApp Cluster Data ONTAP devices.",
   "license": "Apache-2.0",
