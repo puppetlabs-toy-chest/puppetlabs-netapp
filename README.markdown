@@ -41,7 +41,6 @@ NetApp Data ONTAP software.
 
 The following items are supported:
 
-XXX Verify these
  * Creation, modification and deletion of volumes, including auto-increment,
    snapshot schedules and volume options.
  * Creation, modification and deletion of QTrees.
@@ -780,7 +779,7 @@ The volume name. Valid characters are a-z, 1-9 & underscore.
 
 ##### `options`
 
-The volume options hash. XXX Needs more details
+The volume options hash.
 
 ##### `snapreserve`
 
@@ -788,7 +787,7 @@ The percentage of space to reserve for snapshots.
 
 ##### `snapschedule`
 
-The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'. XXX Needs an example
+The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'
 
 ##### `spaceres`
 
