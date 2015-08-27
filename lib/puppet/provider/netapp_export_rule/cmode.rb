@@ -26,10 +26,9 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
       Puppet.debug("Puppet::Provider::Netapp_export.cmode.prefetch: Processing rule for export #{name}. \n")
 
       # Construct an export hash for rule
-      export_rule = { :name   => name,
-                      :ensure => :present }
+      export_rule = { :ensure => :present }
 
-      export_rule[:rule_index] = rule.child_get_int("rule-index")
+      export_rule[:name] = "#{name}:#{rule.child_get_int("rule-index")}"
       # Add the anon UID if present.
       export_rule[:anonuid] = rule.child_get_string("anonymous-user-id") unless rule.child_get_string("anonymous-user-id").nil?
       # Add the client match string if present.
@@ -110,12 +109,7 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
 
-    policy_name = @resource[:name]
-    if @resource[:rule_index]
-      rule_index = @resource[:rule_index]
-    else
-      rule_index = @original_values[:rule_index]
-    end
+    policy_name, rule_index = @resource[:name].split(':')
 
     Puppet.debug("Puppet::Provider::Netapp_export.cmode: Flushing for rule index #{rule_index} on Policy #{policy_name}")
 
@@ -196,10 +190,9 @@ Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provid
     export_rule_create.child_add_string("export-ntfs-unix-security-ops", @resource[:ntfsunixsecops])
     export_rule_create.child_add_string("is-allow-dev-is-enabled", @resource[:allowdevenabled])
     export_rule_create.child_add_string("is-allow-set-uid-enabled", @resource[:allowsetuid])
-    export_rule_create.child_add_string("policy-name", @resource[:name])
-    unless @resource[:rule_index].nil?
-      export_rule_create.child_add_string("rule-index", @resource[:rule_index])
-    end
+    policy_name, rule_index = @resource[:name].split(":")
+    export_rule_create.child_add_string("policy-name", policy_name)
+    export_rule_create.child_add_string("rule-index", rule_index)
 
     # Process protocol array
     protocol_element = NaElement.new('protocol')

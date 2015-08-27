@@ -8,10 +8,18 @@ node 'vsim-01' {
 node 'vserver-01' {
   netapp_export_policy { 'export_rule_test' :
     ensure => present,
-  } 
-  netapp_export_rule { 'export_rule_test' :
+  }
+  netapp_export_rule { 'export_rule_test:1' :
     ensure            => present,
     clientmatch       => '10.0.0.0/8',
+    protocol          => ['nfs'],
+    superusersecurity => 'none',
+    rorule            => ['none', 'sys'],
+    rwrule            => ['none', 'sys'],
+  }
+  netapp_export_rule { 'export_rule_test:2' :
+    ensure            => present,
+    clientmatch       => '192.168.0.0/16',
     protocol          => ['nfs'],
     superusersecurity => 'none',
     rorule            => ['none', 'sys'],
@@ -31,14 +39,12 @@ node 'vsim-01' {
 node 'vserver-01' {
   netapp_export_policy { 'export_rule_test' :
     ensure => absent,
-  } 
-  netapp_export_rule { 'export_rule_test' :
+  }
+  netapp_export_rule { 'export_rule_test:1' :
     ensure            => absent,
-    clientmatch       => '10.0.0.0/8',
-    protocol          => ['nfs'],
-    superusersecurity => 'none',
-    rorule            => ['sys', 'none'],
-    rwrule            => ['sys', 'none'],
+  }
+  netapp_export_rule { 'export_rule_test:2' :
+    ensure            => absent,
   }
 }
     EOS
