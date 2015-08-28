@@ -571,7 +571,7 @@ Valid values are `nextavail`, `priority`, `disabled`.
 
 LIF firewall policy. Default is based on the port role.
 
-Valid values are `mgmt`, `cluster`, `intercluster`.
+Valid values are `mgmt`, `cluster`, `intercluster`, `data`.
 
 ##### `homenode`
 

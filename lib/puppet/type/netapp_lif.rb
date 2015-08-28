@@ -60,7 +60,7 @@ Puppet::Type.newtype(:netapp_lif) do
 
   newproperty(:firewallpolicy) do
     desc "LIF firewall policy."
-    newvalues(:mgmt, :cluster, :intercluster)
+    newvalues(:mgmt, :cluster, :intercluster, :data)
   end
 
   newproperty(:homenode) do
