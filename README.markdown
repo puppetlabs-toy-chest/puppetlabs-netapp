@@ -255,6 +255,8 @@ None as of this first release. Common operations may be encapsulated in defined 
 [`netapp_qtree`](#type-netapp_qtree)
 [`netapp_quota`](#type-netapp_quota)
 [`netapp_role`](#type-netapp_role)
+[`netapp_security_login`](#type-netapp_security_login)
+[`netapp_security_login_role`](#type-netapp_security_login_role)
 [`netapp_snapmirror`](#type-netapp_snapmirror)
 [`netapp_user`](#type-netapp_user)
 [`netapp_volume`](#type-netapp_volume)
@@ -725,6 +727,49 @@ Comment for the policy.
 ##### `qos_policy`
 
 QoS policy name. E.g., 'best\_effort'
+
+### Type: netapp_security_login
+A user account associated with the specified application and authentication method. A new user account can be created with user name as the Active Directory group name. This user account gives access to users belonging to the specified Active Directory group.
+
+#### Parameters
+##### `comment`
+Comments for the user account. The length of comment should be less than or equal to 128 charaters.
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `is_locked`
+Whether the login is locked.
+
+##### `name`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.) A composite key made up from `application:authentication_method:username:vserver` eg `ssh:password:vsadmin:vserver01`
+
+##### `password`
+Password for the user account. This is ignored for creating snmp users. This is required for creating non-snmp users.
+
+##### `role_name`
+*Required.* The default value is 'admin' for Admin vserver and 'vsadmin' for data vserver. This field is required.
+
+### Type: netapp_security_login_role
+Manages a login role
+
+#### Parameters
+
+##### `access_level`
+Access level for the role. Possible values: 'none', 'readonly', 'all'. The default value is 'all'.
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `name`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.) A composite key made up from `command_directory_name:role_name:vserver` eg `ssh:password:vsadmin:vserver01`
+
+##### `role_query`
+A query for the role. The query must apply to the specified command or directory name. Example: The command is 'volume show' and the query is '-volume vol1'. The query is applied to the command resulting in populating only the volumes with name vol1.
 
 ### Type: netapp_snapmirror
 Not yet reviewed.
