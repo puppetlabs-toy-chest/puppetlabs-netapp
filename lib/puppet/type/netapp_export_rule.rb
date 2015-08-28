@@ -8,12 +8,9 @@ Puppet::Type.newtype(:netapp_export_rule) do
   ensurable
 
   newparam(:name) do
-    desc "The export policy name."
+    desc "The export policy name and index. Must take the form of `policy_name:rule_number` where the rule number is an integer and the policy name is an existing export policy."
     isnamevar
-  end
-
-  newproperty(:rule_index) do
-    desc "The rule index."
+    newvalues(/:\d+$/)
   end
 
   newproperty(:anonuid) do
@@ -162,14 +159,8 @@ Puppet::Type.newtype(:netapp_export_rule) do
     raise ArgumentError, "clientmatch is required" if ! self[:clientmatch] and ! self.provider.clientmatch
   end
 
-  # # Autorequire any matching netapp_volume resources.
-  # autorequire(:netapp_volume) do
-  #   requires = []
-  #   [self[:name], self[:path]].compact.each do |path|
-  #     if match = %r{/\w+/(\w+)(?:/\w+)?$}.match(path)
-  #       requires << match.captures[0]
-  #     end
-  #   end
-  #   requires
-  # end
+  # Autorequire any matching netapp_export_policy
+  autorequire(:netapp_export_policy) do
+    [self[:name].split(":").first]
+  end
 end

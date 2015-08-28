@@ -407,8 +407,7 @@ Change ownership mode. Defaults to 'restricted'.
 Valid values are `restricted`, `unrestricted`.
 
 ##### `name`
-
-The export policy. Composite name based on policy name and rule index. Must take the form of `policy_name:rule_number` where the rule number is an integer and the policy name is an existing export policy.
+The export policy name and index. Must take the form of `policy_name:rule_number` where the rule number is an integer and the policy name is an existing export policy.
 
 ##### `ntfsunixsecops`
 
