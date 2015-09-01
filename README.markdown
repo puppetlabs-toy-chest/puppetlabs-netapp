@@ -12,7 +12,6 @@
     * [Device Proxy System Setup](#device-proxy-system-setup)
 1. [Usage](#usage)
   * [Beginning with netapp](#beginning-with-netapp)
-<!--  * [NetApp operations](#netapp-operations) -->
   * [Classes and Defined Types](#classes-and-defined-types)
   * [Types and Providers](#types-and-providers)
 1. [Limitations](#limitations)
@@ -41,7 +40,6 @@ NetApp Data ONTAP software.
 
 The following items are supported:
 
-XXX Verify these
  * Creation, modification and deletion of volumes, including auto-increment,
    snapshot schedules and volume options.
  * Creation, modification and deletion of QTrees.
@@ -258,6 +256,7 @@ None as of this first release. Common operations may be encapsulated in defined 
 [`netapp_security_login`](#type-netapp_security_login)
 [`netapp_security_login_role`](#type-netapp_security_login_role)
 [`netapp_snapmirror`](#type-netapp_snapmirror)
+[`netapp_snapmirror_schedule`](#type-netapp_snapmirror_schedule)
 [`netapp_user`](#type-netapp_user)
 [`netapp_volume`](#type-netapp_volume)
 [`netapp_vserver`](#type-netapp_vserver)
@@ -347,10 +346,46 @@ Should the new aggregate be striped? Default: not_striped.
 Valid values are `striped`, `not_striped`.
 
 ### Type: netapp_cluster_id
-Not yet reviewed.
+Manage Netapp Cluster ID.
+
+#### Parameters
+##### `contact`
+The cluster contact
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `location`
+The cluster location
+
+##### `name`
+The cluster name
 
 ### Type: netapp_cluster_peer
-Not yet reviewed.
+Manage Netapp Cluster Peering.
+
+#### Parameters
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `name`
+The cluster peer name. Must match the remote cluster name.
+
+##### `password`
+Cluster peer password.
+
+##### `peeraddresses`
+Cluster peer address array
+
+##### `timeout`
+Cluster operation timeout. Must be between 25 and 180. Defaults to: 25.
+
+##### `username`
+Cluster peer username.
 
 ### Type: netapp_export_policy
 
@@ -440,31 +475,48 @@ Superuser security flavor. Defaults to 'any'.
 Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
 
 ### Type: netapp_group
-Not yet implemented.
+Manage Netapp Group creation, modification and deletion.
+
+#### Parameters
+##### `comment`
+Group comment
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `groupname`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The group name.
+
+##### `roles`
+List of roles for this group. Comma separate multiple values.
 
 ### Type: netapp_igroup
 Manage Netapp initiator groups
 
 #### Parameters
-##### name
+##### `name`
 **Namevar:** If omitted, this parameter's value defaults to the resource's title.
 
 Initiator group name.
 
-##### group_type
+##### `group_type`
 Initiator group type.
 
 Valid values are `fcp`, `iscsi`, `mixed`.
 
-##### members
+##### `members`
 An array of initiator WWPNs or aliases to be members of the initiator group.
 
-##### os_type
+##### `os_type`
 OS type of the initiators within the group. The os type applies to all initiators within the group and governs the finer details of SCSI protocol interaction with these initiators. Required.
 
 Valid values are `solaris`, `windows`, `hpux`, `aix`, `linux`, `netware`, `vmware`, `openvms`, `xen`, `hyper_v`.
 
-##### portset
+##### `portset`
 The name of the portset to which the igroup should be bound. A value of `false` will unbind the portset.
 
 Valid values are a string or the boolean `false`
@@ -472,15 +524,15 @@ Valid values are a string or the boolean `false`
 Manage Netapp ISCSI service. There may only ever be one of these declared per VServer.
 
 #### Parameters
-##### svm
+##### `svm`
 **Namevar:** If omitted, this parameter's value defaults to the resource's title.
 
 ISCSI service SVM.
 
-##### target_alias
+##### `target_alias`
 ISCSI WWPN alias. May be any string that is a valid ISCSI target WWPN.
 
-##### state
+##### `state`
 ISCSI service state.
 
 Valid values are `on`, `off`.
@@ -489,38 +541,49 @@ Valid values are `on`, `off`.
 Manage Netapp ISCSI initiator (client) authentication.
 
 #### Parameters
-##### initiator
+##### `initiator`
 **Namevar:** If omitted, this parameter's value defaults to the resource's title.
 
 ISCSI initiator name.
-##### auth_type
+##### `auth_type`
 ISCSI initiator authentication type.
 
 Valid values are `chap`, `none`, `deny`.
 
-##### radius
+##### `radius`
 ISCSI radius CHAP setting.
 
 Valid values are `true`, `false`.
 
-##### username
+##### `username`
 ISCSI initiator inbound CHAP username.
 
-##### password
+##### `password`
 ISCSI initiator inbound CHAP password.
 
 Valid values are 12-16 hexidecimal digits.
 
-##### outbound_username
+##### `outbound_username`
 ISCSI initiator outbound CHAP username.
 
-##### outbound_password
+##### `outbound_password`
 ISCSI initiator outbound CHAP password.
 
 Valid values are 12-16 hexidecimal digits.
 
 ### Type: netapp_license
-Not yet reviewed.
+Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer.
+
+#### Parameters
+##### `ensure`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The license code
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
 
 ### Type: netapp_lif
 
@@ -621,10 +684,64 @@ Valid values are `disabled`, `enabled`, `system_defined`.
 *Required*. LIF Vserver name.
 
 ### Type: netapp_lun
-Not yet reviewed.
+Manage Netap Lun creation, modification and deletion.
+
+#### Parameters
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `lunclass`
+Lun class. Default value = 'regular'. Possible values: 'regular', 'protectedendpoint', 'vvol'.
+
+Valid values are `regular`, `protectedendpoint`, `vvol`.
+
+##### `ostype`
+Lun OS Type. Defaults to 'image'. Possible values: 'image', 'aix', 'hpux', 'hyper_v', 'linux', 'netware', 'openvms', 'solaris', 'solaris_efi', 'vmware', 'windows', 'windows_2008', 'windows_gpt'
+
+Valid values are `image`, `aix`, `hpux`, `hyper_v`, `linux`, `netware`, `openvms`, `solaris`, `solaris_efi`, `vmware`, `windows`, `windows_2008`, `windows_gpt`.
+
+##### `path`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+Lun path
+
+##### `prefixsize`
+Lun prefix stream size in bytes. Default value is based on ostype. Not required for 'image' ostype. Must be a multiple of 512 bytes.
+
+##### `qospolicygroup`
+QOS Policy group
+
+##### `size`
+Lun size. Can either be specified in bytes, or specify one of the following size units: [mgt].
+
+##### `spaceresenabled`
+Enable Lun space reservation? Defaults to true.
+
+Valid values are `true`, `false`.
+
+##### `state`
+Lun state. Default value: 'online'. Possible values: 'online', 'offline'.
+
+Valid values are `online`, `offline`.
 
 ### Type: netapp_lun_map
-Not yet reviewed.
+Manage Netap Lun map creation and deletion.
+
+#### Parameters
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `ensure`
+Initiator group to map to.
+
+##### `lunmap`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+Lun map - Composite key of format {path}:{lun-id}.
 
 ### Type: netapp_nfs
 
@@ -661,7 +778,19 @@ Control NFS v4.1 access
 Valid values are `enabled`, `disabled`.
 
 ### Type: netapp_notify
-Not yet reviewed.
+Sends an arbitrary message to the agent run-time log.
+
+#### Parameters
+##### `message`
+The message to be sent to the log.
+
+##### `message`
+An arbitrary tag for your own reference; the name of the message.
+
+##### `message`
+Whether to show the full object path. Defaults to false.
+
+Valid values are `true`, `false`.
 
 ### Type: netapp_qtree
 
@@ -688,10 +817,111 @@ The qtree name.
 *Required.*. The volume to create the qtree against. 
 
 ### Type: netapp_quota
-Not yet reviewed.
+Manage NetApp quota entries.  Please note that NetApp identifies
+a quota entry uniquely by the type, target, volume, and qtree. This type
+on the other hand has to uniquely identify a quota entry only by its
+target.  This means that you cannot manage two quota entries for the
+same user (username = quota-target) but for different trees. As a result
+this type is best at managing tree quotas
+
+Example:
+
+Limit qtree1 on vol1 to 10G
+
+~~~puppet
+netapp_quota { '/vol/vol1/qtree1':
+  ensure    => present,
+  type      => 'tree',
+  volume    => 'vol1',
+  disklimit => '10G',
+}
+~~~
+
+Limit user bob to consume 2G on qtree1. Note that you cannot
+define multiple quotas for user bob:
+
+~~~puppet
+netapp_quota { 'bob':
+  ensure    => present,
+  type      => 'user',
+  qtree     => 'qtree1',
+  volume    => 'vol1',
+  disklimit => '2048M',
+}
+~~~
+
+Make sure the following restrictions apply in your
+environment before using this type:
+- every quota target has to be unique
+- quota entries must not contain any special characters that would
+  require quotation
+
+#### Parameters
+##### `disklimit`
+The amount of space that the target can consume, e.g. `100M` or `2G`. You can also specify absent to make sure there is no limit.
+
+Valid values are `absent`. Values can match `/^[0-9]+[KMGT]$/i`.
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `filelimit`
+The number of files that the target can have. You can also specify absent to make sure there is no limit.
+
+Valid values are `absent`. Values can match `/^[0-9]+[KMGT]?$/i`.
+
+##### `name`
+The name of the quota target.  Depending on the quota type this can be a pathname (e.g. `/vol/vol1/qtree1`), a username, or a group
+
+##### `qtree`
+The qtree that the quota resides on. This is only relevant for `user` and `group` quotas
+
+##### `softdisklimit`
+The amount of space the target has to consume before a message is logged. You can also specify absent to make sure there is no limit.
+
+Valid values are `absent`. Values can match `/^[0-9]+[KMGT]$/i`.
+
+##### `softfilelimit`
+The number of files the target has to own before a message is logged. You can also specify absent to make sure there is no limit
+
+Valid values are `absent`. Values can match `/^[0-9]+[KMGT]?$/i`.
+
+##### `threshold`
+The amount of disk space the target has to consume before a message is logged. Set to absent to make sure the treshold is unlimited
+
+Valid values are `absent`. Values can match `/^[0-9]+[KMGT]$/i`.
+
+##### `type`
+The type of the quota. You can define `tree`, `user` or `group` here
+
+Valid values are `tree`, `user`, `group`.
+
+##### `volume`
+The name of the volume the quota resides on
+
+Values can match `/^\w+$/`.
 
 ### Type: netapp_role
-Not yet reviewed.
+Manage Netapp Role creation, modification and deletion.
+
+#### Parameters
+##### `capabilities`
+List of capabilities for this role. Comma separate multiple values.
+
+##### `comment`
+Role comment
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `rolename`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The role name.
 
 ### Type: netapp_sis_policy
 
@@ -771,10 +1001,112 @@ Valid values are `present`, `absent`.
 A query for the role. The query must apply to the specified command or directory name. Example: The command is 'volume show' and the query is '-volume vol1'. The query is applied to the command resulting in populating only the volumes with name vol1.
 
 ### Type: netapp_snapmirror
-Not yet reviewed.
+Manage Netapp Snapmirror creation, modification and deletion.
+
+#### Parameters
+##### `destination_location`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The destination location.
+
+##### `destination_snapshot`
+The destination snapshot.
+
+##### `ensure`
+Netapp Snapmirror resource state. Valid values are: present, absent.
+
+Valid values are `present`, `absent`.
+
+##### `max_transfer_rate`
+The max transfer rate, in KB/s. Defaults to unlimited.
+
+##### `relationship_type`
+Specifies the type of the SnapMirror relationship. An extended data protection relationship with a policy of type vault is equivalent to a 'vault' relationship. On Data ONTAP 8.3.1 or later, in the case of a Vserver SnapMirror relationship the type of the relationship is always data_protection. Possible values: data_protection , load_sharing , vault , restore , transition_data_protection , extended_data_protection
+
+##### `source_location`
+The source location.
+
+##### `source_snapshot`
+The source snapshot name
+
+### netapp_snapmirror_schedule
+Manage Netapp Snapmirror schedule creation, modification and deletion.
+
+#### Parameters
+##### `connection_mode`
+The connection mode to use between source and destination.
+
+Valid values are `inet`, `inet6`.
+
+##### `days_of_month`
+The days of month for schedule to be set.  Can be single value between 1 and 31, comma seperated list (1,7,14), range (2-10), range with divider (1-30/7), * to match all, or - to match none.
+
+##### `days_of_week`
+The days of week for schedule to be set. Can be single value between 0 and 6, inclusive, with 0 being Sunday, or must be name of the day (e.g. Tuesday), comma sepeated list (1,3,5), range (2-5), * to match all, or - to match none.
+
+##### `destination_location`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The destination location.
+
+##### `ensure`
+Netapp Snapmirror schedule resource state. Valid values are: present, absent.
+
+Valid values are `present`, `absent`.
+
+##### `hours`
+The hour(s) in the day for schedule to be set.  Can be single value between 1 and 24, comma seperated list (1,7,14), range (2-10), range with divider (1-24/3), * to match all, or - to match none.
+
+##### `max_transfer_rate`
+The max transfer rate, in KB/s. Defaults to unlimited.
+
+##### `minutes`
+The minutes in the hour for schedule to be set.  Can be single value between 0 and 59, comma seperated list (1,7,14), range (2-10), range with divider (1-59/3), * to match all, or - to match none.
+
+##### `restart`
+The restart mode to use when transfer interrupted. Allowed values are: always, never and restart.
+
+Valid values are `always`, `never`, `default`.
+
+##### `source_location`
+The source location.
 
 ### Type: netapp_user
-Not yet reviewed.
+Manage Netapp User creation, modification and deletion.
+
+#### Parameters
+##### `comment`
+User comment
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `fullname`
+The user full name.
+
+##### `groups`
+List of groups for this user account. Comma separate multiple values.
+
+##### `passmaxage`
+Number of days that this user's password can be active before the user must change it. Default value is 2^31-1 days.
+
+##### `passminage`
+Number of days that this user's password must be active before the user can change it. Default value is 0.
+
+##### `password`
+The user password. Minimum length is 8 characters, must contain at-least one number.
+
+##### `status`
+Status of user account. Valid values are: enabled, disabled and expired. Cannot be modified via API.
+
+Valid values are `enabled`, `disabled`, `expired`.
+
+##### `username`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The user username.
 
 ### Type: netapp_volume
 
@@ -824,7 +1156,48 @@ The volume name. Valid characters are a-z, 1-9 & underscore.
 
 ##### `options`
 
-The volume options hash. XXX Needs more details
+The volume options hash. Key/value pairs are configured via volume-option-info. Only valid in vserver context.
+
+Example:
+
+~~~puppet
+netapp_volume { 'nfsvol':
+  ensure       => 'present',
+  autosize     => 'off',
+  exportpolicy => 'nfs_exports',
+  initsize     => '2g',
+  junctionpath => '/nfsvol',
+  state        => 'online',
+  options      => {
+    'actual_guarantee'          => 'volume',
+    'convert_ucode'             => 'on',
+    'create_ucode'              => 'on',
+    'effective_guarantee'       => 'volume',
+    'extent'                    => 'off',
+    'fractional_reserve'        => '100',
+    'fs_size_fixed'             => 'off',
+    'guarantee'                 => 'volume',
+    'ignore_inconsistent'       => 'off',
+    'max_write_alloc_blocks'    => '0',
+    'maxdirsize'                => '52346',
+    'minra'                     => 'off',
+    'no_atime_update'           => 'off',
+    'no_i2p'                    => 'off',
+    'nosnap'                    => 'off',
+    'nosnapdir'                 => 'off',
+    'nvfail'                    => 'off',
+    'read_realloc'              => 'off',
+    'root'                      => 'false',
+    'schedsnapname'             => 'create_time',
+    'snapmirrored'              => 'off',
+    'snapshot_clone_dependency' => 'off',
+    'try_first'                 => 'volu me_grow',
+  },
+}
+  snapreserve  => '5',
+  snapschedule => {'days' => '2', 'hours' => '6', 'minutes' => '0', 'weeks' => '1', 'which-hours' => '0:05, 1:05, 2:05, 3:05, 4:05, 5:05, 6:05, 7:05, 8:05, 9:05, 10:05, 11:05, 12:05, 13:05, 14:05, 15:05,
+      16:05, 17:05, 18:05, 19:05, 20:05, 21:05, 22:05, 23:05', 'which-minutes' => ''},
+~~~
 
 ##### `snapreserve`
 
@@ -832,7 +1205,29 @@ The percentage of space to reserve for snapshots.
 
 ##### `snapschedule`
 
-The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'. XXX Needs an example
+The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'.
+
+Example:
+
+~~~puppet
+netapp_volume { 'nfsvol':
+  ensure       => 'present',
+  autosize     => 'off',
+  exportpolicy => 'nfs_exports',
+  initsize     => '2g',
+  junctionpath => '/nfsvol',
+  state        => 'online',
+  snapreserve  => '5',
+  snapschedule => {
+    'days'          => '2',
+    'hours'         => '6',
+    'minutes'       => '0',
+    'weeks'         => '1',
+    'which-hours'   => '0:05, 12:05',
+    'which-minutes' => '',
+  },
+}
+~~~
 
 ##### `spaceres`
 
