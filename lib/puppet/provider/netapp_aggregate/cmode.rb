@@ -15,13 +15,14 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
   confine :feature => :posix
   defaultfor :feature => :posix
 
-  netapp_commands :aggrget     => {:api => 'aggr-get-iter', :iter => true, :result_element =>'attributes-list'}
-  netapp_commands :aggrcreate  => 'aggr-create'
-  netapp_commands :aggradd     => 'aggr-add'
-  netapp_commands :aggrmod     => 'aggr-modify'
-  netapp_commands :aggrdestroy => 'aggr-destroy'
-  netapp_commands :aggronline  => 'aggr-online'
-  netapp_commands :aggroffline => 'aggr-offline'
+  netapp_commands :aggrget       => {:api => 'aggr-get-iter', :iter => true, :result_element =>'attributes-list'}
+  netapp_commands :aggrcreate    => 'aggr-create'
+  netapp_commands :aggradd       => 'aggr-add'
+  netapp_commands :aggrdestroy   => 'aggr-destroy'
+  netapp_commands :aggronline    => 'aggr-online'
+  netapp_commands :aggroffline   => 'aggr-offline'
+  netapp_commands :aggrsetoption => 'aggr-set-option'
+  netapp_commands :aggrgetoption => 'aggr-options-list-info'
 
   mk_resource_methods
 
@@ -54,6 +55,20 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       aggr_info[:diskcount] = aggregate.child_get('aggr-raid-attributes').child_get_string('disk-count')
 
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode self.instances: aggr_info = #{aggr_info}.")
+
+      #loop through all the options that can be set.
+      options_info = aggrgetoption('aggregate', aggregate_name)
+      options = options_info.child_get('options').children_get()
+      options.each do |option|
+        option_name = option.child_get_string ("name")
+        if ["free_space_realloc", "fs_size_fixed", "ha_policy", "ignore_inconsistent", "lost_write_protect", 
+            "max_write_alloc_blocks", "striping", "nosnap", "raid_cv", "raid_lost_write", "raid_zoned",
+            "raidsize", "cache_raid_group_size", "raidtype", "resyncsnaptime", "root", "snapmirrored", 
+            "snapshot_autodelete", "thorough_scrub", "percent_snapshot_space", "nearly_full_threshold",
+            "full_threshold", "is_flash_pool_caching_enabled", "hybrid_enabled", "hybrid_enabled_force"].include?(option_name)
+          aggr_info["option_#{option_name}".to_sym] = option.child_get_string ("value")
+        end
+      end
       aggregates << new(aggr_info)
     end
 
@@ -99,16 +114,29 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
     when :present
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: Ensure is present. Modifying...")
 
-      # Add disks to the existing aggregate
-      newdisks = Integer(@resource[:diskcount]) - Integer(@original_values[:diskcount])
-      if newdisks < 0
-        raise ArgumentError, "aggregate diskcount cannot be reduced without destroying and recreating the aggregate"
-      end
-      result = aggradd('aggregate', @resource[:name], 'disk-count', newdisks)
+      # apply options to the aggregate
+      setoptions()
 
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: Aggregate #{@resource[:name]} has been modified.")
       return true
 
+    end
+  end
+
+  def setoptions()
+    Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode: Aggregate #{@resource[:name]} setoptions.")
+    @property_hash.each do |key, value|
+      #we are only interested in the option_ attributes
+      if key.to_s.include? "option_"
+        # has the value changed ?
+        if @property_hash[key].to_sym != @original_values[key].to_sym
+          aggr = NaElement.new('aggr-set-option')
+          aggr.child_add_string('aggregate', @resource[:name])
+          aggr.child_add_string('option-name', key.to_s.split('option_')[1] )
+          aggr.child_add_string('option-value', @resource[key].to_s)
+          result = aggrsetoption( aggr )
+        end
+      end
     end
   end
 
@@ -184,6 +212,8 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       sleep sleep_time
     end
 
+    # apply options to the aggregate
+    setoptions()
     # Passed above, so must have created aggregate successfully
     return true
   end
