@@ -100,6 +100,11 @@ Puppet::Type.newtype(:netapp_vserver) do
     desc "Vserver snapshot policy"
   end
 
+  newproperty(:is_repository) do
+    desc "Specifies if this Vserver is a Vserver with Infinite Volume."
+    newvalues(:true,:false)
+  end
+
   newproperty(:maxvolumes) do
     desc "Vserver maximum allowed volumes."
   end
