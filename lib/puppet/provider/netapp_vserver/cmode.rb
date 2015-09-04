@@ -9,7 +9,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
   netapp_commands :vserverlist  => {:api => 'vserver-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :vserveradd   => 'vserver-create'
   netapp_commands :vserverdel   => 'vserver-destroy'
-  netapp_commands :vservermod   => 'vserver-modify'
+  netapp_commands :vservermod   => 'vserver-modify-iter'
   netapp_commands :vserverstart => 'vserver-start'
   netapp_commands :vserverstop  => 'vserver-stop'
 
@@ -41,6 +41,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       comment = vserver.child_get_string("comment")
       language = vserver.child_get_string("language")
       state = vserver.child_get_string("state")
+      is_repository = vserver.child_get_string("is-repository-vserver")
 
       # Name mapping switch
       namemappingswitch = []
@@ -90,7 +91,8 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
         :quotapolicy       => quota_policy,
         :snapshotpolicy    => snapshot_policy,
         :aggregatelist     => aggregates,
-        :allowedprotos     => protocols
+        :allowedprotos     => protocols,
+        :is_repository     => is_repository,
       }
 
       Puppet.debug("Puppet::Provider::Netapp_vserver.cmode instances: vserver_info looks like: #{vserver_info.inspect}")
@@ -133,16 +135,20 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     when :present
       Puppet.debug("Puppet::Provider::Netapp_vserver.cmode flush: Required ensure = present. Modifying vserver #{@resource[:name]}.")
 
-      # Create a vserver-modify object
-      vserver_modify = NaElement.new('vserver-modify')
+      # Create a vserver-modify attributes object
+      vserver_attributes = NaElement.new('vserver-info')
+      vserver_query = NaElement.new('vserver-info')
+
+      # Create a vserver-modify query object
+      vserver_query.child_add_string('vserver-name', @resource[:name])
 
       # Build up the modify object
-      vserver_modify.child_add_string('vserver-name', @resource[:name])
-      vserver_modify.child_add_string('comment', @resource[:comment]) if @resource[:comment]
-      vserver_modify.child_add_string('language', @resource[:language])
-      vserver_modify.child_add_string('quota-policy', @resource[:quotapolicy]) if @resource[:quotapolicy]
-      vserver_modify.child_add_string('snapshot-policy', @resource[:snapshotpolicy]) if @resource[:snapshotpolicy]
-      vserver_modify.child_add_string('max-volumes', @resource[:maxvolumes]) if @resource[:maxvolumes]
+      vserver_attributes.child_add_string('vserver-name', @resource[:name])
+      vserver_attributes.child_add_string('comment', @resource[:comment]) if @resource[:comment]
+      vserver_attributes.child_add_string('language', @resource[:language])
+      vserver_attributes.child_add_string('quota-policy', @resource[:quotapolicy]) if @resource[:quotapolicy]
+      vserver_attributes.child_add_string('snapshot-policy', @resource[:snapshotpolicy]) if @resource[:snapshotpolicy]
+      vserver_attributes.child_add_string('max-volumes', @resource[:maxvolumes]) if @resource[:maxvolumes]
 
       # Process namemappingswitch array values
       if !@resource[:namemappingswitch].nil?
@@ -151,7 +157,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
         Array(@resource[:namemappingswitch]).each do |value|
           nms_element.child_add_string("nmswitch", value)
         end
-        vserver_modify.child_add(nms_element)
+        vserver_attributes.child_add(nms_element)
       end
 
       # Process nameserverswitch array values
@@ -161,7 +167,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
         Array(@resource[:nameserverswitch]).each do |value|
           nss_element.child_add_string("nsswitch", value)
         end
-        vserver_modify.child_add(nss_element)
+        vserver_attributes.child_add(nss_element)
       end
 
       # Process aggregatelist array values
@@ -171,7 +177,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
         Array(@resource[:aggregatelist]).each do |value|
           aggrlist_element.child_add_string("aggr-name", value)
         end
-        vserver_modify.child_add(aggrlist_element)
+        vserver_attributes.child_add(aggrlist_element)
       end
 
       # Process allowedprotos array values
@@ -181,15 +187,18 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
         Array(@resource[:allowedprotos]).each do |value|
           allowedprotos_element.child_add_string('protocol', value)
         end
-        vserver_modify.child_add(allowedprotos_element)
+        vserver_attributes.child_add(allowedprotos_element)
       end
 
       # Modify the vserver
-      result = vservermod(vserver_modify)
-
-      Puppet.debug("Puppet::Provider::Netapp_vserver.cmode flush: Vserver #{@resource[:name]} modified successfully.")
-      return true
-
+      vserver_modify = NaElement.new('vserver-modify-iter')
+      vserver_set = NaElement.new('attributes')
+      vserver_set.child_add(vserver_attributes)
+      vserver_modify.child_add(vserver_set)
+      vserver_get = NaElement.new('query')
+      vserver_get.child_add(vserver_query)
+      vserver_modify.child_add(vserver_get)
+      vservermod(vserver_modify)
     end
 
     #@property_hash.clear
@@ -202,6 +211,9 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
   #
   ## Setters
   #
+  def is_repository=(value)
+    raise ArgumentError, "is_repository cannot be changed after creation"
+  end
 
   # VServer state setter.
   def state=(value)
@@ -226,7 +238,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     return true
   end
 
-  # Volume create.
+  # vserver create.
   def create
     Puppet.debug("Puppet::Provider::Netapp_vserver.cmode: creating Netapp Vserver #{@resource[:name]} with a state of #{@resource[:state]}.")
 
@@ -235,6 +247,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     vserver_create.child_add_string("vserver-name", @resource[:name])
     vserver_create.child_add_string("comment", @resource[:comment]) if @resource[:comment]
     vserver_create.child_add_string("language", @resource[:language])
+    vserver_create.child_add_string("is-repository-vserver", @resource[:is_repository]) if @resource[:is_repository]
     vserver_create.child_add_string("quota-policy", @resource[:quotapolicy]) if @resource[:quotapolicy]
     vserver_create.child_add_string("root-volume", @resource[:rootvol])
     vserver_create.child_add_string("root-volume-aggregate", @resource[:rootvolaggr])
