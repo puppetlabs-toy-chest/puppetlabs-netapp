@@ -1,7 +1,7 @@
 require 'puppet/property/netapp_truthy'
 
 Puppet::Type.newtype(:netapp_sis_config) do
-  @doc = "Manage Netapp sis config modification."
+  @doc = "Manage Netapp sis config modification. [Family: vserver]"
 
   apply_to_device
 

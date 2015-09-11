@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp nfs service"
+  @doc = "Manage Netapp nfs service. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

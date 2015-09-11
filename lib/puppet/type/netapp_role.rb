@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_role) do
-  @doc = "Manage Netapp Role creation, modification and deletion."
+  @doc = "Manage Netapp Role creation, modification and deletion. [Family: cluster]"
 
   apply_to_device
 

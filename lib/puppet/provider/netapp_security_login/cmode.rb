@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_security_login).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp security logins"
+  @doc = "Manage Netapp security logins. [Family: cluster]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

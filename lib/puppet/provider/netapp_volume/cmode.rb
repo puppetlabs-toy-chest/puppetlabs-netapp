@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Volume creation, modification and deletion."
+  @doc = "Manage Netapp Volume creation, modification and deletion. [Family: vserver]"
 
   confine :feature => :posix
 

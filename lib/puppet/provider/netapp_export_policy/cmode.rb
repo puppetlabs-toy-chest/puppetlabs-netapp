@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_export_policy).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp CMode export policy creation and deletion."
+  @doc = "Manage Netapp CMode export policy creation and deletion. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

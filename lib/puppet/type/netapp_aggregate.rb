@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_aggregate) do
-  @doc = "Manage Netapp Aggregate creation, modification and deletion."
+  @doc = "Manage Netapp Aggregate creation, modification and deletion. [Family: cluster]"
 
   apply_to_device
 

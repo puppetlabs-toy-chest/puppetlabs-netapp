@@ -1,7 +1,7 @@
 require 'puppet/parameter/boolean'
 
 Puppet::Type.newtype(:netapp_kerberos_realm) do
-  @doc = "Kerberos realm configuration specifies the locations of Key Distribution Center (KDC) servers and administration daemons for the Kerberos realms of interest. When returned as part of the output, all elements of this typedef are reported, unless limited by a set of desired attributes specified by the caller."
+  @doc = "Kerberos realm configuration specifies the locations of Key Distribution Center (KDC) servers and administration daemons for the Kerberos realms of interest. When returned as part of the output, all elements of this typedef are reported, unless limited by a set of desired attributes specified by the caller. [Family: vserver]"
 
   apply_to_device
 

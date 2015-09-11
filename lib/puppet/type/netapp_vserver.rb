@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_vserver) do
-  @doc = "Manage Netapp Vserver creation, modification and deletion."
+  @doc = "Manage Netapp Vserver creation, modification and deletion. [Family: cluster, vserver]"
 
   apply_to_device
 

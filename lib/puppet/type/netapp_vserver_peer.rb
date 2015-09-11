@@ -1,7 +1,7 @@
 require 'ipaddr'
 
 Puppet::Type.newtype(:netapp_vserver_peer) do
-  @doc = "Manage Netapp Vserver Peering."
+  @doc = "Manage Netapp Vserver Peering. [Family: cluster]"
 
   apply_to_device
 

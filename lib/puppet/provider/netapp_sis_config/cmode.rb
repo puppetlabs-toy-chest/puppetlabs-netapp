@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_sis_config).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp sis config."
+  @doc = "Manage Netapp sis config. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

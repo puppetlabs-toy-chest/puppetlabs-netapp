@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_ldap_client) do
-  @doc = "Manage Netapp LDAP client configuration for the cluster."
+  @doc = "Manage Netapp LDAP client configuration for the cluster. [Family: vserver]"
 
   apply_to_device
 

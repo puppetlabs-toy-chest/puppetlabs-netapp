@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_nfs) do
-  @doc = "Manage Netap NFS service"
+  @doc = "Manage Netap NFS service. [Family: vserver]"
 
   apply_to_device
 

@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_lun) do
-  @doc = "Manage Netap Lun creation, modification and deletion."
+  @doc = "Manage Netap Lun creation, modification and deletion. [Family: vserver]"
 
   apply_to_device
 

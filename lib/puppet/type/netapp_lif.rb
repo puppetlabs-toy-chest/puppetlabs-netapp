@@ -1,7 +1,7 @@
 require 'ipaddr'
 
 Puppet::Type.newtype(:netapp_lif) do
-  @doc = "Manage Netapp Logical Inteface (LIF) creation, modification and deletion."
+  @doc = "Manage Netapp Logical Inteface (LIF) creation, modification and deletion. [Family: cluster]"
 
   apply_to_device
 

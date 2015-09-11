@@ -1,7 +1,7 @@
 require 'puppet/parameter/boolean'
 
 Puppet::Type.newtype(:netapp_ldap_config) do
-  @doc = "Create a new association between a Lightweight Directory Access Protocol (LDAP) client configuration and a Vserver. A Vserver can have only one client configuration associated with it."
+  @doc = "Create a new association between a Lightweight Directory Access Protocol (LDAP) client configuration and a Vserver. A Vserver can have only one client configuration associated with it. [Family: vserver]"
 
   apply_to_device
 

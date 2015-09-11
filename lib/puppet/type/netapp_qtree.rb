@@ -1,7 +1,7 @@
 require 'puppet/util/network_device'
 
 Puppet::Type.newtype(:netapp_qtree) do
-  @doc = "Manage Netapp Qtree creation, modification and deletion."
+  @doc = "Manage Netapp Qtree creation, modification and deletion. [Family: vserver]"
 
   apply_to_device
 

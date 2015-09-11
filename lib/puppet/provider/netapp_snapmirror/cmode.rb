@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_snapmirror).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp snapmirror"
+  @doc = "Manage Netapp snapmirror. [Family: cluster, vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

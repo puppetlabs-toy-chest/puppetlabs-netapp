@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_vserver_option) do
-  @doc = "Manage Netapp Vserver option modification."
+  @doc = "Manage Netapp Vserver option modification. [Family: cluster, vserver]"
 
   apply_to_device
 

@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_iscsi_security) do
-  @doc = "Manage Netap ISCSI initiator (client) authentication"
+  @doc = "Manage Netap ISCSI initiator (client) authentication. [Family: vserver]"
 
   apply_to_device
 

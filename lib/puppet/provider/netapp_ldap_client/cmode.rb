@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp LDAP client"
+  @doc = "Manage Netapp LDAP client. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

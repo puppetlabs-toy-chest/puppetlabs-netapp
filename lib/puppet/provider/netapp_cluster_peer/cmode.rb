@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_cluster_peer).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Cluster Peer management."
+  @doc = "Manage Netapp Cluster Peer management. [Family: cluster]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

@@ -1,7 +1,7 @@
 require 'puppet/property/netapp_truthy'
 
 Puppet::Type.newtype(:netapp_sis_policy) do
-  @doc = "Manage Netapp sis policy modification."
+  @doc = "Manage Netapp sis policy modification. [Family: vserver]"
 
   apply_to_device
 

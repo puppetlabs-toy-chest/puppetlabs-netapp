@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_iscsi_interface_accesslist).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp LDAP config"
+  @doc = "Add / Remove the iSCSI LIFs to the accesslist of the specified initiator. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix
