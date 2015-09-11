@@ -573,12 +573,32 @@ Valid values are 12-16 hexidecimal digits.
 
 ### Type: netapp_license
 Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer. [Family: cluster]
+This allows the removal or addition of a license. eg
+netapp_license { 'snaprestore' :
+    ensure => present,
+    codes  => "secret license code",
+  }
 
 #### Parameters
-##### `ensure`
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+##### `package`
+(**Namevar:**)
+Package Possible values:
+base - Cluster Base License,
+nfs - NFS License,
+cifs - CIFS License,
+iscsi - iSCSI License,
+fcp - FCP License,
+snaprestore - SnapRestore License,
+snapmirror - SnapMirror License,
+flexclone - FlexClone License,
+snapvault - SnapVault License,
+snaplock - SnapLock License,
+snapmanagersuite - SnapManagerSuite License,
+snapprotectapps - SnapProtectApp License,
+v_storageattach - Virtual Attached Storage License
 
-The license code
+##### `codes`
+The license code to be added
 
 ##### `ensure`
 The basic property that the resource should be in.
