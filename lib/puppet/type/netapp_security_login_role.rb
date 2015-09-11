@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_security_login_role) do
-  @doc = "A login role"
+  @doc = "A login role [Family: cluster]"
 
   apply_to_device
 

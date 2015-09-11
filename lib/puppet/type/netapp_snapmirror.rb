@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_snapmirror) do
-  @doc = "Manage Netapp Snapmirror creation, modification and deletion."
+  @doc = "Manage Netapp Snapmirror creation, modification and deletion. [Family: cluster, vserver]"
 
   apply_to_device
 

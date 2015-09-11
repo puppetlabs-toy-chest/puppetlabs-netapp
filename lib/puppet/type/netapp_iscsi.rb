@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_iscsi) do
-  @doc = "Manage Netap ISCSI service"
+  @doc = "Manage Netap ISCSI service. [Family: vserver]"
 
   apply_to_device
 

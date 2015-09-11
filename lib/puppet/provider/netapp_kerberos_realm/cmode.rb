@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_kerberos_realm).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp kerberos realm"
+  @doc = "Manage Netapp kerberos realm. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

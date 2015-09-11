@@ -32,7 +32,8 @@ Puppet::Type.newtype(:netapp_quota) do
      environment before using this type:
      - every quota target has to be unique
      - quota entries must not contain any special characters that would
-       require quotation"
+       require quotation
+      [Family: vserver]"
 
   apply_to_device
 

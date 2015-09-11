@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-
+  @doc = "Manage Netapp quota. [Family: vserver]"
   confine :feature => :posix
   defaultfor :feature => :posix
 

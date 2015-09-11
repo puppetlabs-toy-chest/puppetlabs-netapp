@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_igroup) do
-  @doc = "Manage Netapp ISCSI initiator groups"
+  @doc = "Manage Netapp ISCSI initiator groups [Family: vserver]"
 
   apply_to_device
 

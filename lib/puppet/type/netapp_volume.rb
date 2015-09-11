@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_volume) do
-  @doc = "Manage Netapp Volume creation, modification and deletion."
+  @doc = "Manage Netapp Volume creation, modification and deletion. [Family: vserver]"
 
   apply_to_device
 

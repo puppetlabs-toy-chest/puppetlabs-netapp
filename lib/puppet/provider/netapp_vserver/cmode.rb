@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Vserver creation, modification and deletion."
+  @doc = "Manage Netapp Vserver creation, modification and deletion. [Family: cluster, vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

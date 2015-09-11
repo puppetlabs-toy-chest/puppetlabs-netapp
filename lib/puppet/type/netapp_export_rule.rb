@@ -1,7 +1,7 @@
 require 'puppet/parameter/boolean'
 
 Puppet::Type.newtype(:netapp_export_rule) do
-  @doc = "Manage Netapp CMode Export rule creation, modification and deletion."
+  @doc = "Manage Netapp CMode Export rule creation, modification and deletion. [Family: vserver]"
 
   apply_to_device
 

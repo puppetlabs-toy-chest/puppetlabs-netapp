@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Cluster aggregate management."
+  @doc = "Manage Netapp Cluster aggregate management. [Family: cluster]"
 
   def initialize(value={})
     super(value)

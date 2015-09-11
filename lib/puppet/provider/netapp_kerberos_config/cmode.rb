@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_kerberos_config).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp kerberos config"
+  @doc = "Manage Netapp kerberos config. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

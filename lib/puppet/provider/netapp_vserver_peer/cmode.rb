@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_vserver_peer).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Vapplication Peering"
+  @doc = "Manage Netapp Vapplication Peering. [Family: cluster]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

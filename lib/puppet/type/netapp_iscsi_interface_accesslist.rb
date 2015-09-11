@@ -1,7 +1,7 @@
 require 'puppet/parameter/boolean'
 
 Puppet::Type.newtype(:netapp_iscsi_interface_accesslist) do
-  @doc = "Add / Remove the iSCSI LIFs to the accesslist of the specified initiator"
+  @doc = "Add / Remove the iSCSI LIFs to the accesslist of the specified initiator. [Family: vserver]"
 
   apply_to_device
 

@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_license) do
-  @doc = "Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer."
+  @doc = "Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer. [Family: cluster]"
 
   apply_to_device
 

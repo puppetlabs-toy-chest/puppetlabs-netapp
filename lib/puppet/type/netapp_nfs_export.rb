@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_nfs_export) do
-  @doc = "Manage Netapp NFS Export creation, modification and deletion on 7mode."
+  @doc = "Manage Netapp NFS Export creation, modification and deletion on 7mode. [Family: vserver]"
 
   apply_to_device
 

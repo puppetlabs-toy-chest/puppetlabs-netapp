@@ -1,7 +1,7 @@
 require 'ipaddr'
 
 Puppet::Type.newtype(:netapp_cluster_peer) do
-  @doc = "Manage Netapp Cluster Peering."
+  @doc = "Manage Netapp Cluster Peering. [Family: cluster]"
 
   apply_to_device
 

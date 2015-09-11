@@ -1,7 +1,7 @@
 require 'puppet/parameter/boolean'
 
 Puppet::Type.newtype(:netapp_kerberos_config) do
-  @doc = "Kerberos configuration information for a LIF"
+  @doc = "Kerberos configuration information for a LIF. [Family: vserver]"
 
   apply_to_device
 

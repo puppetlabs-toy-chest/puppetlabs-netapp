@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_lun_map).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp Lun map creation and deletion."
+  @doc = "Manage Netapp Lun map creation and deletion. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix

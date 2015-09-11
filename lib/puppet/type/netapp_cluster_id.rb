@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:netapp_cluster_id) do
-  @doc = "Manage Netapp Cluster ID."
+  @doc = "Manage Netapp Cluster ID. [Family: cluster]"
 
   apply_to_device
 

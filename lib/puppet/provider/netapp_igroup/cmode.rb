@@ -1,7 +1,7 @@
 require 'puppet/provider/netapp_cmode'
 
 Puppet::Type.type(:netapp_igroup).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
-  @doc = "Manage Netapp initiator groups"
+  @doc = "Manage Netapp initiator groups. [Family: vserver]"
 
   confine :feature => :posix
   defaultfor :feature => :posix
