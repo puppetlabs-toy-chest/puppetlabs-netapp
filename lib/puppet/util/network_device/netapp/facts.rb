@@ -20,10 +20,13 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     sys_version = result.child_get_string("version")
     @facts['version'] = sys_version if sys_version
 
-    if sys_clustered = result.child_get_string("is-clustered") and !sys_clustered.empty?
-      Puppet.debug("Device is clustered.")
-      @facts['clustered'] = sys_clustered
+    if result.child_get_string("is-clustered") == "true"
+      @facts['clustered'] = true
+    else
+      @facts['clustered'] = false
     end
+
+    Puppet.debug("Clustered = #{@facts['clustered']}.")
 
     # cMode has differnt API's to 7Mode.
     if @facts['clustered'] and ! @facts.empty?

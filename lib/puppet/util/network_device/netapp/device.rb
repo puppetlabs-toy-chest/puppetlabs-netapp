@@ -39,8 +39,14 @@ class Puppet::Util::NetworkDevice::Netapp::Device
     end
 
     # Vserver or vfiler based on if clustered?
-    clustered = result.child_get_string("is-clustered")
+    if result.child_get_string("is-clustered") == "true"
+      clustered = true
+    else
+      clustered = false
+    end
+
     Puppet.debug("Clustered = #{clustered}.")
+
     if clustered
       @transport.set_application_name("puppet_netapp_cmode")
     else
