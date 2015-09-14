@@ -29,6 +29,7 @@ base - Searches only the base directory entry,
 onelevel - Searches the immediate subordinates of the base directory entry,
 subtree - Searches the base directory entry and all its subordinates"
     newvalues(:base, :onelevel, :subtree)
+    defaultto(:subtree)
   end
 
   newproperty(:bind_as_cifs_server, :boolean => true) do
@@ -64,11 +65,12 @@ subtree - Searches the base directory entry and all its subordinates"
   end
 
   newproperty(:min_bind_level) do
-    desc "The minimum authentication level that can be used to authenticate with the LDAP server. If omitted, this parameter defaults to 'sasl' if the configuration uses Active Directory LDAP. For configurations that use LDAP servers from other vendors, this parameter defaults to 'simple' if a 'bind-dn' is specified and 'anonymous' otherwise. Possible values:
+    desc "The minimum authentication level that can be used to authenticate with the LDAP server. If omitted, this parameter defaults to 'sasl'. Possible values:
 anonymous - Anonymous bind,
 simple - Simple bind,
 sasl - Simple Authentication and Security Layer (SASL) bind"
     newvalues(:anonymous, :simple, :sasl)
+    defaultto(:sasl)
   end
 
   newproperty(:netgroup_byhost_dn) do
@@ -105,6 +107,7 @@ subtree - Searches the base directory entry and all its subordinates"
 
   newproperty(:query_timeout) do
     desc "Maximum time in seconds to wait for a query response from the LDAP server. The default for this parameter is 3 seconds."
+    defaultto(3)
   end
 
   newproperty(:schema) do
@@ -121,6 +124,7 @@ subtree - Searches the base directory entry and all its subordinates"
 
    newproperty(:tcp_port) do
     desc "The TCP port on the LDAP server to use for this configuration. If omitted, this parameter defaults to 389."
+    defaultto(389)
   end
 
   newproperty(:use_start_tls) do
