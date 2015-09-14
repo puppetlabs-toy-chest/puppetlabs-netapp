@@ -1383,6 +1383,10 @@ Valid values are `nfs`, `cifs`, `fcp`, `iscsi`, `ndmpd`.
 
 Vserver comment.
 
+##### `ipspace`
+
+IPspace name.
+
 ##### `ensure`
 
 The basic property that the resource should be in.

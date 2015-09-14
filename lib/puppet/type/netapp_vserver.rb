@@ -53,6 +53,10 @@ Puppet::Type.newtype(:netapp_vserver) do
     desc "Vserver comment"
   end
 
+  newparam(:ipspace) do
+    desc "IPspace name."
+  end
+
   newparam(:language) do
     desc "Vserver language"
 
