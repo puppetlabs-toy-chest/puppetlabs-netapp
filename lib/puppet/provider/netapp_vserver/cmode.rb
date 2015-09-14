@@ -39,6 +39,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       root_volume_aggregate = vserver.child_get_string("root-volume-aggregate")
       root_volume_sec_style = vserver.child_get_string("root-volume-security-style")
       comment = vserver.child_get_string("comment")
+      ipspace = vserver.child_get_string("ipspace")
       language = vserver.child_get_string("language")
       state = vserver.child_get_string("state")
       is_repository = vserver.child_get_string("is-repository-vserver")
@@ -85,6 +86,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
         :rootvolaggr       => root_volume_aggregate,
         :rootvolsecstyle   => root_volume_sec_style,
         :comment           => comment,
+        :ipspace           => ipspace,
         :language          => language,
         :namemappingswitch => namemappingswitch,
         :nameserverswitch  => nameserverswitch,
@@ -246,6 +248,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     vserver_create = NaElement.new("vserver-create")
     vserver_create.child_add_string("vserver-name", @resource[:name])
     vserver_create.child_add_string("comment", @resource[:comment]) if @resource[:comment]
+    vserver_create.child_add_string("ipspace", @resource[:ipspace]) if @resource[:ipspace]
     vserver_create.child_add_string("language", @resource[:language])
     vserver_create.child_add_string("is-repository-vserver", @resource[:is_repository]) if @resource[:is_repository]
     vserver_create.child_add_string("quota-policy", @resource[:quotapolicy]) if @resource[:quotapolicy]
