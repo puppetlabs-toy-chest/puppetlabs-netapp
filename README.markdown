@@ -264,7 +264,7 @@ None as of this first release. Common operations may be encapsulated in defined 
 [`netapp_vserver_sis_config`](#type-netapp_vserver_sis_config)
 
 ### Type: netapp_aggregate
-Manage Netapp Aggregate creation, modification and deletion.
+Manage Netapp Aggregate creation, modification and deletion. [Family: cluster]
 
 #### Parameters
 All parameters, except where otherwise noted, are optional.
@@ -346,7 +346,7 @@ Should the new aggregate be striped? Default: not_striped.
 Valid values are `striped`, `not_striped`.
 
 ### Type: netapp_cluster_id
-Manage Netapp Cluster ID.
+Manage Netapp Cluster ID. [Family: cluster]
 
 #### Parameters
 ##### `contact`
@@ -364,7 +364,7 @@ The cluster location
 The cluster name
 
 ### Type: netapp_cluster_peer
-Manage Netapp Cluster Peering.
+Manage Netapp Cluster Peering. [Family: cluster]
 
 #### Parameters
 ##### `ensure`
@@ -389,7 +389,7 @@ Cluster peer username.
 
 ### Type: netapp_export_policy
 
-Manage Netapp CMode Export Policy creation and deletion.
+Manage Netapp CMode Export Policy creation and deletion. [Family: vserver]
 
 #### Parameters
 
@@ -405,7 +405,7 @@ The export policy name.
 
 ### Type: netapp_export_rule
 
-Manage Netapp CMode Export rule creation, modification and deletion.
+Manage Netapp CMode Export rule creation, modification and deletion. [Family: vserver]
 
 #### Parameters
 
@@ -495,7 +495,7 @@ The group name.
 List of roles for this group. Comma separate multiple values.
 
 ### Type: netapp_igroup
-Manage Netapp initiator groups
+Manage Netapp initiator groups. [Family: vserver]
 
 #### Parameters
 ##### `name`
@@ -521,7 +521,7 @@ The name of the portset to which the igroup should be bound. A value of `false` 
 
 Valid values are a string or the boolean `false`
 ### Type: netapp_iscsi
-Manage Netapp ISCSI service. There may only ever be one of these declared per VServer.
+Manage Netapp ISCSI service. There may only ever be one of these declared per VServer. [Family: vserver]
 
 #### Parameters
 ##### `svm`
@@ -538,7 +538,7 @@ ISCSI service state.
 Valid values are `on`, `off`.
 
 ### Type: netapp_iscsi_security
-Manage Netapp ISCSI initiator (client) authentication.
+Manage Netapp ISCSI initiator (client) authentication. [Family: vserver]
 
 #### Parameters
 ##### `initiator`
@@ -572,7 +572,7 @@ ISCSI initiator outbound CHAP password.
 Valid values are 12-16 hexidecimal digits.
 
 ### Type: netapp_license
-Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer.
+Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer. [Family: cluster]
 
 #### Parameters
 ##### `ensure`
@@ -587,7 +587,7 @@ Valid values are `present`, `absent`.
 
 ### Type: netapp_lif
 
-Manage Netapp Logical Inteface (LIF) creation, modification and deletion.
+Manage Netapp Logical Inteface (LIF) creation, modification and deletion. [Family: cluster]
 
 #### Parameters
 
@@ -684,7 +684,7 @@ Valid values are `disabled`, `enabled`, `system_defined`.
 *Required*. LIF Vserver name.
 
 ### Type: netapp_lun
-Manage Netap Lun creation, modification and deletion.
+Manage Netap Lun creation, modification and deletion. [Family: vserver]
 
 #### Parameters
 ##### `ensure`
@@ -727,7 +727,7 @@ Lun state. Default value: 'online'. Possible values: 'online', 'offline'.
 Valid values are `online`, `offline`.
 
 ### Type: netapp_lun_map
-Manage Netap Lun map creation and deletion.
+Manage Netap Lun map creation and deletion. [Family: vserver]
 
 #### Parameters
 ##### `ensure`
@@ -745,7 +745,7 @@ Lun map - Composite key of format {path}:{lun-id}.
 
 ### Type: netapp_nfs
 
-Manage NetApp NFS service
+Manage NetApp NFS service. [Family: vserver]
 
 #### Parameters
 
@@ -794,7 +794,7 @@ Valid values are `true`, `false`.
 
 ### Type: netapp_qtree
 
-Manage Netapp Qtree creation, modification and deletion.
+Manage Netapp Qtree creation, modification and deletion. [Family: vserver]
 
 #### Parameters
 
@@ -904,7 +904,7 @@ The name of the volume the quota resides on
 Values can match `/^\w+$/`.
 
 ### Type: netapp_role
-Manage Netapp Role creation, modification and deletion.
+Manage Netapp Role creation, modification and deletion. [Family: cluster]
 
 #### Parameters
 ##### `capabilities`
@@ -925,7 +925,7 @@ The role name.
 
 ### Type: netapp_sis_policy
 
-Manage Netapp sis policies.
+Manage Netapp sis policies. [Family: vserver]
 
 #### Parameters
 
@@ -958,7 +958,7 @@ Comment for the policy.
 QoS policy name. E.g., 'best\_effort'
 
 ### Type: netapp_security_login
-A user account associated with the specified application and authentication method. A new user account can be created with user name as the Active Directory group name. This user account gives access to users belonging to the specified Active Directory group.
+A user account associated with the specified application and authentication method. A new user account can be created with user name as the Active Directory group name. This user account gives access to users belonging to the specified Active Directory group. [Family: cluster]
 
 #### Parameters
 ##### `comment`
@@ -982,7 +982,7 @@ Password for the user account. This is ignored for creating snmp users. This is 
 *Required.* The default value is 'admin' for Admin vserver and 'vsadmin' for data vserver. This field is required.
 
 ### Type: netapp_security_login_role
-Manages a login role
+Manages a login role. [Family: cluster]
 
 #### Parameters
 
@@ -1001,7 +1001,7 @@ Valid values are `present`, `absent`.
 A query for the role. The query must apply to the specified command or directory name. Example: The command is 'volume show' and the query is '-volume vol1'. The query is applied to the command resulting in populating only the volumes with name vol1.
 
 ### Type: netapp_snapmirror
-Manage Netapp Snapmirror creation, modification and deletion.
+Manage Netapp Snapmirror creation, modification and deletion. [Family: cluster, vserver]
 
 #### Parameters
 ##### `destination_location`
@@ -1110,7 +1110,7 @@ The user username.
 
 ### Type: netapp_volume
 
-Manage Netapp Volume creation, modification and deletion.
+Manage Netapp Volume creation, modification and deletion. [Family: vserver]
 
 #### Parameters
 
@@ -1243,7 +1243,7 @@ Valid values are `online`, `offline`, `restricted`.
 
 ### Type: netapp_vserver
 
-Manage Netapp Vserver creation, modification and deletion.
+Manage Netapp Vserver creation, modification and deletion. [Family: cluster, vserver]
 
 #### Parameters
 
@@ -1323,7 +1323,7 @@ Valid values are `stopped`, `running`.
 
 ### Type: netapp_vserver_option
 
-Manage Netapp Vserver option modification.
+Manage Netapp Vserver option modification. [Family: cluster, vserver]
 
 #### Parameters
 
@@ -1343,7 +1343,7 @@ The vserver option value.
 
 ### Type: netapp_sis_config
 
-Manage Netapp Vserver sis config modification.
+Manage Netapp Vserver sis config modification. [Family: vserver]
 
 #### Parameters
 
