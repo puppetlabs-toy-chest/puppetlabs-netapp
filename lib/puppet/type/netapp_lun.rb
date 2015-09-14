@@ -8,10 +8,6 @@ Puppet::Type.newtype(:netapp_lun) do
   newparam(:path) do
     desc "Lun path"
     isnamevar
-
-    validate do |value|
-      raise ArgumentError, "#{value} is an invalid Lun path." unless value =~ /(\/\w+){3,4}/
-    end
   end
 
   newproperty(:size) do
