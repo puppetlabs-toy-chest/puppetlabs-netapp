@@ -5,9 +5,25 @@ Puppet::Type.newtype(:netapp_license) do
 
   ensurable
 
-  newparam(:code) do
-    desc "The license code"
+  newparam(:package) do
+    desc "Package Possible values:
+'base' - Cluster Base License,
+'nfs' - NFS License,
+'cifs' - CIFS License,
+'iscsi' - iSCSI License,
+'fcp' - FCP License,
+'snaprestore' - SnapRestore License,
+'snapmirror' - SnapMirror License,
+'flexclone' - FlexClone License,
+'snapvault' - SnapVault License,
+'snaplock' - SnapLock License,
+'snapmanagersuite' - SnapManagerSuite License,
+'snapprotectapps' - SnapProtectApp License,
+'v_storageattach' - Virtual Attached Storage License"
     isnamevar
   end
 
+  newparam(:codes) do
+    desc "The license code"
+  end
 end
