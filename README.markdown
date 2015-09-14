@@ -244,6 +244,7 @@ None as of this first release. Common operations may be encapsulated in defined 
 [`netapp_export_policy`](#type-netapp_export_policy)
 [`netapp_export_rule`](#type-netapp_export_rule)
 [`netapp_group`](#type-netapp_group)
+[`netapp_ldap_client`](#type-netapp_ldap_client)
 [`netapp_license`](#type-netapp_license)
 [`netapp_lif`](#type-netapp_lif)
 [`netapp_lun`](#type-netapp_lun)
@@ -584,6 +585,107 @@ The license code
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
+
+### Type: netapp_ldap_client
+Manage Netapp LDAP client configuration for the cluster. [Family: vserver]
+
+#### Parameters
+##### `name`
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
+
+The name of the LDAP client configuration.
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `ad_domain`
+The Active Directory Domain Name for this LDAP configuration. The option is ONLY applicable for configurations using Active Directory LDAP servers.The Active Directory Domain Name for this LDAP configuration. The option is ONLY applicable for configurations using Active Directory LDAP servers.
+
+##### `allow_ssl`
+Allows the use of SSL for the TLS Handshake Protocol over the LDAP connections. The default value is false.
+
+##### `base_dn`
+Indicates the starting point for searches within the LDAP directory tree. If omitted, searches will start at the root of the directory tree.
+
+##### `base_scope`
+This indicates the scope for LDAP search. If omitted, this parameter defaults to 'subtree'. Possible values:
+base - Searches only the base directory entry,
+onelevel - Searches the immediate subordinates of the base directory entry,
+subtree - Searches the base directory entry and all its subordinates
+
+##### `bind_as_cifs_server`
+If set, the cluster will use the CIFS server's credentials to bind to the LDAP server. If omitted, this parameter defaults to 'true' if the configuration uses Active Directory LDAP and defaults to 'false' otherwise.
+
+##### `bind_dn`
+The Bind Distinguished Name (DN) is the LDAP identity used during the authentication process by the clients. This is required if the LDAP server does not support anonymous binds. This field is not used if 'bind-as-cfs-server' is set to 'true'. Example : cn=username,cn=Users,dc=example,dc=com
+
+##### `bind_password`
+The password to be used with the bind-dn.
+
+##### `group_dn`
+The Group Distinguished Name (DN), if specified, is used as the starting point in the LDAP directory tree for group lookups. If not specified, group lookups will start at the base-dn.
+
+##### `group_scope`
+This indicates the scope for LDAP search when doing group lookups. Possible values:
+base - Searches only the base directory entry,
+onelevel - Searches the immediate subordinates of the base directory entry,
+subtree - Searches the base directory entry and all its subordinates
+
+##### `is_netgroup_byhost_enabled`
+This indicates whether netgroup.byhost map should be queried for lookups
+
+##### `min_bind_level`
+The minimum authentication level that can be used to authenticate with the LDAP server. If omitted, this parameter defaults to 'sasl'. Possible values:
+anonymous - Anonymous bind,
+simple - Simple bind,
+sasl - Simple Authentication and Security Layer (SASL) bind
+
+##### `netgroup_byhost_dn`
+The Netgroup Distinguished Name (DN), if specified, is used as the starting point in the LDAP directory tree for netgroup byhost lookups. If not specified, netgroup byhost lookups will start at the base-dn.
+
+##### `netgroup_byhost_scope`
+This indicates the scope for LDAP search when doing netgroup byhost lookups. Possible values:
+base - Searches only the base directory entry,
+onelevel - Searches the immediate subordinates of the base directory entry,
+subtree - Searches the base directory entry and all its subordinates
+
+##### `netgroup_dn`
+The Netgroup Distinguished Name (DN), if specified, is used as the starting point in the LDAP directory tree for netgroup lookups. If not specified, netgroup lookups will start at the base-dn.
+
+##### `netgroup_scope`
+This indicates the scope for LDAP search when doing netgroup lookups. Possible values:
+base - Searches only the base directory entry,
+onelevel - Searches the immediate subordinates of the base directory entry,
+subtree - Searches the base directory entry and all its subordinates
+
+##### `preffered_ad_servers`
+Preferred Active Directory (AD) Domain controllers to use for this configuration. This option is ONLY applicable for configurations using Active Directory LDAP servers
+
+##### `query_timeout`
+Maximum time in seconds to wait for a query response from the LDAP server. The default for this parameter is 3 seconds.
+
+##### `schema`
+LDAP schema to use for this configuration.
+
+##### `servers`
+List of LDAP Server IP addresses to use for this configuration. The option is NOT applicable for configurations using Active Directory LDAP servers.
+
+##### `tcp_port`
+The TCP port on the LDAP server to use for this configuration. If omitted, this parameter defaults to 389.
+
+##### `use_start_tls`
+This indicates if start_tls will be used over LDAP connections.
+
+##### `user_dn`
+The User Distinguished Name (DN), if specified, is used as the starting point in the LDAP directory tree for user lookups. If this parameter is omitted, user lookups will start at the base-dn.
+
+##### `user_scope`
+This indicates the scope for LDAP search when doing user lookups. Possible values:
+base - Searches only the base directory entry,
+onelevel - Searches the immediate subordinates of the base directory entry,
+subtree - Searches the base directory entry and all its subordinates
 
 ### Type: netapp_lif
 
