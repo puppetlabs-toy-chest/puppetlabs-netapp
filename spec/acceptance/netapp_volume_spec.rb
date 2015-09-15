@@ -1,21 +1,25 @@
 require 'spec_helper_acceptance'
 
 describe 'volume' do
-#  it 'makes a volume' do
-#    pp=<<-EOS
-#node 'vsim-01' {
-#}
-#node 'vserver-01' {
-#  netapp_volume {'volumename':
-#    aggregate => 'aggr1',
-#    ensure => present,
-#  }
-#}
-#    EOS
-#    make_site_pp(pp)
-#    run_device(:allow_changes => true)
-#    run_device(:allow_changes => false)
-#  end
+  it 'makes a volume' do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_volume {'volume_with_param':
+    aggregate        => 'aggr1',
+    ensure           => present,
+    volume_type      => 'rw',
+    group_id         => '0',
+    user_id          => '0',
+    unix_permissions => '0755',
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
 #
 #  it 'deletes a volume' do
 #    pp=<<-EOS

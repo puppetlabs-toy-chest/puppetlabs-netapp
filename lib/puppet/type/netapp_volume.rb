@@ -91,6 +91,27 @@ Puppet::Type.newtype(:netapp_volume) do
     desc "The export policy with which the volume is associated."
   end
 
+  newparam(:volume_type) do
+    desc "The type of the volume to be created. Possible values:
+rw - read-write volume (default setting),
+ls - load-sharing volume,
+dp - data-protection volume,
+dc - data-cache volume (FlexCache)"
+    newvalues(:rw, :ls, :dp, :dc)
+  end
+
+  newparam(:group_id) do
+    desc "The UNIX group ID for the volume."
+  end
+
+  newparam(:user_id) do
+    desc "The UNIX user ID for the volume."
+  end
+
+  newparam(:unix_permissions) do
+    desc "Unix permission bits in octal string format.It's similar to Unix style permission bits: In Data ONTAP 7-mode, the default setting of '0755' gives read/write/execute permissions to owner and read/execute to group and other users. In Data ONTAP Cluster-Mode, for security style 'mixed' or 'unix', the default setting of '0755' gives read/write/execute permissions to owner and read/execute permissions to group and other users. For security style 'ntfs', the default setting of '0000' gives no permissions to owner, group and other users. It consists of 4 octal digits derived by adding up bits 4, 2 and 1. Omitted digits are assumed to be zeros. First digit selects the set user ID(4), set group ID (2) and sticky (1) attributes. The second digit selects permission for the owner of the file: read (4), write (2) and execute (1); the third selects permissions for other users in the same group; the fourth for other users not in the group."
+  end
+
   newproperty(:options, :array_matching => :all) do
     desc "The volume options hash."
     validate do |value|
