@@ -41,7 +41,7 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
       comment = vserver.child_get_string("comment")
       ipspace = vserver.child_get_string("ipspace")
       language = vserver.child_get_string("language")
-      state = vserver.child_get_string("state")
+      state = munge_state(vserver.child_get_string("state"))
       is_repository = vserver.child_get_string("is-repository-vserver")
 
       # Name mapping switch
@@ -305,6 +305,24 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
     Puppet.debug("Puppet::Provider::Netapp_vserver.cmode: checking existance of Netapp Vserver #{@resource[:name]}")
     Puppet.debug("Value = #{@property_hash[:ensure]}")
     @property_hash[:ensure] == :present
+  end
+
+  def self.munge_state(value)
+    case value
+    when 'running'
+      :running
+    when 'starting'
+      :running
+    when 'stopped'
+      :stopped
+    when 'stopping'
+      :stopped
+    when 'initializing'
+      :running
+    else
+      warning"This is an unknown state '#{value}', defaulting to :running"
+      :running
+    end
   end
 
 end

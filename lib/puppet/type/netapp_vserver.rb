@@ -19,17 +19,6 @@ Puppet::Type.newtype(:netapp_vserver) do
 
     newvalues(:stopped, :running)
     defaultto(:running)
-
-    munge do |value|
-      case value
-      when 'starting'
-        value = :running
-      when 'stopping'
-        value = :stopped
-      when 'initializing'
-        value = :running
-      end
-    end
   end
 
   newparam(:rootvol) do
