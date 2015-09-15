@@ -421,6 +421,10 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     arguments += ["size", resource[:initsize]] if resource[:initsize]
     arguments += ["language-code", resource[:languagecode]] if resource[:languagecode]
     arguments += ["space-reserve", resource[:spaceres]] if resource[:spaceres]
+    arguments += ["volume-type", resource[:volume_type]] if resource[:volume_type]
+    arguments += ["group-id", resource[:group_id]] if resource[:group_id]
+    arguments += ["user-id", resource[:user_id]] if resource[:user_id]
+    arguments += ["unix-permissions", resource[:unix_permissions]] if resource[:unix_permissions]
     volcreate(*arguments)
 
     # Update other attributes after resource creation.
