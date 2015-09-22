@@ -33,13 +33,9 @@ node 'vserver-01' {
   netapp_kerberos_realm { 'kerberosrealm1':
     ensure               => 'present',
     admin_server_ip      => '2.2.2.2',
-    admin_server_port    => '749',
-    clock_skew           => '5',
     kdc_ip               => '2.2.2.2',
-    kdc_port             => '88',
     kdc_vendor           => 'other',
     password_server_ip   => '2.2.2.2',
-    password_server_port => '464',
   }
 }
     EOS
@@ -56,13 +52,9 @@ node 'vserver-01' {
   netapp_kerberos_realm { 'kerberosrealm1':
     ensure               => 'present',
     admin_server_ip      => '2.2.2.2',
-    admin_server_port    => '749',
-    clock_skew           => '5',
     kdc_ip               => '2.2.2.2',
-    kdc_port             => '88',
     kdc_vendor           => 'other',
     password_server_ip   => '2.2.2.2',
-    password_server_port => '464',
   }
 }
     EOS
@@ -79,13 +71,9 @@ node 'vserver-01' {
   netapp_kerberos_realm { 'kerberosrealm1':
     ensure               => 'absent',
     admin_server_ip      => '2.2.2.2',
-    admin_server_port    => '749',
-    clock_skew           => '5',
     kdc_ip               => '2.2.2.2',
-    kdc_port             => '88',
     kdc_vendor           => 'other',
     password_server_ip   => '2.2.2.2',
-    password_server_port => '464',
   } 
 }
     EOS
