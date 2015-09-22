@@ -83,12 +83,19 @@ Puppet::Type.type(:netapp_lun).provide(:cmode, :parent => Puppet::Provider::Neta
     end
   end
 
-  # Set lun state
+  # Set lun size
   def size=(value)
     Puppet.debug("Puppet::Provider::Netapp_lun.cmode size=: Setting lun size for #{@resource[:path]} to #{@resource[:size]}.")
 
+    force
+    if @resource[:force] == nil
+      force = false
+    else
+      force = @resource[:force]
+    end
+
     # Resize the volume
-    result = lunresize('path', @resource[:path], 'size', @resource[:size])
+    result = lunresize('force', force, 'path', @resource[:path], 'size', @resource[:size])
 
     Puppet.debug("Puppet::Provider::Netapp_lun.cmode size=: Lun has been resized.")
     return true

@@ -28,6 +28,7 @@ Puppet::Type.newtype(:netapp_lun) do
           value = value.gsub(/m/, '').to_i*1024*1024
         end
       end
+      value
     end
   end
 
@@ -35,6 +36,11 @@ Puppet::Type.newtype(:netapp_lun) do
     desc "Lun state. Default value: 'online'. Possible values: 'online', 'offline'."
     newvalues(:online, :offline)
     defaultto(:online)
+  end
+
+  newproperty(:force) do
+    desc "Forcibly reduce the size. This is required for reducing the size of the LUN to avoid accidentally reducing the LUN size. Default to false"
+    newvalues(:false, :true)
   end
 
   newparam(:lunclass) do
@@ -72,7 +78,6 @@ Puppet::Type.newtype(:netapp_lun) do
 
   ## Validate params
   validate do
-    raise ArgumentError, 'Size is required' if self[:size].nil?
     raise ArgumentError, 'Prefixsize is not required for \'image\' ostype.' if self[:ostype] == :image and !self[:prefixsize].nil?
   end
 

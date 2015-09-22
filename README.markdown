@@ -843,6 +843,12 @@ Enable Lun space reservation? Defaults to true.
 
 Valid values are `true`, `false`.
 
+##### `force`
+whether or not to force a resize, when shrinking the lun.
+
+Valid values are `true`, `false`.
+
+
 ##### `state`
 Lun state. Default value: 'online'. Possible values: 'online', 'offline'.
 
