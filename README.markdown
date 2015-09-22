@@ -1079,6 +1079,10 @@ Comment for the policy.
 
 QoS policy name. E.g., 'best\_effort'
 
+##### `changelog_threshold_percent`
+
+Percentage at which the changelog will be processed for a threshold type of policy, tested once each hour
+
 ### Type: netapp_security_login
 A user account associated with the specified application and authentication method. A new user account can be created with user name as the Active Directory group name. This user account gives access to users belonging to the specified Active Directory group. [Family: cluster]
 
