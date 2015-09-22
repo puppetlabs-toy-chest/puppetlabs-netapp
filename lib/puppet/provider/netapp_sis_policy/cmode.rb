@@ -27,13 +27,14 @@ Puppet::Type.type(:netapp_sis_policy).provide(:cmode, :parent => Puppet::Provide
 
     sis_policies = []
     api_map = {
-      'policy-name' => :name,
-      'policy-type' => :type,
-      'schedule'    => :job_schedule,
-      'duration'    => :duration,
-      'enabled'     => :enabled,
-      'comment'     => :comment,
-      'qos-policy'  => :qos_policy,
+      'policy-name'                 => :name,
+      'policy-type'                 => :type,
+      'schedule'                    => :job_schedule,
+      'duration'                    => :duration,
+      'enabled'                     => :enabled,
+      'comment'                     => :comment,
+      'changelog-threshold-percent' => :changelog_threshold_percent,
+      'qos-policy'                  => :qos_policy,
     }
     results.each do |sis_policy|
       policy_info = { :ensure => :present }
@@ -86,11 +87,12 @@ Puppet::Type.type(:netapp_sis_policy).provide(:cmode, :parent => Puppet::Provide
     args = Array.new
     args += ['policy-name', @resource[:name]]
     args += ['policy-type', @resource[:type]] if @resource[:type]
-    args += ['schedule',    @resource[:job_schedule]] if @resource[:job_schedule]
-    args += ['duration',    @resource[:duration]] if @resource[:duration]
-    args += ['enabled',     @resource[:enabled]] if @resource[:enabled]
-    args += ['comment',     @resource[:comment]] if @resource[:comment]
-    args += ['qos-policy',  @resource[:qos_policy]] if @resource[:qos_policy]
+    args += ['schedule', @resource[:job_schedule]] if @resource[:job_schedule]
+    args += ['duration', @resource[:duration]] if @resource[:duration]
+    args += ['enabled', @resource[:enabled]] if @resource[:enabled]
+    args += ['comment', @resource[:comment]] if @resource[:comment]
+    args += ['changelog-threshold-percent', @resource[:changelog_threshold_percent]] if @resource[:changelog_threshold_percent]
+    args += ['qos-policy', @resource[:qos_policy]] if @resource[:qos_policy]
     Puppet.debug("Puppet::Provider::Netapp_sis_policy.cmode policy_arguments: #{args.inspect}")
     args
   end

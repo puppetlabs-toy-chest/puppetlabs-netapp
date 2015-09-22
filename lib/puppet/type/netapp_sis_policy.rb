@@ -33,6 +33,10 @@ Puppet::Type.newtype(:netapp_sis_policy) do
     desc "Comment for the policy"
   end
 
+  newproperty(:changelog_threshold_percent) do
+    desc "Percentage at which the changelog will be processed for a threshold type of policy, tested once each hour"
+  end
+
   newproperty(:qos_policy) do
     desc "QoS Policy Name. Eg: 'best_effort'"
   end
