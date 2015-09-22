@@ -47,7 +47,6 @@ node 'vsim-01' {
   }
   netapp_snapmirror { 'vs4:vs4_root':
     ensure            => 'present',
-    max_transfer_rate => '0',
     relationship_type => 'data_protection',
     source_location   => 'vs0:vs0_root',
   }
