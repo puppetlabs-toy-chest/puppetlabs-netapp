@@ -36,6 +36,7 @@ Puppet::Type.newtype(:netapp_snapmirror) do
 
   newproperty(:max_transfer_rate) do
     desc "The max transfer rate, in KB/s. Defaults to unlimited."
+    defaultto(0)
   end
 
   newproperty(:relationship_type) do
