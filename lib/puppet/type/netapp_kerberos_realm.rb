@@ -26,10 +26,14 @@ Puppet::Type.newtype(:netapp_kerberos_realm) do
 
   newproperty(:admin_server_port) do
     desc "The TCP port on the Kerberos administration server where the Kerberos administration service is running. The default for this parmater is 749."
+
+    defaultto(749)
   end
 
   newproperty(:clock_skew) do
     desc "The clock skew in minutes is the tolerance for accepting tickets with time stamps that do not exactly match the host's system clock. The default for this parameter is 5 minutes."
+
+    defaultto(5)
   end
 
   newproperty(:comment) do
@@ -46,6 +50,8 @@ Puppet::Type.newtype(:netapp_kerberos_realm) do
   
   newproperty(:kdc_port) do
     desc "TCP port on the KDC to be used for Kerberos communication. The default for this parameter is 88."
+
+    defaultto(88)
   end
 
   newproperty(:kdc_vendor) do
@@ -58,5 +64,7 @@ Puppet::Type.newtype(:netapp_kerberos_realm) do
 
   newproperty(:password_server_port) do
     desc "The TCP port on the Kerberos password-changing server where the Kerberos password-changing service is running. The default for this parameter is 464."
+
+    defaultto(464)
   end
 end
