@@ -59,7 +59,7 @@ Puppet::Type.type(:netapp_security_login).provide(:cmode, :parent => Puppet::Pro
     when :present
       #if lock status changes, do the right thing
       if @original_values[:is_locked] != is_locked
-        if is_locked
+        if is_locked == "true"
           securityloginlock(*args)
         else
           securityloginunlock(*args)

@@ -1096,7 +1096,9 @@ The basic property that the resource should be in.
 Valid values are `present`, `absent`.
 
 ##### `is_locked`
-Whether the login is locked.
+Whether the login is locked'.
+
+The valid values for are 'true' or 'false'.
 
 ##### `name`
 (**Namevar:** If omitted, this parameter's value defaults to the resource's title.) A composite key made up from `application:authentication_method:username:vserver` eg `ssh:password:vsadmin:vserver01`
