@@ -73,8 +73,8 @@ Puppet::Type.type(:netapp_security_login_role).provide(:cmode, :parent => Puppet
     args += ['command-directory-name', command_directory_name]
     args += ['role-name', rolename]
     args += ['vserver', vserver]
-    args += ['access-level', resource[:access_level]]
-    args += ['role-query', resource[:role_query]]
+    args += ['access-level', resource[:access_level]] if @resource[:access_level]
+    args += ['role-query', resource[:role_query]] if @resource[:role_query]
     args
   end
 end
