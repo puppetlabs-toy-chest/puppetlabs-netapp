@@ -74,7 +74,13 @@ Puppet::Type.type(:netapp_igroup).provide(:cmode, :parent => Puppet::Provider::N
     to_add = value - (@original_values[:members] || [])
 
     to_remove.each do |member|
-      igroupremove('initiator-group-name',resource[:name],'initiator',member)
+      force
+      if @resource[:force] == nil
+        force = false
+      else
+        force = @resource[:force]
+      end
+      igroupremove('initiator-group-name',resource[:name],'initiator',member,'force',force)
     end
     to_add.each do |member|
       igroupadd('initiator-group-name',resource[:name],'initiator',member)

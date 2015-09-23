@@ -4,6 +4,14 @@ describe 'vserver' do
   it 'makes a vserver' do
     pp=<<-EOS
 node 'vsim-01' {
+  netapp_aggregate {'aggr1':
+    ensure => 'present',
+    blocktype => '64_bit',
+    checksumstyle => 'block',
+    diskcount => '3',
+    option_free_space_realloc => 'off',
+    nodes => ['VSIM-01']
+  }
   netapp_vserver { 'test_vserver':
     ensure          => present,
     rootvol         => 'test_vserver_root',

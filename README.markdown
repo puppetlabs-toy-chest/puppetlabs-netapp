@@ -504,6 +504,9 @@ Manage Netapp initiator groups. [Family: vserver]
 
 Initiator group name.
 
+##### `force`
+Forcibly remove the initiator even if there are existing LUNs mapped to this initiator group. Best practice is to attempt to unmap all the luns associated with a group before removing the initiator. Default to false
+
 ##### `group_type`
 Initiator group type.
 
