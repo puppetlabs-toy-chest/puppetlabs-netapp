@@ -31,4 +31,9 @@ Puppet::Type.newtype(:netapp_igroup) do
   newproperty(:portset) do
     desc "portset that is bound to the initiator group"
   end
+
+  newproperty(:force) do
+    desc "Forcibly remove the initiator even if there are existing LUNs mapped to this initiator group. Best practice is to attempt to unmap all the luns associated with a group before removing the initiator. Default to false"
+    newvalues(:false, :true)
+  end
 end
