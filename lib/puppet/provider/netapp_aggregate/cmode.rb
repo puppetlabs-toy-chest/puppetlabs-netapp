@@ -60,13 +60,13 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
       options_info = aggrgetoption('aggregate', aggregate_name)
       options = options_info.child_get('options').children_get()
       options.each do |option|
-        option_name = option.child_get_string ("name")
+        option_name = option.child_get_string("name")
         if ["free_space_realloc", "fs_size_fixed", "ha_policy", "ignore_inconsistent", "lost_write_protect", 
             "max_write_alloc_blocks", "striping", "nosnap", "raid_cv", "raid_lost_write", "raid_zoned",
             "raidsize", "cache_raid_group_size", "raidtype", "resyncsnaptime", "root", "snapmirrored", 
             "snapshot_autodelete", "thorough_scrub", "percent_snapshot_space", "nearly_full_threshold",
             "full_threshold", "is_flash_pool_caching_enabled", "hybrid_enabled", "hybrid_enabled_force"].include?(option_name)
-          aggr_info["option_#{option_name}".to_sym] = option.child_get_string ("value")
+          aggr_info["option_#{option_name}".to_sym] = option.child_get_string("value")
         end
       end
       aggregates << new(aggr_info)
