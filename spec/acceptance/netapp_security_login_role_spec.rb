@@ -30,7 +30,6 @@ node 'vsim-01' {
   }
   netapp_security_login_role { 'vserver:roller:vserver-01':
     ensure       => 'present',
-    access_level => 'none',
   }
 }
 node 'vserver-01' {
