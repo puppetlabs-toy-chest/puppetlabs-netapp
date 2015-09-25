@@ -50,6 +50,7 @@ node 'vsim-01' {
     ensure      => present,
     role_name   => 'admin',
     comment     => 'comment2',
+    is_locked   => 'true',
   }
 }
 node 'vserver-01' {

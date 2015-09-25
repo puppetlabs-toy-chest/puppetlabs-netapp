@@ -23,7 +23,7 @@ Puppet::Type.newtype(:netapp_security_login) do
   end
 
   newproperty(:is_locked) do
-    desc "Whether the login is locked"
+    desc "Whether the login is locked, The valid values for are true or false"
   end
 
   validate do
