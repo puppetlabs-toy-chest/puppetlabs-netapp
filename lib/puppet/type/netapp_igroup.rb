@@ -29,7 +29,7 @@ Puppet::Type.newtype(:netapp_igroup) do
   end
 
   newproperty(:portset) do
-    desc "portset that is bound to the initiator group"
+    desc "portset that is bound to the initiator group  A value of `false` will unbind the portset. Valid values are a string or `false`"
   end
 
   newproperty(:force) do
