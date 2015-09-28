@@ -31,7 +31,7 @@ Puppet::Type.type(:netapp_igroup).provide(:cmode, :parent => Puppet::Provider::N
         :ensure     => :present,
         :group_type => igroup.child_get_string('initiator-group-type'),
         :os_type    => igroup.child_get_string('initiator-group-os-type'),
-        :portset    => igroup.child_get_string('initiator-group-portset-name') || false,
+        :portset    => igroup.child_get_string('initiator-group-portset-name') || "false",
         :members    => members
       }
       igroups << new(igroup_hash)
@@ -58,8 +58,8 @@ Puppet::Type.type(:netapp_igroup).provide(:cmode, :parent => Puppet::Provider::N
   end
 
   def portset=(value)
-    if value == false
-      igroupportsetunbind('initiator-group-name')
+    if value == "false"
+      igroupportsetunbind('initiator-group-name', resource[:name])
     else
       igroupportsetbind('initiator-group-name',resource[:name],'portset-name',value)
     end

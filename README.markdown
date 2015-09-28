@@ -523,7 +523,8 @@ Valid values are `solaris`, `windows`, `hpux`, `aix`, `linux`, `netware`, `vmwar
 ##### `portset`
 The name of the portset to which the igroup should be bound. A value of `false` will unbind the portset.
 
-Valid values are a string or the boolean `false`
+Valid values are a string or `false`
+
 ### Type: netapp_iscsi
 Manage Netapp ISCSI service. There may only ever be one of these declared per VServer. [Family: vserver]
 
