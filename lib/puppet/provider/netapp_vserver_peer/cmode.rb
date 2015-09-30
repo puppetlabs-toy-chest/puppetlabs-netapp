@@ -77,7 +77,7 @@ Puppet::Type.type(:netapp_vserver_peer).provide(:cmode, :parent => Puppet::Provi
     args.child_add_string('vserver', vserver)
     args.child_add_string('peer-vserver', peer_vserver)
     if method == 'create'
-      args.child_add_string('peer-cluster', @resource[:peer_cluster])
+      args.child_add_string('peer-cluster', @resource[:peer_cluster]) unless @resource[:peer_cluster].nil?
     end
 
     unless @resource[:applications].nil?
