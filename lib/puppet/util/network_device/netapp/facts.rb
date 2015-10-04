@@ -104,8 +104,8 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
       system_host = systems.children_get().find do |system|
         # Check the system name matches the host we're looking for
         Puppet.debug("System-name = #{system.child_get_string('system-name')}. downcase = #{system.child_get_string("system-name").downcase}")
-        Puppet.debug("Match = #{host.downcase == system.child_get_string("system-name").downcase}")
-        host.downcase == system.child_get_string("system-name").downcase
+        Puppet.debug("Match = #{host.downcase =~ /#{system.child_get_string("system-name").downcase}/ ? :True : :False }")
+        host.downcase =~ /#{system.child_get_string("system-name").downcase}/
       end
 
       if system_host
