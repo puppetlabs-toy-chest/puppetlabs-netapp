@@ -117,10 +117,20 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         Puppet.debug("Interfaces Result = #{iresult.inspect}")
 
         interfaces = iresult.child_get("attributes-list")
-        system_host = interfaces.children_get().find do |interface|
-          Puppet.debug("Network Address = #{interface.child_get_string('address')}, role = #{interface.child_get_string('role')}")
-          Puppet.debug("Match = #{Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string('address') ? :True : :False }")
-          Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string('address') && interface.child_get_string('role') == "cluster_mgmt"
+        interface_host = interfaces.children_get().find do |interface|
+          Puppet.debug("Network Address = #{interface.child_get_string("address")}, role = #{interface.child_get_string("role")}")
+          Puppet.debug("Match = #{Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string("address") ? :True : :False }")
+          Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string("address") && interface.child_get_string("role") == "cluster_mgmt"
+        end
+
+        if interface_host
+            Puppet.debug("Mgmt interface mached. Getting current-node value to continue")
+            # Looping node system-info again to match current-node
+            system_host = systems.children_get().find do |system|
+                Puppet.debug("System name = #{system.child_get_string("system-name").downcase}, current-node = #{interface_host.child_get_string("current-node")}")
+                Puppet.debug("Match = #{system.child_get_string("system-name").downcase == interface_host.child_get_string("current-node")}")
+                system.child_get_string("system-name").downcase == interface_host.child_get_string("current-node")
+            end
         end
       end
 
