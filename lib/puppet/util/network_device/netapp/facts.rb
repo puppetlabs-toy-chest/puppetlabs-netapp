@@ -1,3 +1,4 @@
+require 'socket'
 require 'puppet/util/network_device/netapp'
 
 class Puppet::Util::NetworkDevice::Netapp::Facts
@@ -108,6 +109,21 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         host.downcase =~ /#{system.child_get_string("system-name").downcase}/
       end
 
+      # If system_host wasn't found using system-name, check if it's a cluster-mgmt interface
+      if system_host.nil?
+        Puppet.debug("No matching system found with the system name = #{host}. Trying to match cluster-mgmt interfaces")
+        # Pull out interfaces info
+        iresult = @transport.invoke("net-interface-get-iter")
+        Puppet.debug("Interfaces Result = #{iresult.inspect}")
+
+        interfaces = iresult.child_get("attributes-list")
+        system_host = interfaces.children_get().find do |interface|
+          Puppet.debug("Network Address = #{interface.child_get_string('address')}, role = #{interface.child_get_string('role')}")
+          Puppet.debug("Match = #{Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string('address') ? :True : :False }")
+          Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string('address') && interface.child_get_string('role') == "cluster_mgmt"
+        end
+      end
+
       if system_host
         # Pull out the required variables
         [
@@ -130,7 +146,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         # Facts dump
         Puppet.debug("System info = #{@facts.inspect}")
       else
-        raise ArgumentError, "No matching system found with the system name #{host}"
+        raise ArgumentError, "No matching system name or cluster-mgmt interfaces found for host = #{host}"
       end
 
       # Get DNS domainname for fqdn
