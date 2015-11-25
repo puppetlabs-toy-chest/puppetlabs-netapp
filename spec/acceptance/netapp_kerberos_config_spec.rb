@@ -4,6 +4,14 @@ describe 'kerberos_config' do
   it 'modify a kerberos_config' do
     pp=<<-EOS
 node 'vsim-01' {
+  netapp_aggregate {'aggr1':
+    ensure                    => 'present',
+    blocktype                 => '64_bit',
+    checksumstyle             => 'block',
+    diskcount                 => '3',
+    option_free_space_realloc => 'off',
+    nodes                     => ['VSIM-01']
+  }
   netapp_vserver { 'vserver-01':
     ensure          => present,
     rootvol         => 'vserver_01_root',
@@ -38,8 +46,12 @@ node 'vserver-01' {
     v41    => 'disabled',
   }
   netapp_kerberos_config { 'nfs_lif':
-    ensure              => 'present',
-    is_kerberos_enabled => 'false',
+    ensure                   => 'present',
+    is_kerberos_enabled      => 'false',
+    #it is not possible to test the following attributes in an automated fashion
+    #is_kerberos_enabled     => 'true',
+    #keytab_uri              => 'http://127.0.0.1',
+    #service_principal_name  => 'nfs/sec.example.com@AUTH.SEC.EXAMPLE.COM',
   }
 }
     EOS

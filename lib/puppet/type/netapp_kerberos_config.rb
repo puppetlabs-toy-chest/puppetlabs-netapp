@@ -35,7 +35,7 @@ If 'false', Kerberos security is disabled and the associated account is deleted 
     desc "Load Keytab from URI. This field should not be specified when disabling Kerberos."
   end
 
-  newproperty(:organizaational_unit) do
+  newproperty(:organizational_unit) do
     desc "Organization Unit. This option is available for a Microsoft AD KDC only."
   end
 
