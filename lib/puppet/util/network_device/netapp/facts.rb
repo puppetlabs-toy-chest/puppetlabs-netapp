@@ -1,3 +1,4 @@
+require 'socket'
 require 'puppet/util/network_device/netapp'
 
 class Puppet::Util::NetworkDevice::Netapp::Facts
@@ -104,8 +105,33 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
       system_host = systems.children_get().find do |system|
         # Check the system name matches the host we're looking for
         Puppet.debug("System-name = #{system.child_get_string('system-name')}. downcase = #{system.child_get_string("system-name").downcase}")
-        Puppet.debug("Match = #{host.downcase == system.child_get_string("system-name").downcase}")
-        host.downcase == system.child_get_string("system-name").downcase
+        Puppet.debug("Match = #{host.downcase =~ /#{system.child_get_string("system-name").downcase}/ ? :True : :False }")
+        host.downcase =~ /#{system.child_get_string("system-name").downcase}/
+      end
+
+      # If system_host wasn't found using system-name, check if it's a cluster-mgmt interface
+      if system_host.nil?
+        Puppet.debug("No matching system found with the system name = #{host}. Trying to match cluster-mgmt interfaces")
+        # Pull out interfaces info
+        iresult = @transport.invoke("net-interface-get-iter")
+        Puppet.debug("Interfaces Result = #{iresult.inspect}")
+
+        interfaces = iresult.child_get("attributes-list")
+        interface_host = interfaces.children_get().find do |interface|
+          Puppet.debug("Network Address = #{interface.child_get_string("address")}, role = #{interface.child_get_string("role")}")
+          Puppet.debug("Match = #{Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string("address") ? :True : :False }")
+          Socket.getaddrinfo(host, nil)[0][3] == interface.child_get_string("address") && interface.child_get_string("role") == "cluster_mgmt"
+        end
+
+        if interface_host
+            Puppet.debug("Mgmt interface mached. Getting current-node value to continue")
+            # Looping node system-info again to match current-node
+            system_host = systems.children_get().find do |system|
+                Puppet.debug("System name = #{system.child_get_string("system-name").downcase}, current-node = #{interface_host.child_get_string("current-node")}")
+                Puppet.debug("Match = #{system.child_get_string("system-name").downcase == interface_host.child_get_string("current-node")}")
+                system.child_get_string("system-name").downcase == interface_host.child_get_string("current-node")
+            end
+        end
       end
 
       if system_host
@@ -130,7 +156,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         # Facts dump
         Puppet.debug("System info = #{@facts.inspect}")
       else
-        raise ArgumentError, "No matching system found with the system name #{host}"
+        raise ArgumentError, "No matching system name or cluster-mgmt interfaces found for host = #{host}"
       end
 
       # Get DNS domainname for fqdn
