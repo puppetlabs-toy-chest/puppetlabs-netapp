@@ -141,35 +141,8 @@ dc - data-cache volume (FlexCache)"
     end
   end
 
-  newproperty(:snapschedule, :array_matching=> :all) do
-    desc "The volume snapshot schedule, in a hash format. Valid keys are: 'minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes'. "
-    validate do |value|
-      raise ArgumentError, "Puppet::Type::Netapp_volume: snapschedule property must be a hash." unless value.is_a? Hash
-    end
-
-    def insync?(is)
-      # @should is an Array. see lib/puppet/type.rb insync?
-      should = @should.first
-
-      # Comparison of hashes
-      return false unless is.class == Hash and should.class == Hash
-      should.each do |k,v|
-        # Skip record if is is " " and should is "0"
-        next if is[k] == " " and should[k] == "0"
-        return false unless is[k] == should[k].to_s
-      end
-      true
-    end
-
-    def should_to_s(newvalue)
-      # Newvalue is an array, but we're only interested in first record.
-      newvalue = newvalue.first
-      newvalue.inspect
-    end
-
-    def is_to_s(currentvalue)
-      currentvalue.inspect
-    end
+  newproperty(:snapshot_policy) do
+    desc "The name of the snapshot policy. The default policy name is 'default'."
   end
 
   autorequire(:netapp_export_policy) do
