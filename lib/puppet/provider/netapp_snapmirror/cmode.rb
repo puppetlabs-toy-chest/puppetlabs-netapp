@@ -68,10 +68,10 @@ Puppet::Type.type(:netapp_snapmirror).provide(:cmode, :parent => Puppet::Provide
   def get_args (method)
     args = NaElement.new("snapmirror-#{method}")
     args.child_add_string('destination-location', @resource[:name])
-    args.child_add_string('source-location', @resource[:source_location])
+    args.child_add_string('source-location', @resource[:source_location]) unless @resource[:source_location].nil?
     if method != 'initialize'
-      args.child_add_string('relationship-type', @resource[:relationship_type])
-      args.child_add_string('max-transfer-rate', @resource[:max_transfer_rate])
+      args.child_add_string('relationship-type', @resource[:relationship_type]) unless @resource[:relationship_type].nil?
+      args.child_add_string('max-transfer-rate', @resource[:max_transfer_rate]) unless @resource[:max_transfer_rate].nil?
     end
 
     args
