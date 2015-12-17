@@ -33,6 +33,7 @@ node 'vserver-01' {
   netapp_ldap_client { 'ldapclient10':
     ensure                     => 'present',
     base_dn                    => 'DC=',
+    ad_domain                  => '',
     bind_as_cifs_server        => 'true',
     group_scope                => 'subtree',
     netgroup_byhost_scope      => 'subtree',
@@ -58,6 +59,7 @@ node 'vserver-01' {
   netapp_ldap_client { 'ldapclient10':
     ensure                     => 'present',
     base_dn                    => 'DC=',
+    ad_domain                  => '',
     base_scope                 => 'subtree',
     bind_as_cifs_server        => 'true',
     group_scope                => 'subtree',
