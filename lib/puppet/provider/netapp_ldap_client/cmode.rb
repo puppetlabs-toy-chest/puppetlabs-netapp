@@ -102,27 +102,27 @@ Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provid
   def get_args (method)
     args = NaElement.new("ldap-client-#{method}")
     args.child_add_string('ldap-client-config', @resource[:name])
-    args.child_add_string('ad-domain', @resource[:ad_domain])
+    args.child_add_string('ad-domain', @resource[:ad_domain]) unless @resource[:ad_domain].nil?
     args.child_add_string('allow-ssl', @resource[:allow_ssl]) unless @resource[:allow_ssl].nil?
     args.child_add_string('base-dn', @resource[:base_dn]) unless @resource[:base_dn].nil?
-    args.child_add_string('base-scope', @resource[:base_scope])
+    args.child_add_string('base-scope', @resource[:base_scope]) unless @resource[:base_scope].nil?
     args.child_add_string('bind-as-cifs-server', @resource[:bind_as_cifs_server])
     args.child_add_string('bind-dn', @resource[:bind_dn]) unless @resource[:bind_dn].nil?
-    args.child_add_string('bind-password', @resource[:bind_password])
+    args.child_add_string('bind-password', @resource[:bind_password]) unless @resource[:bind_password].nil?
     args.child_add_string('group-dn', @resource[:group_dn]) unless @resource[:group_dn].nil?
-    args.child_add_string('group-scope', @resource[:group_scope])
+    args.child_add_string('group-scope', @resource[:group_scope]) unless @resource[:group_scope].nil?
     args.child_add_string('is-netgroup-byhost-enabled', @resource[:is_netgroup_byhost_enabled]) unless @resource[:is_netgroup_byhost_enabled].nil?
-    args.child_add_string('min-bind-level', @resource[:min_bind_level])
+    args.child_add_string('min-bind-level', @resource[:min_bind_level]) unless @resource[:min_bind_level].nil?
     args.child_add_string('netgroup-byhost-dn', @resource[:netgroup_byhost_dn]) unless @resource[:netgroup_byhost_dn].nil?
     args.child_add_string('netgroup-byhost-scope', @resource[:netgroup_byhost_scope])
     args.child_add_string('netgroup-dn', @resource[:netgroup_dn]) unless @resource[:netgroup_dn].nil?
-    args.child_add_string('netgroup-scope', @resource[:netgroup_scope])
+    args.child_add_string('netgroup-scope', @resource[:netgroup_scope]) unless @resource[:netgroup_scope].nil?
     args.child_add_string('query-timeout', @resource[:query_timeout]) unless @resource[:query_timeout].nil?
-    args.child_add_string('schema', @resource[:schema])
+    args.child_add_string('schema', @resource[:schema]) unless @resource[:schema].nil?
     args.child_add_string('tcp-port', @resource[:tcp_port]) unless @resource[:tcp_port].nil?
     args.child_add_string('use-start-tls', @resource[:use_start_tls]) unless @resource[:use_start_tls].nil?
     args.child_add_string('user-dn', @resource[:user_dn]) unless @resource[:user_dn].nil?
-    args.child_add_string('user-scope', @resource[:user_scope])
+    args.child_add_string('user-scope', @resource[:user_scope]) unless @resource[:user_scope].nil?
 
     # Add servers array
     unless @resource[:servers].nil?

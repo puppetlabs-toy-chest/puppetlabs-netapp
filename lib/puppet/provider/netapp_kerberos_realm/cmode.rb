@@ -73,16 +73,16 @@ Puppet::Type.type(:netapp_kerberos_realm).provide(:cmode, :parent => Puppet::Pro
     args += ['realm', resource[:name]]
     args += ['ad-server-ip', resource[:ad_server_ip]] unless resource[:ad_server_ip].nil?
     args += ['ad-server-name', resource[:ad_server_name]] unless resource[:ad_server_name].nil?
-    args += ['admin-server-ip', resource[:admin_server_ip]]
-    args += ['admin-server-port', resource[:admin_server_port]]
-    args += ['clock-skew', resource[:clock_skew]]
+    args += ['admin-server-ip', resource[:admin_server_ip]] unless resource[:admin_server_ip].nil?
+    args += ['admin-server-port', resource[:admin_server_port]] unless resource[:admin_server_port].nil?
+    args += ['clock-skew', resource[:clock_skew]] unless resource[:clock_skew].nil?
     args += ['comment', resource[:comment]] unless resource[:comment].nil?
     args += ['config-name', resource[:config_name]] unless resource[:config_name].nil?
     args += ['kdc-ip', resource[:kdc_ip]]
-    args += ['kdc-port', resource[:kdc_port]]
+    args += ['kdc-port', resource[:kdc_port]] unless resource[:kdc_port].nil?
     args += ['kdc-vendor', resource[:kdc_vendor]]
-    args += ['password-server-ip', resource[:password_server_ip]]
-    args += ['password-server-port', resource[:password_server_port]]
+    args += ['password-server-ip', resource[:password_server_ip]] unless resource[:password_server_ip].nil?
+    args += ['password-server-port', resource[:password_server_port]] unless resource[:password_server_port].nil?
     args
   end
 end

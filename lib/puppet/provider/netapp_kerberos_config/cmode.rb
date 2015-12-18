@@ -61,13 +61,13 @@ Puppet::Type.type(:netapp_kerberos_config).provide(:cmode, :parent => Puppet::Pr
   def get_args
     args = Array.new
     args += ['interface-name', resource[:name]]
-    args += ['admin-password', resource[:admin_password]]
-    args += ['admin-user-name', resource[:admin_user_name]]
-    args += ['force', resource[:force]]
-    args += ['is-kerberos-enabled', resource[:is_kerberos_enabled]]
-    args += ['keytab-uri', resource[:keytab_uri]]
-    args += ['organizational-unit', resource[:organizational_unit]]
-    args += ['service-principal-name', resource[:service_principal_name]]
+    args += ['admin-password', resource[:admin_password]] unless @resource[:admin_password].nil?
+    args += ['admin-user-name', resource[:admin_user_name]] unless @resource[:admin_user_name].nil?
+    args += ['force', resource[:force]] unless @resource[:force].nil?
+    args += ['is-kerberos-enabled', resource[:is_kerberos_enabled]] unless @resource[:is_kerberos_enabled].nil?
+    args += ['keytab-uri', resource[:keytab_uri]] unless @resource[:keytab_uri].nil?
+    args += ['organizational-unit', resource[:organizational_unit]] unless @resource[:organizational_unit].nil?
+    args += ['service-principal-name', resource[:service_principal_name]] unless @resource[:service_principal_name].nil?
     args
   end
 end
