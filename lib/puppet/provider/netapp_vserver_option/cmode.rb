@@ -7,7 +7,6 @@ Puppet::Type.type(:netapp_vserver_option).provide(:cmode, :parent => Puppet::Pro
   defaultfor :feature => :posix
 
   netapp_commands :vsrvoptlist => {:api => 'options-get-iter', :iter => true, :result_element => 'attributes-list'}
-  netapp_commands :vsrvoptset  => 'options-set'
   netapp_commands :vsrvoptmod  => 'options-modify-iter'
 
   mk_resource_methods
@@ -73,7 +72,14 @@ Puppet::Type.type(:netapp_vserver_option).provide(:cmode, :parent => Puppet::Pro
     option_query.child_add_string('name', @resource[:name])
 
     # Execute it
-    result = vsrvoptmod('attributes', option_attributes, 'query', option_query)
+    option_modify = NaElement.new('options-modify-iter')
+    option_set = NaElement.new('attributes')
+    option_set.child_add(option_attributes)
+    option_modify.child_add(option_set)
+    option_get = NaElement.new('query')
+    option_get.child_add(option_query)
+    option_modify.child_add(option_get)
+    result = vsrvoptmod(option_modify)
 
     Puppet.debug("Puppet::Provider::Netapp_vserver_option.cmode flush: Option set successfully.")
     return true
