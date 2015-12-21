@@ -1,4 +1,4 @@
-require 'puppet/property/netapp_truthy'
+require_relative '../../puppet_x/puppetlabs/netapp/property/netapp_truthy'
 
 Puppet::Type.newtype(:netapp_sis_config) do
   @doc = "Manage Netapp sis config modification. [Family: vserver]"
