@@ -1,4 +1,3 @@
-
 require 'puppet/property'
 
 class Puppet::Property::NetappTruthy < Puppet::Property
