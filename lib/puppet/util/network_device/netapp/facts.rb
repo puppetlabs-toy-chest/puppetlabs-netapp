@@ -20,13 +20,10 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     sys_version = result.child_get_string("version")
     @facts['version'] = sys_version if sys_version
 
-    if result.child_get_string("is-clustered") == "true"
-      @facts['clustered'] = true
-    else
-      @facts['clustered'] = false
+    if sys_clustered = result.child_get_string("is-clustered") and !sys_clustered.empty?
+      Puppet.debug("Device is clustered.")
+      @facts['clustered'] = sys_clustered
     end
-
-    Puppet.debug("Clustered = #{@facts['clustered']}.")
 
     # cMode has differnt API's to 7Mode.
     if @facts['clustered'] and ! @facts.empty?
@@ -95,6 +92,18 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     if vserver.empty?
       Puppet.debug("Not connected to a vserver, so gather system facts")
 
+      #Pull out cluster info
+      result = @transport.invoke("cluster-identity-get")
+      cluster_info = result.child_get("attributes")
+      identity_info = cluster_info.child_get("cluster-identity-info")
+      cluster_name = identity_info.child_get_string("cluster-name")
+      if host.downcase ==  identity_info.child_get_string("cluster-name")
+         system_host =  identity_info.child_get_string("cluster-name")
+      end
+      @facts["hostname"] = system_host
+
+      Puppet.debug("System info = #{@facts.inspect}")
+
       # Pull out node system-info
       result = @transport.invoke("system-get-node-info-iter")
       Puppet.debug("Result = #{result.inspect}")
@@ -138,7 +147,6 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     end
 
     @facts
-
   end
 
   # Helper method to get 7-Mode facts
