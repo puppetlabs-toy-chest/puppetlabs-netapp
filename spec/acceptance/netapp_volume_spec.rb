@@ -20,23 +20,24 @@ node 'vserver-01' {
     run_device(:allow_changes => true)
     run_device(:allow_changes => false)
   end
-#
-#  it 'deletes a volume' do
-#    pp=<<-EOS
-#node 'vsim-01' {
-#}
-#node 'vserver-01' {
-#  netapp_volume {'volumename':
-#    aggregate => 'aggr1',
-#    ensure => absent,
-#  }
-#}
-#    EOS
-#    make_site_pp(pp)
-#    run_device(:allow_changes => true)
-#    run_device(:allow_changes => false)
-#  end
-#
+
+  it 'edit a volume' do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_volume {'volumename':
+    aggregate => 'aggr1',
+    ensure => present,
+    snapshot_policy => 'default-1weekly',
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
   it 'makes a volume offline and delete' do
     pp=<<-EOS
 node 'vsim-01' {

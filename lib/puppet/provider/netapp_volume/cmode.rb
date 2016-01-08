@@ -7,8 +7,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
   netapp_commands :vollist        => {:api => 'volume-get-iter', :iter => true, :result_element => 'attributes-list'}
   netapp_commands :optslist       => 'volume-options-list-info'
-  netapp_commands :snapschedlist  => 'snapshot-get-schedule'
-  netapp_commands :snapschedset   => 'snapshot-set-schedule'
   netapp_commands :volsizeset     => 'volume-size'
   netapp_commands :volmodify      => 'volume-modify-iter'
   netapp_commands :snapresset     => 'snapshot-set-reserve'
@@ -70,15 +68,17 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get junction path
       volume_hash[:junctionpath] = volume[:junctionpath]
 
+      # Get snapshot policy
+      volume_hash[:snapshot_policy] = volume[:snapshot_policy]
+
       if ! transport.get_vserver.empty?
-        # Get volume snapschedule and options, only if volume is online.
+        # Get volume options, only if volume is online.
         if (volume[:state] == "online")
           # Get volume options
           volume_hash[:options] = self.get_options(vol_name)
-          volume_hash[:snapschedule] = self.get_snapschedule(vol_name)
         end
       else
-        Puppet.debug("Puppet::Provider::Netapp_volume.cmode self.instances: Not a vserver; skipping options and snapschedule")
+        Puppet.debug("Puppet::Provider::Netapp_volume.cmode self.instances: Not a vserver; skipping options")
       end
 
       # Create the instance and add to volumes array.
@@ -137,11 +137,13 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       vol_space_info = volume.child_get("volume-space-attributes")
       vol_state_info = volume.child_get("volume-state-attributes")
       vol_autosize_info = volume.child_get("volume-autosize-attributes")
+      vol_snapshot_info = volume.child_get("volume-snapshot-attributes")
 
       # Get name
       vol_name = vol_id_info.child_get_string("name")
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Processing volume #{vol_name}.")
 
+      vol_snapshot_policy = vol_snapshot_info.child_get_string("snapshot-policy")
       vol_size_bytes = vol_space_info.child_get_int("size")
       vol_state = vol_state_info.child_get_string("state")
       vol_root = vol_state_info.child_get_string("is-vserver-root")
@@ -181,14 +183,15 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
       # Construct hash
       vol_info = {
-        :name         => vol_name,
-        :size_bytes   => vol_size_bytes,
-        :state        => vol_state,
-        :snap_reserve => vol_snap_reserve,
-        :exportpolicy => vol_export_policy,
-        :auto_size    => vol_auto_size,
-        :junctionpath => vol_junction_path,
-        :vserver_root => vol_root,
+        :name            => vol_name,
+        :size_bytes      => vol_size_bytes,
+        :state           => vol_state,
+        :snap_reserve    => vol_snap_reserve,
+        :snapshot_policy => vol_snapshot_policy,
+        :exportpolicy    => vol_export_policy,
+        :auto_size       => vol_auto_size,
+        :junctionpath    => vol_junction_path,
+        :vserver_root    => vol_root,
       }
 
       Puppet.debug("Vol_info looks like: #{vol_info.inspect}")
@@ -225,30 +228,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
     # Return current_options
     current_options
-  end
-
-  # Snapshot schedule getter.
-  def self.get_snapschedule(name)
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_snapschedule: checking current volume snapshot schedule for Volume #{name}.")
-
-    # Create hash for current_options
-    current_schedule = {}
-
-    # Create array of schedule keys we're interested in.
-    keys = ['minutes', 'hours', 'days', 'weeks', 'which-hours', 'which-minutes']
-
-    # Pull list of volume-options
-    output = snapschedlist("volume", name)
-    # Get the schedule information list
-    keys.each do |key|
-        # Get the value for key.
-        value = output.child_get_string(key)
-        Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_snapschedule: Key = #{key} Value = #{value}")
-        current_schedule[key] = value
-    end
-
-    # Return current_schedule hash.
-    current_schedule
   end
 
   #
@@ -339,23 +318,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
   end
 
-  # Snapshot schedule setter.
-  def snapschedule=(value)
-    Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapschedule=: Got to snapschedule setter.")
-    # Value is an array, so pull out first value.
-    snapschedule = value.first
-
-    # Set the snapshot schedule
-    snapschedset(
-      'volume', @resource[:name],
-      'weeks', snapschedule['weeks'].to_s,
-      'days', snapschedule['days'].to_s,
-      'hours', snapschedule['hours'].to_s,
-      'minutes', snapschedule['minutes'].to_s,
-      'which-hours', snapschedule['which-hours'].to_s,
-      'which-minutes', snapschedule['which-minutes'].to_s )
-  end
-
   # Volume state setter.
   def state=(value)
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode state=: Got to state setter.")
@@ -412,6 +374,31 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     volmodify(volume_modify)
   end
 
+ def snapshot_policy=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapshot_policy=: setting snapshot policy value for Volume #{@resource[:name]} to #{@resource[:snapshot_policy].inspect}")
+
+    # Build up the attributes to set
+    volume_snapshot_attributes = NaElement.new('volume-snapshot-attributes')
+    volume_snapshot_attributes.child_add_string('snapshot-policy', @resource[:snapshot_policy])
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_snapshot_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+
+    volmodify(volume_modify)
+  end
   # Volume create.
   def create
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode: creating Netapp Volume #{resource[:name]} of initial size #{resource[:initsize]} in Aggregate #{resource[:aggregate]} using space reserve of #{resource[:spaceres]}, with a state of #{resource[:state]}.")
@@ -431,10 +418,10 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     methods = [
       'autosize',
       'exportpolicy',
+      'snapshot_policy',
       'junctionpath',
       'options',
       'snapreserve',
-      'snapschedule',
     ]
 
     methods.each do |method|
