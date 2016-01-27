@@ -1,6 +1,86 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [1.1.0]
+### Summary
+This release contains many major additions and fixes gleaned from real-world application.
+
+#### Features
+- New type `netapp_security_login`
+- New type `netapp_security_login_role`
+- New type `netapp_snapmirror_schedule`
+- Add `netapp_aggregate` properties:
+  - `option_free_space_realloc`
+  - `option_fs_size_fixed`
+  - `option_ha_policy`
+  - `option_ignore_inconsistent`
+  - `option_lost_write_protect`
+  - `option_max_write_alloc_blocks`
+  - `option_striping`
+  - `option_nosnap`
+  - `option_raid_cv`
+  - `option_raid_lost_write`
+  - `option_raid_zoned`
+  - `option_raidsize`
+  - `option_cache_raid_group_size`
+  - `option_raidtype`
+  - `option_resyncsnaptime`
+  - `option_root`
+  - `option_snapmirrored`
+  - `option_snapshot_autodelete`
+  - `option_thorough_scrub`
+  - `option_percent_snapshot_space`
+  - `option_nearly_full_threshold`
+  - `option_full_threshold`
+  - `option_is_flash_pool_caching_enabled`
+  - `option_hybrid_enabled`
+  - `option_hybrid_enabled_force`
+- Add `netapp_igroup` property: force
+- Add `netapp_lun` property: force
+- Add `netapp_sis_policy` property: changelog\_threshold\_percent
+- Add `netapp_volume` properties:
+  - `volume_type`
+  - `group_id`
+  - `user_id`
+  - `unix_permissions`
+- Add `netapp_vserver` properties:
+  - `ipspace`
+  - `is_repository`
+
+#### Bugfixes
+- Lots of readme updates
+- Fix `netapp_export_rule` ordering and uniqueness constraint.
+- Fix `netapp_igroup` portset property
+- Fix `netapp_kerberos_config` properties:
+  - `admin_password`
+  - `admin_user_name`
+  - `keytab_uri`
+  - `organizational_unit`
+  - `service_principal_name`
+  - `organizational_unit`
+- Fix `netapp_license`
+- Fix `netapp_lun` size property
+- Fix `netapp_security_login` unlocking
+- Fix `netapp_security_login_role` properties:
+  - `access_level`
+  - `role_query`
+- Fix `netapp_vserver` stopping/starting
+- Fix `netapp_vserver_peer` to make peer\_cluster optional
+- Fix `netapp_cluster_id` to allow contact/location to be edited
+- Fix `netapp_kerberos_realm` properties to have default values:
+  - `admin_server_port` to be 749
+  - `clock_skew` to be 5
+  - `kdc_port` to be 88
+  - `password_server_port` to be 464
+- Fix `netapp_ldap_client` properties to have default values:
+  - `base_scope` to be subtree
+  - `min_bind_level` to be sasl
+  - `query_timeout` to be 3
+  - `tcp_port` to be 389
+- Fix `netapp_lif` firewallpolicy valid value: add `data`
+- Fix `netapp_snapmirror` property to have default value: max\_transfer\_rate to be 0
+- Fix fact resolution on 7mode
+
 ## [1.0.0] - 2015-08-18
 ### Summary
 This is the first stable release of the netapp module.
@@ -86,4 +166,6 @@ Also improved Readme, and correct various typos and incorrect code comments.
 ## 0.1.0 2013-01-12 Gavin Williams <fatmcgav@gmail.com>
 * Initial release.
 
+[1.1.0]: https://github.com/hunner/puppet-hiera/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/hunner/puppet-hiera/compare/0.5.0...1.0.0
 [0.5.0]: https://github.com/hunner/puppet-hiera/compare/v0.4.0...0.5.0
