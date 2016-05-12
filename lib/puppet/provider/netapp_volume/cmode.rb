@@ -130,7 +130,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
     # Itterate through the volume-info blocks
     result.each do |volume|
-      #Puppet.debug("Volume = #{volume.inspect}")
+      Puppet.debug("Volume = #{volume.inspect}")
 
       # Pull out relevant info blocks
       vol_id_info = volume.child_get("volume-id-attributes")
