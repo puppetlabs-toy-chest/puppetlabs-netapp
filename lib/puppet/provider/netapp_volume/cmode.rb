@@ -153,7 +153,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
         vol_export_policy = vol_export_attributes.child_get_string("policy")
       end
       # Get Auto size settings.
-      if vol_state != 'offline'
+      unless %w{offline restricted}.include?('offline')
         vol_auto_size = vol_autosize_info.child_get_string("mode")
       end
 
