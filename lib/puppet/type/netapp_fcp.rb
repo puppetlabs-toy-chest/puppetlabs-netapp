@@ -26,5 +26,4 @@ Puppet::Type.newtype(:netapp_fcp) do
     desc "True/False: Start the FCP service after creation"
   end
 
-
 end
