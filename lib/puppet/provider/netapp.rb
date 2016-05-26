@@ -4,6 +4,7 @@ require 'puppet/util/network_device/netapp/device'
 class Puppet::Provider::Netapp < Puppet::Provider
 
   attr_accessor :device
+  LUN_RESIZE_ERROR_CODE = 9042 
   def self.transport
     if Facter.value(:url) then
       Puppet.debug "Puppet::Util::NetworkDevice::Netapp: connecting via facter url."
@@ -49,7 +50,10 @@ class Puppet::Provider::Netapp < Puppet::Provider
               result = transport.invoke(apicommand, *args)
             end
             if result.results_status == 'failed'
-              raise Puppet::Error, "Executing api call #{[apicommand, args].flatten.join(' ')} failed: #{result.results_reason.inspect}"
+              error = result.results_errno
+              if error != LUN_RESIZE_ERROR_CODE.to_s
+                raise Puppet::Error, "Executing api call #{[apicommand, args].flatten.join(' ')} failed: #{result.results_reason.inspect}"
+              end
             end
           end
 

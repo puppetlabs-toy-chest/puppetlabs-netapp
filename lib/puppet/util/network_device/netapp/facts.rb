@@ -117,6 +117,8 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         host.downcase == system.child_get_string("system-name").downcase
       end
 
+      Puppet.debug("Cluster_Name = #{cluster_name}")
+      Puppet.debug("Host Name = #{host}")
       if system_host
         # Pull out the required variables
         [
@@ -138,8 +140,9 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
 
         # Facts dump
         Puppet.debug("System info = #{@facts.inspect}")
-      else
+      elsif cluster_name.downcase != host.downcase
         raise ArgumentError, "No matching system found with the system name #{host}"
+        end
       end
 
       # Get DNS domainname for fqdn
