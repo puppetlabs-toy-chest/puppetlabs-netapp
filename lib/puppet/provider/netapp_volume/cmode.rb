@@ -100,14 +100,6 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Check if volume is online.
       self.class.get_volinfo.each do |volume|
         next unless volume[:name] == resource[:name]
-        if volume[:junctionpath] and volume[:vserver_root] != "true"
-          Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{volume[:name]} is currently mounted. Unmounting... ")
-          volunmount("volume-name", resource[:name])
-        end
-        if volume[:state] == "online"
-          Puppet.debug("Puppet::Provider::Netapp_volume.cmode: Volume #{volume[:name]} is currently online. Offlining... ")
-          voloffline('name', resource[:name])
-        end
         voldestroy('name', resource[:name])
       end
     end
