@@ -142,7 +142,6 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         Puppet.debug("System info = #{@facts.inspect}")
       elsif cluster_name.downcase != host.downcase
         raise ArgumentError, "No matching system found with the system name #{host}"
-        end
       end
 
       # Get DNS domainname for fqdn
