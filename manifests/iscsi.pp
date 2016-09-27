@@ -55,17 +55,17 @@
 
 
   netapp_volume { "${vol_name}":
-    ensure => $ensure,
-    aggregate => $aggr,
-    initsize => $vol_size,
-    spaceres => $spaceres,
+    ensure      => $ensure,
+    aggregate   => $aggr,
+    initsize    => $vol_size,
+    spaceres    => $spaceres,
     snapreserve => $snapreserve
   }->
   
   netapp_lun {"/vol/${vol_name}/${name}":
-    ensure => $ensure,
-    ostype => $ostype,
-    size => $size,
+    ensure          => $ensure,
+    ostype          => $ostype,
+    size            => $size,
     spaceresenabled => $spaceresenabled
   }->
 
@@ -74,16 +74,16 @@
   }->
 
   netapp_igroup { '${igroup}':
-    ensure => $ensure,
+    ensure     => $ensure,
     group_type => $grouptype,
-    members => $initiator,
-    os_type => $ostype,
-    name => $igroup
+    members    => $initiator,
+    os_type    => $ostype,
+    name       => $igroup
  }->
 
  netapp_lun_map {"/vol/${vol_name}/${name}:${lunid}":
     ensure => $ensure,
-    initiatorgroup =>  $igroup
+    initiatorgroup => $igroup
     
   }
 }

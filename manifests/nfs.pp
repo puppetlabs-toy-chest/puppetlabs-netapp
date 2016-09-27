@@ -52,38 +52,38 @@
    }
 
    netapp_export_rule { "${exp_policy}_${name}:${rule}":
-    ensure => $ensure,
-    clientmatch => $client,
-    protocol => $protocol,
+    ensure            => $ensure,
+    clientmatch       => $client,
+    protocol          => $protocol,
     superusersecurity => $superusersecurity,
-    rorule => $rorule,
-    rwrule => $rwrule
+    rorule            => $rorule,
+    rwrule            => $rwrule
    }->
 
    netapp_export_rule { "${root_policy}:${root_policy_rule}":
-    ensure => $ensure,
-    clientmatch => $root_policy_match,
+    ensure            => $ensure,
+    clientmatch       => $root_policy_match,
     superusersecurity => $superusersecurity,
-    rorule => $rorule,
-    rwrule => $rwrule
+    rorule            => $rorule,
+    rwrule            => $rwrule
    }->
    netapp_nfs { "${svm}":
     ensure => $ensure,
    }->
 
    netapp_volume { "${svm_root}":
-    ensure => $ensure,
+    ensure       => $ensure,
     exportpolicy => $root_policy,
    }->
 
    netapp_volume { "nfs_${name}":
-    ensure => $ensure,
-    aggregate => $aggr,
-    initsize => $size,
+    ensure       => $ensure,
+    aggregate    => $aggr,
+    initsize     => $size,
     exportpolicy => "$exp_policy_$name",
-    spaceres => $spaceres,
+    spaceres     => $spaceres,
     junctionpath => $path,
-    snapreserve => $snapreserve
+    snapreserve  => $snapreserve
    }
 
 }
