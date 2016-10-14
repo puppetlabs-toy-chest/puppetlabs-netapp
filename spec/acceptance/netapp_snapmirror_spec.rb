@@ -46,9 +46,11 @@ node 'vsim-01' {
     peer_cluster => 'VSIM',
   }
   netapp_snapmirror { 'vs4:vs4_root':
-    ensure            => 'present',
-    relationship_type => 'data_protection',
-    source_location   => 'vs0:vs0_root',
+    ensure              => 'present',
+    relationship_type   => 'data_protection',
+    source_location     => 'vs0:vs0_root',
+    snapmirror_policy   => 'DPDefault',
+    snapmirror_schedule => 'daily',
   }
 }
 node 'vserver-01' {
