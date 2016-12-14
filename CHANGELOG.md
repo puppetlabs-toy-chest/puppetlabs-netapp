@@ -1,6 +1,21 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [1.2.0]
+### Summary
+This release adds several helper manifests for setting up common configurations
+of nfs/iscsi/svm, and fixes some bugs with `netapp_volume`
+
+#### Features
+- Add `netapp::nfs` define
+- Add `netapp::iscsi` define
+- Add `netapp::svm` define
+
+#### Bugfixes
+- Better debug and error handling
+- Remove volume offline during volume destroy in netapp\_volume
+- Fix volume info to not incorrectly get autosize info
+
 ## [1.1.0]
 ### Summary
 This release contains many major additions and fixes gleaned from real-world application.
@@ -166,6 +181,7 @@ Also improved Readme, and correct various typos and incorrect code comments.
 ## 0.1.0 2013-01-12 Gavin Williams <fatmcgav@gmail.com>
 * Initial release.
 
+[1.2.0]: https://github.com/hunner/puppet-hiera/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/hunner/puppet-hiera/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/hunner/puppet-hiera/compare/0.5.0...1.0.0
 [0.5.0]: https://github.com/hunner/puppet-hiera/compare/v0.4.0...0.5.0
