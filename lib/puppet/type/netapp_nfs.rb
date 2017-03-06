@@ -30,6 +30,39 @@ Puppet::Type.newtype(:netapp_nfs) do
     newvalues(:enabled, :disabled)
   end
 
+  newproperty(:showmount) do
+    desc "Enable or Disable showmount."
+    newvalues(:enabled, :disabled)
+  end
+
+  newproperty(:v3msdosclient) do
+    desc "Control Access for Win clients."
+    newvalues(:enabled, :disabled)
+  end
+
+  newproperty(:v364bitidentifiers) do
+    desc "Control 64bit file identifiers for v3."
+    newvalues(:enabled, :disabled)
+  end
+
+  newproperty(:v4numericids) do
+    desc "Control handling of user IDs."
+    newvalues(:enabled, :disabled)
+  end
+
+  newproperty(:v41pnfs) do
+    desc "Control NFS v4.1 pnfs."
+    newvalues(:enabled, :disabled)
+  end
+ 
+  newproperty(:nfsv4iddomain) do
+    desc "NFSv4 Domain name"
+  end
+
+  newproperty(:v41referrals) do
+    desc "Control NFS v4.1 referrals."
+    newvalues(:enabled, :disabled)
+  end
   #newproperty(:udp) do
   #  desc "Control NFS v4.1 access."
   #  newvalues(:enabled, :disabled)
