@@ -69,40 +69,40 @@ Puppet::Type.type(:netapp_qtree).provide(:sevenmode, :parent => Puppet::Provider
   end
 
   def flush
-    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Got to flush for resource #{@resource[:name]}.")
+    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Got to flush for resource #{@resource[:qtname]}.")
 
     # Check required resource state
     Puppet.debug("Property_hash ensure = #{@property_hash[:ensure]}")
     if @property_hash[:ensure] == :absent
 
       Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Ensure is absent.")
-      Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: destroying Netapp Qtree #{@resource[:name]} against volume #{@resource[:volume]}")
+      Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: destroying Netapp Qtree #{@resource[:qtname]} against volume #{@resource[:volume]}")
 
       # Query Netapp to remove qtree against volume.
-      result = qdel('qtree', "/vol/#{@resource[:volume]}/#{@resource[:name]}")
+      result = qdel('qtree', "/vol/#{@resource[:volume]}/#{@resource[:qtname]}")
 
-      Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: qtree #{@resource[:name]} destroyed successfully. \n")
+      Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: qtree #{@resource[:qtname]} destroyed successfully. \n")
 
     end
   end
 
   def create
-    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: creating Netapp Qtree #{@resource[:name]} on volume #{@resource[:volume]}.")
+    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: creating Netapp Qtree #{@resource[:qtname]} on volume #{@resource[:volume]}.")
 
     # Query Netapp to create qtree against volume. .
-    result = qadd('qtree', @resource[:name], 'volume', @resource[:volume])
+    result = qadd('qtree', @resource[:qtname], 'volume', @resource[:volume])
 
-    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Qtree #{@resource[:name]} created successfully on volume #{@resource[:volume]}. \n")
+    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Qtree #{@resource[:qtname]} created successfully on volume #{@resource[:volume]}. \n")
 
   end
 
   def destroy
-    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: destroying Netapp Qtree #{@resource[:name]} against volume #{@resource[:volume]}")
+    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: destroying Netapp Qtree #{@resource[:qtname]} against volume #{@resource[:volume]}")
     @property_hash[:ensure] = :absent
   end
 
   def exists?
-    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: checking existance of Netapp qtree #{@resource[:name]} against volume #{@resource[:volume]}")
+    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: checking existance of Netapp qtree #{@resource[:qtname]} against volume #{@resource[:volume]}")
     Puppet.debug("Value = #{@property_hash[:ensure]}")
     @property_hash[:ensure] == :present
   end
