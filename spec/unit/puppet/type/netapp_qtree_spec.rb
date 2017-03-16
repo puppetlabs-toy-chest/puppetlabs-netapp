@@ -34,6 +34,10 @@ describe Puppet::Type.type(:netapp_qtree) do
         described_class.new(:name => 'qtree01a', :ensure => :present)[:name].should == 'qtree01a'
       end
 
+      it "should support a volume and directory name" do
+        expect { described_class.new(:name => '/volume/dir1', :ensure => :present)[:name].should == '/volume/dir1'
+      end
+
       it "should not support a nested directory" do
         expect { described_class.new(:name => 'dir1/dir2', :ensure => :present) }.to raise_error(Puppet::Error, /dir1\/dir2 is not a valid qtree name/)
       end
@@ -74,6 +78,27 @@ describe Puppet::Type.type(:netapp_qtree) do
         expect { described_class.new(:name => 'q1', :volume => 'vol 1', :ensure => :present) }.to raise_error(Puppet::Error, /vol 1 is not a valid volume name/)
       end
     end
+    
+    describe "foo qtname" do
+      it "should support an alphanumerical name" do
+        described_class.new(:qtname => 'qtree01a', :ensure => :present)[:qtname].should == 'qtree01a'
+      end
+
+      it "should not support a nested directory" do
+        expect { described_class.new(:qtname => 'dir1/dir2', :ensure => :present) }.to raise_error(Puppet::Error, /dir1\/dir2 is not a valid qtree name/)
+      end
+
+      it "should support underscores" do
+        described_class.new(:qtname => 'foo_bar', :ensure => :present)[:qtname].should == 'foo_bar'
+      end
+
+      it "should support hyphens" do
+        described_class.new(:qtname => 'abc-def', :ensure => :present)[:qtname].should == 'abc-def'
+      end
+
+      it "should not support spaces" do
+        expect { described_class.new(:qtname => 'qtree 1', :ensure => :present) }.to raise_error(Puppet::Error, /qtree 1 is not a valid qtree name/)
+      end
   end
 
   describe "autorequiring" do
