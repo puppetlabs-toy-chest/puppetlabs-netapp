@@ -11,7 +11,7 @@ Puppet::Type.newtype(:netapp_qtree) do
     isnamevar
     desc "The qtree name."
     validate do |value|
-      unless (value =~ /^[\w\-]+$/) or (value =~ /^\/\w+\/\w+$/)
+      unless (value =~ /^[\w\-\.]+$/) or (value =~ /^\/\w+\/[\w\-\.]+$/)
          raise ArgumentError, "%s is not a valid qtree name." % value
       end
     end
@@ -43,7 +43,7 @@ Puppet::Type.newtype(:netapp_qtree) do
       end
     end
     validate do |value|
-      unless value =~ /^[\w\-]+$/
+      unless value =~ /^[\w\-\.]+$/
          raise ArgumentError, "%s is not a valid qtname name." % value
       end
     end
