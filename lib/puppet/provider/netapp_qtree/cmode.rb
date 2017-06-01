@@ -39,13 +39,19 @@ Puppet::Type.type(:netapp_qtree).provide(:cmode, :parent => Puppet::Provider::Ne
       secstyle = qtree_info.child_get_string("security-style")
 
       # Construct an export hash for rule
-      qtree_hash = { :name          => name,
+      qtree_hash = { :qtname        => name,
                      :mode          => mode,
                      :securitystyle => secstyle,
                      :ensure        => :present }
 
-      # Add the volume details
-      qtree_hash[:volume] = qtree_info.child_get_string("volume") unless qtree_info.child_get_string("volume").empty?
+      # Add the volume details and title
+      if qtree_info.child_get_string("volume").empty?
+        qtree_hash[:name] = qtree_hash[:qtname]
+      else
+        qtree_hash[:volume] = qtree_info.child_get_string("volume")
+        qtree_hash[:name] = "/#{qtree_hash[:volume]}/#{qtree_hash[:qtname]}"
+      end
+
       Puppet.debug("Puppet::Provider::Netapp_qtree.cmode.prefetch: Volume for '#{name}' is '#{qtree_info.child_get_string("volume")}'.")
 
       # Create the instance and add to exports array.
