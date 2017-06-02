@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 require 'yaml'
-require 'puppet/util/network_device/netapp/NaServer'
+#require 'puppet/util/network_device/netapp/NaServer'
 
 describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
 
@@ -343,8 +343,6 @@ describe Puppet::Type.type(:netapp_quota).provider(:sevenmode) do
           let(:parameters) do
             user_quota_parameters
           end
-    require 'pry'
-    binding.pry
           it "should pass \"-\" as a value for #{apiproperty} if desired value is absent" do
             resource.provider.set(:name => 'bob', :type => :user, :qtree => 'qtree01', :volume => 'vol01')
             resource.provider.expects(:mod).with('quota-target', 'bob', 'quota-type', 'user', 'volume', 'vol01', 'qtree', 'qtree01', apiproperty, '-')

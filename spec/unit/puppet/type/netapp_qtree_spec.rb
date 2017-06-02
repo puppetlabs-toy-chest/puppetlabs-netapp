@@ -10,12 +10,12 @@ describe Puppet::Type.type(:netapp_qtree) do
     described_class.provide(:fake_netapp_qtree_provider) { mk_resource_methods }
   end
 
-  it "should have :name be its namevar" do
-    described_class.key_attributes.should == [:name]
+  it "should have :qtname be its namevar" do
+    described_class.key_attributes.should == [:qtname, :volume]
   end
 
   describe "when validating attributes" do
-    [:name, :provider, :volume].each do |param|
+    [:qtname, :provider, :volume].each do |param|
       it "should have a #{param} parameter" do
         described_class.attrtype(param).should == :param
       end
@@ -31,80 +31,88 @@ describe Puppet::Type.type(:netapp_qtree) do
   describe "when validating values" do
     describe "for name" do
       it "should support an alphanumerical name" do
-        described_class.new(:name => 'qtree01a', :ensure => :present)[:name].should == 'qtree01a'
+        described_class.new(:title => 'qtree01a', :ensure => :present)[:qtname].should == 'qtree01a'
       end
 
       it "should support a volume and directory name" do
-        expect { described_class.new(:name => '/volume/dir1', :ensure => :present)[:name].should == '/volume/dir1'
+        expect(described_class.new(:title => '/volume/dir1', :ensure => :present)[:qtname]).to eq('dir1')
+        expect(described_class.new(:title => '/volume/dir1', :ensure => :present)[:volume]).to eq('volume')
+      end
+
+      it "supports composite namevars" do
+        resource = described_class.new(:title => '/volume/dir1', :ensure => :present)
+        expect(resource[:qtname]).to eq("dir1")
+        expect(resource[:volume]).to eq("volume")
       end
 
       it "should not support a nested directory" do
-        expect { described_class.new(:name => 'dir1/dir2', :ensure => :present) }.to raise_error(Puppet::Error, /dir1\/dir2 is not a valid qtree name/)
+        expect { described_class.new(:title => 'dir1/dir2', :ensure => :present) }.to raise_error(Puppet::Error, /dir1\/dir2 is not a valid qtree name/)
       end
 
       it "should support underscores" do
-        described_class.new(:name => 'foo_bar', :ensure => :present)[:name].should == 'foo_bar'
+        described_class.new(:title => 'foo_bar', :ensure => :present)[:qtname].should == 'foo_bar'
       end
 
       it "should support hyphens" do
-        described_class.new(:name => 'abc-def', :ensure => :present)[:name].should == 'abc-def'
+        described_class.new(:title => 'abc-def', :ensure => :present)[:qtname].should == 'abc-def'
       end
 
       it "should not support spaces" do
-        expect { described_class.new(:name => 'qtree 1', :ensure => :present) }.to raise_error(Puppet::Error, /qtree 1 is not a valid qtree name/)
+        expect { described_class.new(:title => 'qtree 1', :ensure => :present) }.to raise_error(Puppet::Error, /qtree 1 is not a valid qtree name/)
       end
     end
 
     describe "for ensure" do
       it "should support present" do
-        described_class.new(:name => 'q1', :ensure => 'present')[:ensure].should == :present
+        described_class.new(:title => 'q1', :ensure => 'present')[:ensure].should == :present
       end
 
       it "should support absent" do
-        described_class.new(:name => 'q1', :ensure => 'absent')[:ensure].should == :absent
+        described_class.new(:title => 'q1', :ensure => 'absent')[:ensure].should == :absent
       end
 
       it "should not support other values" do
-        expect { described_class.new(:name => 'q1', :ensure => 'foo') }.to raise_error(Puppet::Error, /Invalid value "foo"/)
+        expect { described_class.new(:title => 'q1', :ensure => 'foo') }.to raise_error(Puppet::Error, /Invalid value "foo"/)
       end
     end
 
     describe "for volume" do
       it "should support a simple name" do
-        described_class.new(:name => 'q1', :volume => 'vol1', :ensure => :present)[:volume].should == 'vol1'
+        described_class.new(:title => 'q1', :volume => 'vol1', :ensure => :present)[:volume].should == 'vol1'
       end
 
       it "should not support spaces" do
-        expect { described_class.new(:name => 'q1', :volume => 'vol 1', :ensure => :present) }.to raise_error(Puppet::Error, /vol 1 is not a valid volume name/)
+        expect { described_class.new(:title => 'q1', :volume => 'vol 1', :ensure => :present) }.to raise_error(Puppet::Error, /vol 1 is not a valid volume name/)
       end
     end
-    
+
     describe "foo qtname" do
       it "should support an alphanumerical name" do
-        described_class.new(:qtname => 'qtree01a', :ensure => :present)[:qtname].should == 'qtree01a'
+        described_class.new(:title => 'qtree01a', :ensure => :present)[:qtname].should == 'qtree01a'
       end
 
       it "should not support a nested directory" do
-        expect { described_class.new(:qtname => 'dir1/dir2', :ensure => :present) }.to raise_error(Puppet::Error, /dir1\/dir2 is not a valid qtree name/)
+        expect { described_class.new(:title => 'dir1/dir2', :ensure => :present) }.to raise_error(Puppet::Error, /dir1\/dir2 is not a valid qtree name/)
       end
 
       it "should support underscores" do
-        described_class.new(:qtname => 'foo_bar', :ensure => :present)[:qtname].should == 'foo_bar'
+        described_class.new(:title => 'foo_bar', :ensure => :present)[:qtname].should == 'foo_bar'
       end
 
       it "should support hyphens" do
-        described_class.new(:qtname => 'abc-def', :ensure => :present)[:qtname].should == 'abc-def'
+        described_class.new(:title => 'abc-def', :ensure => :present)[:qtname].should == 'abc-def'
       end
 
       it "should not support spaces" do
-        expect { described_class.new(:qtname => 'qtree 1', :ensure => :present) }.to raise_error(Puppet::Error, /qtree 1 is not a valid qtree name/)
+        expect { described_class.new(:title => 'qtree 1', :ensure => :present) }.to raise_error(Puppet::Error, /qtree 1 is not a valid qtree name/)
       end
+    end
   end
 
   describe "autorequiring" do
     let :qtree do
       described_class.new(
-        :name   => 'q1',
+        :title   => 'q1',
         :ensure => :present,
         :volume => 'vol1'
       )
@@ -116,7 +124,7 @@ describe Puppet::Type.type(:netapp_qtree) do
 
     let :volume do
       Puppet::Type.type(:netapp_volume).new(
-        :name   => 'vol1',
+        :title   => 'vol1',
         :ensure => :present
       )
     end
