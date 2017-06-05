@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_sevenmode'
+require_relative '../netapp_sevenmode'
 
 Puppet::Type.type(:netapp_volume).provide(:sevenmode, :parent => Puppet::Provider::NetappSevenmode) do
   @doc = "Manage Netapp 7-Mode Volume creation, modification and deletion."

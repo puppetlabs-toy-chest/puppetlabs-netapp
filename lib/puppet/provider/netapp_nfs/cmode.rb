@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp nfs service. [Family: vserver]"

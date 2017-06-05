@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp'
+require_relative 'netapp'
 class Puppet::Provider::NetappCmode < Puppet::Provider::Netapp
   def initialize(value={})
     super(value)

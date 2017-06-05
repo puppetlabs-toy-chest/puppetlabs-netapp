@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_export_rule).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp CMode export rule creation, modification and deletion. [Family: vserver]"
