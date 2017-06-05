@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_sevenmode'
+require_relative '../netapp_sevenmode'
 
 Puppet::Type.type(:netapp_nfs_export).provide(:sevenmode, :parent => Puppet::Provider::NetappSevenmode) do
   @doc = "Manage Netapp NFS export creation, modification and deletion on 7Mode."

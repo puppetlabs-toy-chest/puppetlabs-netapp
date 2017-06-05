@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp license management. Only supported by ONTAP 8.2 and newer. [Family: cluster]"

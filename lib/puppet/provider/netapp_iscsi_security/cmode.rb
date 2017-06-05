@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_iscsi_security).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netap ISCSI initiator (client) authentication. [Family: vserver]"

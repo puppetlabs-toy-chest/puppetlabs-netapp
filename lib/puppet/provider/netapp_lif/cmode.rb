@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp Logical Interface (LIF) export rule creation, modification and deletion. [Family: cluster]"

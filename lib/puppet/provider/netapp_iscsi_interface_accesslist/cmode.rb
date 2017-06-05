@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_iscsi_interface_accesslist).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Add / Remove the iSCSI LIFs to the accesslist of the specified initiator. [Family: vserver]"

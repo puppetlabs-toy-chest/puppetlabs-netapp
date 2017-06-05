@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_sevenmode'
+require_relative '../netapp_sevenmode'
 
 Puppet::Type.type(:netapp_qtree).provide(:sevenmode, :parent => Puppet::Provider::NetappSevenmode) do
   @doc = "Manage Netapp Qtree creation, modification and deletion."

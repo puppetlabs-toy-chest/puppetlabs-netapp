@@ -1,4 +1,4 @@
-require 'puppet/util/network_device/netapp'
+require_relative '../netapp'
 
 class Puppet::Util::NetworkDevice::Netapp::Facts
 

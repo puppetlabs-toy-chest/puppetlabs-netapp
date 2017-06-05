@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_kerberos_config).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp kerberos config. [Family: vserver]"

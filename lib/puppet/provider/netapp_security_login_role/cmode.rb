@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp_cmode'
+require_relative '../netapp_cmode'
 
 Puppet::Type.type(:netapp_security_login_role).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp security login roles. [Family: cluster]"

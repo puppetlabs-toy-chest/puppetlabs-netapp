@@ -1,5 +1,5 @@
 require 'puppet/provider'
-require 'puppet/util/network_device/netapp/device'
+require_relative '../util/network_device/netapp/device'
 
 class Puppet::Provider::Netapp < Puppet::Provider
 

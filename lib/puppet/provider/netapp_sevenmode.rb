@@ -1,4 +1,4 @@
-require 'puppet/provider/netapp'
+require_relative 'netapp'
 class Puppet::Provider::NetappSevenmode < Puppet::Provider::Netapp
   # Only run in 7Mode
   def self.inherited(klass)
