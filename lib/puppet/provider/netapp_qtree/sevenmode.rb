@@ -38,11 +38,13 @@ Puppet::Type.type(:netapp_qtree).provide(:sevenmode, :parent => Puppet::Provider
       Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode.prefetch: Processing rule for qtree '#{name}'.")
 
       # Construct an export hash for rule
-      qtree_hash = { :name => name,
+      qtree_hash = { :qtname => name,
                      :ensure => :present }
 
       # Add the volume details
-      qtree_hash[:volume] = qtree_info.child_get_string("volume") unless qtree_info.child_get_string("volume").empty?
+      qtree_hash[:volume] = qtree_info.child_get_string("volume")
+      qtree_hash[:name] = "/#{qtree_hash[:volume]}/#{qtree_hash[:qtname]}"
+
       Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode.prefetch: Volume for '#{name}' is '#{qtree_info.child_get_string("volume")}'.")
 
       # Create the instance and add to exports array.
@@ -58,15 +60,20 @@ Puppet::Type.type(:netapp_qtree).provide(:sevenmode, :parent => Puppet::Provider
   end
 
   def self.prefetch(resources)
-    Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Got to self.prefetch.")
+    Puppet.debug("Puppet::Provider::Netapp_qtree.cmode: Got to self.prefetch.")
     # Itterate instances and match provider where relevant.
-    instances.each do |prov|
-      Puppet.debug("Prov.name = #{resources[prov.name]}. ")
-      if resource = resources[prov.name]
-        resource.provider = prov
+    qtrees_list=instances
+    resources.each do |name, res|
+      Puppet.debug("name = #{name}. ")
+      Puppet.debug("Res.name = #{res[:name]}. ")
+      Puppet.debug("Res.qtname = #{res[:qtname]}. ")
+      Puppet.debug("Res.volume = #{res[:volume]}. ")
+      if provider = qtrees_list.find{ |app| app.qtname == res[:qtname] && app.volume == res[:volume] }
+        resources[name].provider = provider
       end
     end
   end
+
 
   def flush
     Puppet.debug("Puppet::Provider::Netapp_qtree.sevenmode: Got to flush for resource #{@resource[:qtname]}.")

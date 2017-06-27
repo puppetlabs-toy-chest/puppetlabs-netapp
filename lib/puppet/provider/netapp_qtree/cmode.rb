@@ -45,13 +45,8 @@ Puppet::Type.type(:netapp_qtree).provide(:cmode, :parent => Puppet::Provider::Ne
                      :ensure        => :present }
 
       # Add the volume details and title
-      if qtree_info.child_get_string("volume").empty?
-        qtree_hash[:volume] = ""
-        qtree_hash[:name] = qtree_hash[:qtname]
-      else
-        qtree_hash[:volume] = qtree_info.child_get_string("volume")
-        qtree_hash[:name] = "/#{qtree_hash[:volume]}/#{qtree_hash[:qtname]}"
-      end
+      qtree_hash[:volume] = qtree_info.child_get_string("volume")
+      qtree_hash[:name] = "/#{qtree_hash[:volume]}/#{qtree_hash[:qtname]}"
 
       Puppet.debug("Puppet::Provider::Netapp_qtree.cmode.prefetch: Volume for '#{name}' is '#{qtree_info.child_get_string("volume")}'.")
 
