@@ -9,19 +9,43 @@ Puppet::Type.newtype(:netapp_qtree) do
 
   newparam(:name) do
     desc "The qtree name."
-    isnamevar
     validate do |value|
-      unless value =~ /^[\w\-]+$/
+      unless (value =~ /^[\w\-]+$/) or (value =~ /^\/\w+\/\w+$/)
          raise ArgumentError, "%s is not a valid qtree name." % value
       end
     end
   end
 
-  newparam(:volume) do
+  newproperty(:volume) do
+    isnamevar
     desc "The volume to create qtree against."
+    defaultto do
+      if @resource[:name].count('/') == 2
+        @resource[:name].split('/')[1]
+      else
+        ""
+      end
+    end
     validate do |value|
       unless value =~ /^\w+$/
          raise ArgumentError, "%s is not a valid volume name." % value
+      end
+    end
+  end
+
+  newproperty(:qtname) do
+    isnamevar
+    desc "The qtname to create."
+    defaultto do
+      if @resource[:name].count('/') == 2
+        @resource[:name].split('/')[2]
+      else
+        @resource[:name]
+      end
+    end
+    validate do |value|
+      unless value =~ /^[\w\-]+$/
+         raise ArgumentError, "%s is not a valid qtname name." % value
       end
     end
   end

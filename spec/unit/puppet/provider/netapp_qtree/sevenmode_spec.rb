@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 require 'yaml'
-require 'puppet/util/network_device/netapp/NaServer'
+#require 'puppet/util/network_device/netapp/NaServer'
 
 describe Puppet::Type.type(:netapp_qtree).provider(:sevenmode) do
 
@@ -13,7 +13,7 @@ describe Puppet::Type.type(:netapp_qtree).provider(:sevenmode) do
 
   let :volume_qtree do
     Puppet::Type.type(:netapp_qtree).new(
-      :name     => 'qtree',
+      :title    => 'qtree',
       :ensure   => :present,
       :volume   => 'volume',
       :provider => provider
@@ -22,7 +22,7 @@ describe Puppet::Type.type(:netapp_qtree).provider(:sevenmode) do
 
   let :provider do
     described_class.new(
-      :name => 'qtree'
+      :title => 'qtree'
     )
   end
 
@@ -33,13 +33,13 @@ describe Puppet::Type.type(:netapp_qtree).provider(:sevenmode) do
       instances.size.should == 1
       instances.map do |prov|
         {
-          :name          => prov.get(:name),
+          :title         => prov.get(:name),
           :ensure        => prov.get(:ensure),
           :volume        => prov.get(:volume)
         }
       end.should == [
         {
-          :name          => 'qtree',
+          :title         => 'qtree',
           :ensure        => :present,
           :volume        => 'volume'
         }
@@ -76,7 +76,7 @@ describe Puppet::Type.type(:netapp_qtree).provider(:sevenmode) do
   describe "when destroying a resource" do
     it "should be able to destroy a qtree" do
       # if we destroy a provider, we must have been present before so we must have values in @property_hash
-      volume_qtree.provider.set(:name => 'qtree', :volume => 'volume')
+      volume_qtree.provider.set(:title => 'qtree', :volume => 'volume')
       volume_qtree.provider.expects(:qdel).with('qtree', "/vol/volume/qtree")
       volume_qtree.provider.destroy
       volume_qtree.provider.flush
