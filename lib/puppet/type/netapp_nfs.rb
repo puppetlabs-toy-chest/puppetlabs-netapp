@@ -8,6 +8,9 @@ Puppet::Type.newtype(:netapp_nfs) do
   newparam(:vserver) do
     desc "NFS service SVM"
     isnamevar
+    validate do |value|
+      raise ArgumentError, 'A Vserver name can only contain alphanumeric characters and ".", "-" or "_"' unless value =~ /^[a-zA-Z0-9\-_.]+$/
+    end
   end
 
   newproperty(:state) do
@@ -28,6 +31,17 @@ Puppet::Type.newtype(:netapp_nfs) do
   newproperty(:v41) do
     desc "Control NFS v4.1 access."
     newvalues(:enabled, :disabled)
+  end
+
+  newproperty(:auth_sys_extended_groups) do
+    desc "AUTH_SYS Extended Groups enabled."
+    newvalues(:enabled, :disabled)
+  end
+
+  newproperty(:enable_ejukebox) do
+    desc "Enable NFSv3 EJUKEBOX error."
+    defaultto :false
+    newvalues(:true, :false)
   end
 
   #newproperty(:udp) do

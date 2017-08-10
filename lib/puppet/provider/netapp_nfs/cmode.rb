@@ -3,7 +3,7 @@ require_relative '../netapp_cmode'
 Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::NetappCmode) do
   @doc = "Manage Netapp nfs service. [Family: vserver]"
 
-  confine :feature => :posix
+  confine    :feature => :posix
   defaultfor :feature => :posix
 
   netapp_commands :nfslist    => {:api => 'nfs-service-get-iter', :iter => true, :result_element => 'attributes-list'}
@@ -21,11 +21,14 @@ Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::Neta
     results.each do |nfs|
       vserver = nfs.child_get_string('vserver')
       nfs_hash = {
-        :name   => vserver,
-        :ensure => :present,
-        :v3     => nfs.child_get_string('is-nfsv3-enabled') == 'true' ? 'enabled' : 'disabled',
-        :v40    => nfs.child_get_string('is-nfsv40-enabled') == 'true' ? 'enabled' : 'disabled',
-        :v41    => nfs.child_get_string('is-nfsv41-enabled') == 'true' ? 'enabled' : 'disabled',
+        :name                     => vserver,
+        :ensure                   => :present,
+        :v3                       => nfs.child_get_string('is-nfsv3-enabled') == 'true' ? 'enabled' : 'disabled',
+        :v40                      => nfs.child_get_string('is-nfsv40-enabled') == 'true' ? 'enabled' : 'disabled',
+        :v41                      => nfs.child_get_string('is-nfsv41-enabled') == 'true' ? 'enabled' : 'disabled',
+        :auth_sys_extended_groups => nfs.child_get_string('auth-sys-extended-groups') == 'true' ? 'enabled' : 'disabled',
+        :enable_ejukebox          => nfs.child_get_string('enable-ejukebox'),
+
       }
 
       nfs_state = nfs.child_get_string('is-nfs-access-enabled')
@@ -83,6 +86,8 @@ Puppet::Type.type(:netapp_nfs).provide(:cmode, :parent => Puppet::Provider::Neta
     args += ['is-nfsv3-enabled', resource[:v3] == :enabled ? 'true' : 'false'] if resource[:v3]
     args += ['is-nfsv40-enabled', resource[:v40] == :enabled ? 'true' : 'false'] if resource[:v40]
     args += ['is-nfsv41-enabled', resource[:v41] == :enabled ? 'true' : 'false'] if resource[:v41]
+    args += ['auth-sys-extended-groups', resource[:auth_sys_extended_groups] == :enabled ? 'true' : 'false'] if resource[:auth_sys_extended_groups]
+    args += ['enable-ejukebox', resource[:enable_ejukebox]] if resource[:enable_ejukebox]
     args
   end
 end
