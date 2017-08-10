@@ -8,6 +8,9 @@ Puppet::Type.newtype(:netapp_ldap_client) do
   newparam(:name) do
     desc "The name of the LDAP client configuration."
     isnamevar
+    validate do |value|
+      raise ArgumentError, '#{value} is an invalid LDAP client configuration name.' unless value =~ /\w{1,32}/
+    end
   end
 
   newproperty(:ad_domain) do
