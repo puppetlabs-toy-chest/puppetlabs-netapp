@@ -15,8 +15,21 @@ Puppet::Type.newtype(:netapp_vserver_cifs_options) do
     desc 'Maximum simultaneous operations per TCP connection. Defaults to 255.'
     defaultto '255'
     validate do |value|
+      raise ArgumentError, '%s is not a valid max-queue-depth.' % value unless value =~ /^\d+$/
       raise ArgumentError, 'The value for maximum simultaneous operations per TCP connection must be in between 2 to 65535.' unless value.to_i.between?(2, 65535)
     end
+
+    munge do |value|
+      case value
+      when String
+        if value =~ /^[0-9]+$/
+          value = Integer(value)
+        end
+      end
+
+      return value
+    end
+
   end
 
   newproperty(:smb2_enabled) do
