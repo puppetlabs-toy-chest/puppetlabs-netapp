@@ -1,0 +1,40 @@
+--- !ruby/object:NaElement
+name: results
+content: ""
+children:
+- !ruby/object:NaElement
+  name: array-profiles
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: storage-array
+    content: ""
+    children:
+    - !ruby/object:NaElement
+      name: name
+      content: storage_array_name1
+      children: []
+      attrkeys: []
+      attrvals: []
+    - !ruby/object:NaElement
+      name: max-queue-depth
+      content: 100
+      children: []
+      attrkeys: []
+      attrvals: []
+  - !ruby/object:NaElement
+    name: storage-array
+    content: ""
+    children:
+    - !ruby/object:NaElement
+      name: name
+      content: storage_array_name2
+      children: []
+      attrkeys: []
+      attrvals: []
+    - !ruby/object:NaElement
+      name: max-queue-depth
+      content: 100
+      children: []
+      attrkeys: []
+      attrvals: []
