@@ -117,6 +117,10 @@ Puppet::Type.newtype(:netapp_lif) do
     newvalues(:disabled, :enabled, :system_defined)
   end
 
+  newproperty(:subnetname) do
+    desc "LIF subnet name."
+  end
+
   newparam(:vserver) do
     desc "LIF Vserver name"
   end

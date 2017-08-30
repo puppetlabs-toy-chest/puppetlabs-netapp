@@ -34,7 +34,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
       # Pull out required info
       required_fields = %w(address administrative-status comment dns-domain-name failover-group failover-policy
       firewall-policy home-node home-port is-auto-revert netmask netmask-length routing-group-name
-      use-failover-group)
+      use-failover-group subnet-name)
 
       required_fields.each do |field|
         Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Getting value for #{field}.")
@@ -103,7 +103,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
       # Add values to it
       modify_fields = %w(interface-name address administrative-status comment dns-domain-name failover-group failover-policy
         firewall-policy home-node home-port is-auto-revert netmask netmask-length routing-group-name
-        use-failover-group vserver)
+        use-failover-group subnet-name vserver)
 
       modify_fields.each do |field|
         Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Processing field #{field}.")
@@ -132,7 +132,7 @@ Puppet::Type.type(:netapp_lif).provide(:cmode, :parent => Puppet::Provider::Neta
     # Add values to it
     create_fields = %w(interface-name address administrative-status comment dns-domain-name failover-group failover-policy
       firewall-policy home-node home-port is-auto-revert netmask netmask-length routing-group-name
-      role use-failover-group vserver)
+      role use-failover-group subnet-name vserver)
 
     create_fields.each do |field|
       Puppet.debug("Puppet::Provider::Netapp_lif.cmode: Processing field #{field}.")
