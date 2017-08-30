@@ -26,7 +26,7 @@ Puppet::Type.newtype(:netapp_net_dns) do
   newproperty(:name_servers, :array_matching => :all) do
     desc 'IPv4 addresses of name servers.'
     validate do |value|
-      raise ArgumentError, '#{value} is an invalid value for field "name-servers"' unless value =~ Resolv::IPv4::Regex
+      raise ArgumentError, '%s is an invalid value for field name-servers' % value unless value =~ Resolv::IPv4::Regex
     end
     def insync?(is)
       is = [] if is == :absent
