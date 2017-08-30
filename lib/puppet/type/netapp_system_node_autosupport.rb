@@ -7,7 +7,7 @@ Puppet::Type.newtype(:netapp_system_node_autosupport) do
     desc 'The node name.'
     isnamevar
     validate do |value|
-      raise ArgumentError, '#{value} is a invalid node name' unless value =~ /^[a-zA-Z0-9\-_.]+$/
+      raise ArgumentError, '%s is a invalid node name' % value unless value =~ /^[a-zA-Z0-9\-_.]+$/
     end
   end
 

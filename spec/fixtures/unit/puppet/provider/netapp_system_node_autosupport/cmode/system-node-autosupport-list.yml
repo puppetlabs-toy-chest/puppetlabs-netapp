@@ -1,0 +1,25 @@
+--- !ruby/object:NaElement
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: node-name
+    content: "nodeA"
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: periodic-tx-window
+    content: "1h"
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: node-name
+    content: "nodeB"
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: periodic-tx-window
+    content: "2h"
