@@ -1,0 +1,49 @@
+--- !ruby/object:NaElement
+- !ruby/object:NaElement
+  name: storage_failover_info
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: sfo-options-info
+    content: ""
+    attrkeys: []
+    attrvals: []
+    children:
+    - !ruby/object:NaElement
+      name: options-related-info
+      content: "options-related-info-content"
+      children:
+      - !ruby/object:NaElement
+        name: sfo-giveback-options-info
+        content: "sfo_giveback_content"
+        children:
+        - !ruby/object:NaElement
+          name: giveback-options
+          content: "giveback_options_content"
+          children:
+          - !ruby/object:NaElement
+            name: auto-giveback-after-panic-enabled 
+            content: "true"
+            attrkeys: []
+            attrvals: []
+          - !ruby/object:NaElement
+            name: auto-giveback-enabled
+            content: "true"
+            attrkeys: []
+            attrvals: []
+          - !ruby/object:NaElement
+            name: auto-giveback-override-vetoes-enabled
+            content: "true"
+            attrkeys: []
+            attrvals: []
+  - !ruby/object:NaElement
+    name: sfo-node-info
+    content: "JKL"
+    children:
+    - !ruby/object:NaElement
+      name: node-related-info
+      content: "enabled"
+      children:
+      - !ruby/object:NaElement
+        name: node
+        content: "nodeA"
