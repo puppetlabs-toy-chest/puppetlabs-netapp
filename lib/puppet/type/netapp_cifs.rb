@@ -8,7 +8,7 @@ Puppet::Type.newtype(:netapp_cifs) do
     desc 'cifs server name'
     isnamevar
     validate do |value|
-      raise ArgumentError, '#{value} is an invalid cifs server name' unless value =~ /^[a-zA-Z0-9\-_.]+$/
+      raise ArgumentError, '%s is an invalid cifs server name.' % value unless value =~ /^[a-zA-Z0-9\-_.]+$/
     end
   end
 

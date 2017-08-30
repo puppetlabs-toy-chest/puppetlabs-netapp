@@ -1,0 +1,22 @@
+--- !ruby/object:NaElement
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: cifs-server
+    content: "cifs01"
+  - !ruby/object:NaElement
+    name: domain
+    content: "abc.local"
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: cifs-server
+    content: "cifs02"
+  - !ruby/object:NaElement
+    name: domain
+    content: "xyz.local"
+
