@@ -35,7 +35,7 @@ Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provid
       unless ldapclient.child_get("preferred-ad-servers").nil?
         preffered_servers_info = ldapclient.child_get("preferred-ad-servers").children_get()
         preffered_servers_info.each do |server|
-          preffered_servers << preffered_server.content()
+          preffered_servers << server.content()
         end unless preffered_servers_info.nil?
       end
       ldapclient_hash = {
