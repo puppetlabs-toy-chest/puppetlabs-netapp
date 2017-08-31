@@ -35,7 +35,7 @@ Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provid
       unless ldapclient.child_get("preferred-ad-servers").nil?
         preffered_servers_info = ldapclient.child_get("preferred-ad-servers").children_get()
         preffered_servers_info.each do |server|
-          preffered_servers << preffered_server.content()
+          preffered_servers << server.content()
         end unless preffered_servers_info.nil?
       end
       ldapclient_hash = {
@@ -114,7 +114,7 @@ Puppet::Type.type(:netapp_ldap_client).provide(:cmode, :parent => Puppet::Provid
     args.child_add_string('is-netgroup-byhost-enabled', @resource[:is_netgroup_byhost_enabled]) unless @resource[:is_netgroup_byhost_enabled].nil?
     args.child_add_string('min-bind-level', @resource[:min_bind_level]) unless @resource[:min_bind_level].nil?
     args.child_add_string('netgroup-byhost-dn', @resource[:netgroup_byhost_dn]) unless @resource[:netgroup_byhost_dn].nil?
-    args.child_add_string('netgroup-byhost-scope', @resource[:netgroup_byhost_scope])
+    args.child_add_string('netgroup-byhost-scope', @resource[:netgroup_byhost_scope]) unless @resource[:netgroup_byhost_scope].nil?
     args.child_add_string('netgroup-dn', @resource[:netgroup_dn]) unless @resource[:netgroup_dn].nil?
     args.child_add_string('netgroup-scope', @resource[:netgroup_scope]) unless @resource[:netgroup_scope].nil?
     args.child_add_string('query-timeout', @resource[:query_timeout]) unless @resource[:query_timeout].nil?

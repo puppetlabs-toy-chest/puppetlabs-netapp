@@ -1,4 +1,4 @@
-require 'spec_helper_acceptance'
+require_relative '../spec_helper_acceptance.rb'
 
 describe 'ldap_client' do
   it 'makes a ldap_client' do
@@ -73,6 +73,9 @@ node 'vserver-01' {
     use_start_tls              => 'false',
     user_scope                 => 'subtree',
     is_netgroup_byhost_enabled => 'false',
+    group_dn                   => 'XXX',
+    netgroup_dn                => 'YYY',
+    user_dn                    => 'ZZZ',
   }
 }
     EOS
@@ -81,7 +84,7 @@ node 'vserver-01' {
     run_device(:allow_changes => false)
   end
 
- it 'delete a ldap_client' do
+  it 'delete a ldap_client' do
     pp=<<-EOS
 node 'vsim-01' {
 }
