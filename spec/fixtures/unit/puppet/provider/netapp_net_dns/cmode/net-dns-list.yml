@@ -1,0 +1,49 @@
+--- !ruby/object:NaElement
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: domains
+    content: ""
+    children:
+    - !ruby/object:NaElement
+      name: string
+      content: "domain1.com"
+      attrkeys: []
+      attrvals: []
+    - !ruby/object:NaElement
+      name: string
+      content: "domain2.com"
+      attrkeys: []
+      attrvals: []
+    - !ruby/object:NaElement
+      name: string
+      content: "domain3.com"
+      attrkeys: []
+      attrvals: []
+  - !ruby/object:NaElement
+    name: name-servers
+    content: ""
+    children:
+    - !ruby/object:NaElement
+      name: ip_address
+      content: "10.10.10.10"
+      attrkeys: []
+      attrvals: []
+    - !ruby/object:NaElement
+      name: ip_address
+      content: "10.10.10.11"
+      attrkeys: []
+      attrvals: []
+    - !ruby/object:NaElement
+      name: ip_address
+      content: "10.10.10.12"
+      attrkeys: []
+      attrvals: []
+  - !ruby/object:NaElement
+    name: vserver-name
+    content: "vserver01"
+  - !ruby/object:NaElement
+    name: dns-state
+    content: "enabled"
