@@ -14,19 +14,32 @@ Puppet::Type.type(:netapp_storage_failover).provide(:cmode, :parent => Puppet::P
     Puppet.debug("Puppet::Provider::Netapp_storage_failover.cmode: Got to self.instances")
     strgfailoverinfos = []
     results = strgfailovershow() || []
-    
+
     results.each do |storage_failover_info|
-      sfo_options_info  = storage_failover_info.child_get('sfo-options-info')
-      options_related_info = sfo_options_info.child_get('options-related-info')
-      sfo_giveback_options_info = options_related_info.child_get('sfo-giveback-options-info')
-      giveback_options = sfo_giveback_options_info.child_get('giveback-options')
-      auto_giveback_after_panic_enabled = giveback_options.child_get_string('auto-giveback-after-panic-enabled')
-      auto_giveback_enabled = giveback_options.child_get_string('auto-giveback-enabled')
-      auto_giveback_override_vetoes_enabled = giveback_options.child_get_string('auto-giveback-override-vetoes-enabled')
-      sfo_node_info = storage_failover_info.child_get('sfo-node-info')
-      node_related_info = sfo_node_info.child_get('node-related-info')
-      node = node_related_info.child_get_string('node')
-      
+      unless storage_failover_info.nil?
+        sfo_options_info  = storage_failover_info.child_get('sfo-options-info')
+        unless sfo_options_info.nil?
+          options_related_info = sfo_options_info.child_get('options-related-info')
+          unless options_related_info.nil?
+            sfo_giveback_options_info = options_related_info.child_get('sfo-giveback-options-info')
+            unless sfo_giveback_options_info.nil?
+              giveback_options = sfo_giveback_options_info.child_get('giveback-options')
+              unless giveback_options.nil?
+                auto_giveback_after_panic_enabled = giveback_options.child_get_string('auto-giveback-after-panic-enabled')
+                auto_giveback_enabled = giveback_options.child_get_string('auto-giveback-enabled')
+                auto_giveback_override_vetoes_enabled = giveback_options.child_get_string('auto-giveback-override-vetoes-enabled')
+              end
+            end
+          end
+        end
+        sfo_node_info = storage_failover_info.child_get('sfo-node-info')
+        unless sfo_node_info.nil?
+          node_related_info = sfo_node_info.child_get('node-related-info')
+          unless node_related_info.nil?
+            node = node_related_info.child_get_string('node')
+          end
+        end
+      end
       strg_failover_info_hash = {
         :name       => node,
         :auto_giveback => auto_giveback_enabled,
