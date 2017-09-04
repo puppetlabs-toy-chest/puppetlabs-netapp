@@ -39,11 +39,11 @@ describe Puppet::Type.type(:netapp_net_port) do
       end
 
       it "node and port name should concatenated with only one @" do
-        expect { described_class.new(:node_port_name => 'node@@port') }.to raise_error(Puppet::Error, /node@@port is an invalid node_port name/)
+        expect { described_class.new(:node_port_name => 'node@@port') }.to raise_error(Puppet::Error, /node@@port is an invalid node_port name. Please note: node and port name should follow format node@port./)
       end
 
       it "node_port_name should not support space" do
-        expect { described_class.new(:node_port_name => 'node @port') }.to raise_error(Puppet::Error, /node @port is an invalid node_port name/)
+        expect { described_class.new(:node_port_name => 'node @port') }.to raise_error(Puppet::Error, /node @port is an invalid node_port name. Please note: node and port name should follow format node@port./)
       end
 
       it "node name should support underscores" do
@@ -63,11 +63,11 @@ describe Puppet::Type.type(:netapp_net_port) do
       end
 
       it "port name should not support underscores" do
-        expect { described_class.new(:node_port_name => 'node@port_a') }.to raise_error(Puppet::Error, /node@port_a is an invalid node_port name/)
+        expect { described_class.new(:node_port_name => 'node@port_a') }.to raise_error(Puppet::Error, /node@port_a is an invalid node_port name. Please note: node and port name should follow format node@port./)
       end
 
       it "port name should not support hyphens" do
-        expect { described_class.new(:node_port_name => 'node@port-a') }.to raise_error(Puppet::Error, /node@port-a is an invalid node_port name/)
+        expect { described_class.new(:node_port_name => 'node@port-a') }.to raise_error(Puppet::Error, /node@port-a is an invalid node_port name. Please note: node and port name should follow format node@port./)
       end
     end
 

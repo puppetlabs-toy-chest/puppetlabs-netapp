@@ -7,7 +7,7 @@ Puppet::Type.newtype(:netapp_net_port) do
     desc 'The node and port name concatenated with @'
     isnamevar
     validate do |value|
-      raise ArgumentError, '%s is an invalid node_port name.' % value unless value =~ /^[a-zA-Z\-_.0-9]+(?:@[0-9a-zA-Z]+)$/
+      raise ArgumentError, '%s is an invalid node_port name. Please note: node and port name should follow format node@port.' % value unless value =~ /^[a-zA-Z\-_.0-9]+(?:@[0-9a-zA-Z]+)$/
     end
   end
 
