@@ -1,0 +1,31 @@
+--- !ruby/object:NaElement
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: vserver
+    content: "vserver1"
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: max-mpx
+    content: "10"
+  - !ruby/object:NaElement
+    name: is-smb2-enabled
+    content: "true"
+- !ruby/object:NaElement
+  name: result
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: vserver
+    content: "vserver2"
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: max-mpx
+    content: "20"
+  - !ruby/object:NaElement
+    name: is-smb2-enabled
+    content: "false"
