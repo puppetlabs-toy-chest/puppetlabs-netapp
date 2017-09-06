@@ -28,16 +28,16 @@ describe Puppet::Type.type(:netapp_net_port).provider(:cmode) do
       instances.size.should == 2
       instances.map do |prov|
         {
-          :node_port_name    => prov.get(:node_port_name),
+          :name              => prov.get(:name),
           :flowcontrol_admin => prov.get(:flowcontrol_admin)
         }
       end.should == [
         {
-          :node_port_name    => 'node_name1@port1',
+          :name              => 'node_name1@port1',
           :flowcontrol_admin => "full"
         },
         {
-          :node_port_name    => 'node_name2@port2',
+          :name              => 'node_name2@port2',
           :flowcontrol_admin => "full"
         }
       ]

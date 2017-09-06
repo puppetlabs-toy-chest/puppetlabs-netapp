@@ -22,7 +22,7 @@ Puppet::Type.type(:netapp_net_port).provide(:cmode, :parent => Puppet::Provider:
       node_port_name = node_name1 + "@" + port_name1
 
       net_port_info_hash = {
-        :node_port_name => node_port_name,
+        :name              => node_port_name,
         :flowcontrol_admin => result.child_get_string('administrative-flowcontrol'),
         :ensure            => :present
       }
@@ -41,7 +41,7 @@ Puppet::Type.type(:netapp_net_port).provide(:cmode, :parent => Puppet::Provider:
   end
 
   def flush
-    nodeport_name = @resource[:name]
+    nodeport_name = @resource[:node_port_name]
     nodeport = nodeport_name.split("@")	
     node = nodeport[0]
     port = nodeport[1]
