@@ -1,0 +1,45 @@
+--- !ruby/object:NaElement
+- !ruby/object:NaElement
+  name: net_port
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: node
+    content: node_name1
+    children: []
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: port
+    content: port1
+    children: []
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: administrative-flowcontrol
+    content: full
+    children: []
+    attrkeys: []
+    attrvals: []
+- !ruby/object:NaElement
+  name: net_port
+  content: ""
+  children:
+  - !ruby/object:NaElement
+    name: node
+    content: node_name2
+    children: []
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: port
+    content: port2
+    children: []
+    attrkeys: []
+    attrvals: []
+  - !ruby/object:NaElement
+    name: administrative-flowcontrol
+    content: full
+    children: []
+    attrkeys: []
+    attrvals: []
