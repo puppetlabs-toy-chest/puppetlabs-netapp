@@ -1,6 +1,30 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [1.3.0]
+### Summary
+This release adds many new types and new parameters.
+
+### Added
+- New `netapp_cifs` type.
+- New `netapp_net_dns` type.
+- New `netapp_net_port` type.
+- New `netapp_storage_array` type.
+- New `netapp_storage_failover` type.
+- New `netapp_system_node_autosupport` type.
+- New `netapp_vserver_cifs_domain_password_schedule` type.
+- New `netapp_vserver_cifs_options` type.
+- New `netapp_nfs` property `auth_sys_extended_groups`.
+- New `netapp_nfs` property `enable_ejukebox`.
+
+### Fixed
+- Issues with requiring libraries on the first pluginsync.
+- `netapp_ldap_client` name validation.
+- `netapp_ldap_client` instance listing.
+- `netapp_ldap_client` without `netgroup_byhost_scope`.
+- `netapp_qtree` allows same qtname in separate volumes.
+
+
 ## [1.2.0]
 ### Summary
 This release adds several helper manifests for setting up common configurations
@@ -181,7 +205,8 @@ Also improved Readme, and correct various typos and incorrect code comments.
 ## 0.1.0 2013-01-12 Gavin Williams <fatmcgav@gmail.com>
 * Initial release.
 
-[1.2.0]: https://github.com/hunner/puppet-hiera/compare/1.1.0...1.2.0
-[1.1.0]: https://github.com/hunner/puppet-hiera/compare/1.0.0...1.1.0
-[1.0.0]: https://github.com/hunner/puppet-hiera/compare/0.5.0...1.0.0
+[1.3.0]: https://github.com/puppetlabs/puppetlabs-netapp/compare/1.2.0...1.3.0
+[1.2.0]: https://github.com/puppetlabs/puppetlabs-netapp/compare/1.1.0...1.2.0
+[1.1.0]: https://github.com/puppetlabs/puppetlabs-netapp/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/puppetlabs/puppetlabs-netapp/compare/0.5.0...1.0.0
 [0.5.0]: https://github.com/hunner/puppet-hiera/compare/v0.4.0...0.5.0
