@@ -115,6 +115,7 @@ describe Puppet::Util::NetworkDevice::Netapp::Facts do
     {
       :productname            => 'FAS3240',
       :manufacturer           => 'NetApp',
+      :osfamily               => 'NetApp',
       :operatingsystem        => 'OnTAP',
       :operatingsystemrelease => '8.1P2',
       :hostname               => 'filer01',
