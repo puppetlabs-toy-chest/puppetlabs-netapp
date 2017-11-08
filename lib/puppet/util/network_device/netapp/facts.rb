@@ -54,9 +54,19 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     # Set operatingsystem details if present
     if @facts['version'] then
       if @facts['version'] =~ /^NetApp Release (\d.\d(.\d)?\w*)/i
+        # Legacy facts
         @facts['operatingsystem'] = 'OnTAP'
-        @facts['os']['family'] = 'NetApp'
         @facts['operatingsystemrelease'] = $1
+        # New style facts
+        @facts['os'] = {}
+        @facts['os']['architecture'] = 'x86_64'
+        @facts['os']['family'] = 'OnTAP'
+        @facts['os']['hardware'] = 'x86_64'
+        @facts['os']['name'] = 'OnTAP'
+        @facts['os']['release'] = {}
+        @facts['os']['release']['full'] = $1
+        @facts['os']['release']['major'] = $1.split('.').first
+        @facts['os']['release']['minor'] = $1.split('.').last
       end
     end
 
