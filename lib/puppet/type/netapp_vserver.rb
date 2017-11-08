@@ -137,7 +137,7 @@ Puppet::Type.newtype(:netapp_vserver) do
 
   newproperty(:allowedprotos, :array_matching => :all) do
     desc "Vserver allowed protocols"
-    newvalues(:nfs, :cifs, :fcp, :iscsi, :ndmp)
+    newvalues(:nfs, :cifs, :fcp, :iscsi, :ndmpd)
 
     def insync?(is)
       # Check that the arrays are same length
