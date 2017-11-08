@@ -272,7 +272,7 @@ All parameters, except where otherwise noted, are optional.
 
 ##### `blocktype`
 
-The indirect block format for the aggregate. Default value: '64_bit'. 
+The indirect block format for the aggregate. Default value: '64_bit'.
 
 Valid values are `64_bit`, `32_bit`.
 
@@ -428,7 +428,7 @@ User name or ID to map anonymous users to. Defaults to 65534.
 
 ##### `clientmatch`
 
-*Required*. Client match specification for the export rule. May take an fqdn, IP address, IP hyphenated range, or CIDR notation. 
+*Required*. Client match specification for the export rule. May take an fqdn, IP address, IP hyphenated range, or CIDR notation.
 
 ##### `ensure`
 
@@ -946,7 +946,7 @@ The qtree name.
 
 ##### `volume`
 
-*Required.*. The volume to create the qtree against. 
+*Required.*. The volume to create the qtree against.
 
 ### Type: netapp_quota
 Manage NetApp quota entries.  Please note that NetApp identifies
@@ -1254,7 +1254,7 @@ Manage Netapp Volume creation, modification and deletion. [Family: vserver]
 
 ##### `aggregate`
 
-*Required.*. The aggregate this volume should be created in. 
+*Required.*. The aggregate this volume should be created in.
 
 ##### `autosize`
 
@@ -1413,7 +1413,7 @@ Vserver aggregate list. May be an array.
 
 Vserver allowed protocols.
 
-Valid values are `nfs`, `cifs`, `fcp`, `iscsi`, `ndmpd`.
+Valid values are `nfs`, `cifs`, `fcp`, `iscsi`, `ndmp`.
 
 ##### `comment`
 
