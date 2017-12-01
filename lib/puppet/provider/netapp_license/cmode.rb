@@ -37,7 +37,9 @@ Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::
     # Iterate instances and match provider where relevant.
     instances.each do |prov|
       Puppet.debug("Prov.name = #{resources[prov.name]}. ")
-      if resource = resources[prov.name]
+      key = prov.name
+      k = resources.keys.find{|k| k.downcase == key.downcase}
+      if resource = (resources[k])
         resource.provider = prov
       end
     end
@@ -47,7 +49,7 @@ Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::
     Puppet.debug("Puppet::Provider::Netapp_license: Got to flush for resource #{@resource[:name]}.")
     case @property_hash[:ensure]
     when :absent
-      licensedelete(@resource[:package])
+      licensedelete('package', @resource[:package])
     end
   end
 
@@ -57,7 +59,13 @@ Puppet::Type.type(:netapp_license).provide(:cmode, :parent => Puppet::Provider::
     element = NaElement.new('codes')
     element.child_add_string('license-code-v2', @resource[:codes])
     args.child_add(element)
-    licenseadd(args)
+    results = licenseadd(args)
+    records = results.children_get()
+    records.each do |record|
+      if(record.name == 'license-v2-failure-list' and record.children_get().count > 0)
+        raise Puppet::Error, "Adding license for a Data ONTAP service failed."
+      end
+    end
   end
 
   def destroy
