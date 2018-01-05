@@ -55,7 +55,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     if @facts['version'] then
       if @facts['version'] =~ /^NetApp Release (\d.\d(.\d)?\w*)/i
         @facts['operatingsystem'] = 'OnTAP'
-        @facts['os']['family'] = 'NetApp'
+        @facts['osfamily'] = 'NetApp'
         @facts['operatingsystemrelease'] = $1
       end
     end
