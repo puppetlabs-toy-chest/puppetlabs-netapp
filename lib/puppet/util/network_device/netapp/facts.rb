@@ -55,7 +55,7 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
     if @facts['version'] then
       if @facts['version'] =~ /^NetApp Release (\d.\d(.\d)?\w*)/i
         @facts['operatingsystem'] = 'OnTAP'
-        @facts['os']['family'] = 'NetApp'
+        @facts['osfamily'] = 'NetApp'
         @facts['operatingsystemrelease'] = $1
       end
     end
@@ -142,7 +142,13 @@ class Puppet::Util::NetworkDevice::Netapp::Facts
         # Facts dump
         Puppet.debug("System info = #{@facts.inspect}")
       elsif cluster_name.downcase != host.downcase
-        raise ArgumentError, "No matching system found with the system name #{host}"
+        # Allow the hostname portion of the systemname to match the
+        # clustername when connecting by FDQN to a device
+        if cluster_name.downcase == host.split('.').first
+          Puppet.debug("Cluster name #{cluster_name} matches hostname portion of system name - Allowing")
+        else
+          raise ArgumentError, "No matching system or cluster name found with the system name #{host}"
+        end
       end
 
       # Get DNS domainname for fqdn
