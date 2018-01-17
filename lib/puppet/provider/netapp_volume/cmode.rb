@@ -153,7 +153,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       if jp = vol_id_info.child_get("junction-path")
         vol_junction_path = jp.content
       else
-        vol_junction_path = false
+        vol_junction_path = :false
       end
       # Check if autosize is set
       #if (vol_auto_size =~ /^grow/)
@@ -228,7 +228,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
   # Volume junction-path setter
   def junctionpath=(value)
-    if ! value
+    if value == :false
       result = volunmount("volume-name", @resource[:name])
     else
       result = volmount("volume-name", @resource[:name], "junction-path", value)
