@@ -57,7 +57,7 @@ Puppet::Type.type(:netapp_iscsi).provide(:cmode, :parent => Puppet::Provider::Ne
           fail ArgumentError, "Cannot change #{property} after creation"
         end
       end
-      iscsimodify(*get_args)
+      iscsimodify(*get_args('modify'))
     end
   end
 
@@ -71,7 +71,7 @@ Puppet::Type.type(:netapp_iscsi).provide(:cmode, :parent => Puppet::Provider::Ne
   end
 
   def create
-    iscsicreate(*get_args)
+    iscsicreate(*get_args('create'))
     @property_hash.clear
   end
 
@@ -83,10 +83,12 @@ Puppet::Type.type(:netapp_iscsi).provide(:cmode, :parent => Puppet::Provider::Ne
     @property_hash[:ensure] == :present
   end
 
-  def get_args
+  def get_args(method)
     args = Array.new
     # Alias-name is only settable on create
-    args += ['alias-name', resource[:target_alias]] if resource[:target_alias]
+    if method == 'create'
+      args += ['alias-name', resource[:target_alias]] if resource[:target_alias]
+    end
     args
   end
 end
