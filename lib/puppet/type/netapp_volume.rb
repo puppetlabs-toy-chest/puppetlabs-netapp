@@ -75,7 +75,7 @@ Puppet::Type.newtype(:netapp_volume) do
     munge do |value|
       case value
       when false, :false, "false"
-        false
+        :false
       else
         value
       end
