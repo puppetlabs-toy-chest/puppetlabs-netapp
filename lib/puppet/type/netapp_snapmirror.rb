@@ -48,4 +48,12 @@ restore ,
 transition_data_protection ,
 extended_data_protection"
   end
+
+  newproperty(:snapmirror_policy) do
+    desc "Specifies the name of the snapmirror policy for the relationship. For SnapMirror relationships of type 'vault' or 'extended data protection', the policy will also have rules to select snapshot copies that must be transferred. If no policy is specified, a default policy will be applied depending on the type of the SnapMirror relationship. This parameter is only available on Data ONTAP 8.2 or later operating in Cluster-Mode if the relationship control plane is 'v2'."
+  end
+
+  newproperty(:snapmirror_schedule) do
+    desc "Specifies the name of the cron schedule, which is used to update the SnapMirror relationship."
+  end
 end

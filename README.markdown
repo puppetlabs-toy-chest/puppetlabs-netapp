@@ -1167,6 +1167,12 @@ The source location.
 ##### `source_snapshot`
 The source snapshot name
 
+##### `snapmirror_policy`
+Specifies the name of the snapmirror policy for the relationship. For SnapMirror relationships of type 'vault' or 'extended data protection', the policy will also have rules to select snapshot copies that must be transferred. If no policy is specified, a default policy will be applied depending on the type of the SnapMirror relationship. This parameter is only available on Data ONTAP 8.2 or later operating in Cluster-Mode if the relationship control plane is 'v2'.
+
+##### `snapmirror_schedule`
+Specifies the name of the cron schedule, which is used to update the SnapMirror relationship.
+
 ### netapp_snapmirror_schedule
 Manage Netapp Snapmirror schedule creation, modification and deletion.
 
