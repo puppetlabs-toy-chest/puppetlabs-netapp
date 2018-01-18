@@ -4,6 +4,8 @@ describe 'lun' do
   it 'makes a lun' do
     pp=<<-EOS
 node 'vsim-01' {
+}
+node 'vserver-01' {
   netapp_volume { 'stuff':
     ensure       => 'present',
     autosize     => 'off',
@@ -12,9 +14,8 @@ node 'vsim-01' {
     junctionpath => 'false',
     snapreserve  => '5',
     state        => 'online',
+    aggregate    => 'aggr_new'
   }
-}
-node 'vserver-01' {
   netapp_lun { '/vol/stuff/lun1':
     ensure => 'present',
     size   => '4194304',
@@ -30,6 +31,8 @@ node 'vserver-01' {
   it 'delete a lun' do
     pp=<<-EOS
 node 'vsim-01' {
+}
+node 'vserver-01' {
   netapp_volume { 'stuff':
     ensure       => 'present',
     autosize     => 'off',
@@ -39,8 +42,6 @@ node 'vsim-01' {
     snapreserve  => '5',
     state        => 'online',
   }
-}
-node 'vserver-01' {
   netapp_lun { '/vol/stuff/lun1':
     ensure => 'absent',
     size   => '4194308',
