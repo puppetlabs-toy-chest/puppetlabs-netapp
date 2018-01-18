@@ -46,10 +46,13 @@ Puppet::Type.type(:netapp_vserver).provide(:cmode, :parent => Puppet::Provider::
 
       # Name mapping switch
       namemappingswitch = []
-      namemappingswitch_info = vserver.child_get("name-mapping-switch").children_get()
-      namemappingswitch_info.each do |nmswitch|
-        namemappingswitch << nmswitch.content()
-      end unless namemappingswitch_info.nil?
+      namemappingswitch_infos = vserver.child_get("name-mapping-switch")
+      if namemappingswitch_infos != nil
+        namemappingswitch_info = namemappingswitch_infos.children_get()
+        namemappingswitch_info.each do |nmswitch|
+          namemappingswitch << nmswitch.content()
+        end unless namemappingswitch_info.nil?
+      end
       # Name server switch
       nameserverswitch = []
       nameserverswitch_info = vserver.child_get("name-server-switch").children_get()
