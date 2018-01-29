@@ -41,10 +41,10 @@ Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Ne
 
       # according to na_quota(5) entries can span over multiple lines
       quota_hash[:disklimit] = size_in_byte(quota_entry.child_get_string('disk-limit')) unless quota_entry.child_get_string('disk-limit').nil? or quota_entry.child_get_string('disk-limit') == '-'
-      quota_hash[:filelimit] = size_in_byte(quota_entry.child_get_string('size-limit')) unless quota_entry.child_get_string('size-limit').nil? or quota_entry.child_get_string('size-limit') == '-'
+      quota_hash[:filelimit] = size_in_byte(quota_entry.child_get_string('file-limit')) unless quota_entry.child_get_string('file-limit').nil? or quota_entry.child_get_string('file-limit') == '-'
       quota_hash[:threshold] = size_in_byte(quota_entry.child_get_string('threshold')) unless quota_entry.child_get_string('threshold').nil? or quota_entry.child_get_string('threshold') == '-'
       quota_hash[:softdisklimit] = size_in_byte(quota_entry.child_get_string('soft-disk-limit')) unless quota_entry.child_get_string('soft-disk-limit').nil? or quota_entry.child_get_string('soft-disk-limit') == '-'
-      quota_hash[:softfilelimit] = size_in_byte(quota_entry.child_get_string('soft-size-limit')) unless quota_entry.child_get_string('soft-size-limit').nil? or quota_entry.child_get_string('soft-size-limit') == '-'
+      quota_hash[:softfilelimit] = size_in_byte(quota_entry.child_get_string('soft-file-limit')) unless quota_entry.child_get_string('soft-file-limit').nil? or quota_entry.child_get_string('soft-file-limit') == '-'
 
       instances << new(quota_hash)
     end
