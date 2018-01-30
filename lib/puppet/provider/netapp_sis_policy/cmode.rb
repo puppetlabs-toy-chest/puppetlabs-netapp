@@ -41,9 +41,9 @@ Puppet::Type.type(:netapp_sis_policy).provide(:cmode, :parent => Puppet::Provide
       sis_policy.children_get.each do |policy|
         case policy.content
         when 'true', 'enabled'
-          value = true
+          value = :true
         when 'false', 'disabled'
-          value = false
+          value = :false
         else
           value = policy.content
         end

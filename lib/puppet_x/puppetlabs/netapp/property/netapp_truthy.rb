@@ -1,7 +1,7 @@
 require 'puppet/property'
 
 class Puppet::Property::NetappTruthy < Puppet::Property
-  def self.truthy_property(desc=nil, trueval=true, falseval=false)
+  def self.truthy_property(desc=nil, trueval=:true, falseval=:false)
     options = [:true, :false]
     desc "#{desc or 'Undocumented attribute.'}
     Valid options: <#{options.join('|')}>"
