@@ -22,7 +22,9 @@ Puppet::Type.newtype(:netapp_aggregate) do
     munge do |value|
       case value
       when 'creating'
-        value = :online
+        value = "online"
+      else
+        value
       end
     end
   end
