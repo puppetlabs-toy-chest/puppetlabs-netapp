@@ -123,7 +123,7 @@ Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Ne
   end
 
   def destroy
-    del(*default_api_args)
+    @property_hash[:ensure] = :absent
   end
 
   # Define getter methods
@@ -181,15 +181,19 @@ Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Ne
     # just been created and was not prefetched) use the should-value
     volume = @property_hash[:volume] || resource[:volume]
 
-    # check the current state so we do not activate quotas on a
-    # volume that has quotas turned off.
-    if status('volume', volume).child_get_string('status') == 'on'
-      if @need_restart
-        qoff 'volume', volume
-        qon 'volume', volume
-        @need_restart = false
-      else
-        resize 'volume', volume
+    if @property_hash[:ensure] == :absent
+      del(*default_api_args)
+    else
+      # check the current state so we do not activate quotas on a
+      # volume that has quotas turned off.
+      if status('volume', volume).child_get_string('status') == 'on'
+        if @need_restart
+          qoff 'volume', volume
+          qon 'volume', volume
+          @need_restart = false
+        else
+          resize 'volume', volume
+        end
       end
     end
   end
