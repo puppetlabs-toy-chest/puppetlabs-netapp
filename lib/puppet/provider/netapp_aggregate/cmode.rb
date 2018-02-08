@@ -146,14 +146,14 @@ Puppet::Type.type(:netapp_aggregate).provide(:cmode, :parent => Puppet::Provider
 
     # Set the aggregate state
     case @resource[:state]
-    when :online
+    when "online"
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode state=: Bringing aggregate #{@resource[:name]} online.")
 
       result = aggronline('aggregate', @resource[:name])
 
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode state=: Aggregate online.")
       return true
-    when :offline
+    when "offline"
       Puppet.debug("Puppet::Provider::Netapp_aggregate.cmode state=: Taking aggregate #{@resource[:name]} offline.")
 
       result = aggroffline('aggregate', @resource[:name])

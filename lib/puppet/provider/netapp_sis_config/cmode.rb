@@ -49,9 +49,9 @@ Puppet::Type.type(:netapp_sis_config).provide(:cmode, :parent => Puppet::Provide
 
         case config.content
         when 'true', 'enabled'
-          value = true
+          value = :true
         when 'false', 'disabled'
-          value = false
+          value = :false
         else
           value = config.content
         end
@@ -106,10 +106,10 @@ Puppet::Type.type(:netapp_sis_config).provide(:cmode, :parent => Puppet::Provide
   end
 
   def enabled=(value)
-    if value == true
+    if value == :true
       result = sisenable("path", @resource[:name])
       @property_hash[:enabled] = true
-    elsif value == false
+    elsif value == :false
       result = sisdisable("path", @resource[:name])
       @property_hash = {
         :name   => @resource[:name],
