@@ -91,6 +91,10 @@ Puppet::Type.newtype(:netapp_volume) do
     desc "The export policy with which the volume is associated."
   end
 
+  newproperty(:qospolicy) do
+    desc "The QoS policy with which the volume is associated."
+  end
+
   newparam(:volume_type) do
     desc "The type of the volume to be created. Possible values:
 rw - read-write volume (default setting),
