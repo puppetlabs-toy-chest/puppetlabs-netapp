@@ -1278,6 +1278,10 @@ Valid values are `present`, `absent`.
 
 The export policy with which the volume is associated.
 
+##### `qospolicy`
+
+The qos policy with which the volume is associated.
+
 ##### `group_id`
 
 The UNIX group ID for the volume.
@@ -1313,6 +1317,7 @@ netapp_volume { 'nfsvol':
   ensure       => 'present',
   autosize     => 'off',
   exportpolicy => 'nfs_exports',
+  qospolicy    => 'qos_policy',
   initsize     => '2g',
   junctionpath => '/nfsvol',
   state        => 'online',

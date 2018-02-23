@@ -93,6 +93,11 @@ Puppet::Type.newtype(:netapp_volume) do
 
   newproperty(:qospolicy) do
     desc "The QoS policy with which the volume is associated."
+    validate do |value|
+      unless value =~ /^\S+$/
+        raise ArgumentError, "%s is not a valid qospolicy name." % value
+      end
+    end
   end
 
   newparam(:volume_type) do
