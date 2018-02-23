@@ -71,6 +71,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get snapshot policy
       volume_hash[:snapshot_policy] = volume[:snapshot_policy]
 
+      # Get qos policy
+      volume_hash[:qospolicy] = volume[:qospolicy]
+
       if ! transport.get_vserver.empty?
         # Get volume options, only if volume is online.
         if (volume[:state] == "online")
@@ -144,6 +147,11 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       if vol_export_attributes = volume.child_get("volume-export-attributes")
         vol_export_policy = vol_export_attributes.child_get_string("policy")
       end
+      if vol_qos_attributes = volume.child_get("volume-qos-attributes")
+        vol_qos_policy = vol_qos_attributes.child_get_string("policy-group-name")
+      else
+	vol_qos_policy = 'none'
+      end
       # Get Auto size settings.
       unless vol_state == "offline"
         vol_auto_size = vol_autosize_info.child_get_string("mode")
@@ -181,6 +189,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
         :snap_reserve    => vol_snap_reserve,
         :snapshot_policy => vol_snapshot_policy,
         :exportpolicy    => vol_export_policy,
+        :qospolicy       => vol_qos_policy,
         :auto_size       => vol_auto_size,
         :junctionpath    => vol_junction_path,
         :vserver_root    => vol_root,
@@ -366,6 +375,35 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     volmodify(volume_modify)
   end
 
+  # QoS policy setter
+  def qospolicy=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode qospolicy=: setting qos policy value for Volume #{@resource[:name]} to #{@resource[:qospolicy].inspect}")
+
+    # Build up the attributes to set
+    volume_qos_attributes = NaElement.new('volume-qos-attributes')
+    volume_qos_attributes.child_add_string('policy-group-name', @resource[:qospolicy])
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_qos_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    # I don't know why I can't just pass the attributes and query directly, so
+    # I have to make an invoke_elem NaElement call instead
+    #result = volmodify("attributes", volume_attributes, "query", volume_query)
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+    volmodify(volume_modify)
+  end
+
  def snapshot_policy=(value)
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapshot_policy=: setting snapshot policy value for Volume #{@resource[:name]} to #{@resource[:snapshot_policy].inspect}")
 
@@ -410,6 +448,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     methods = [
       'autosize',
       'exportpolicy',
+      'qospolicy',
       'snapshot_policy',
       'junctionpath',
       'options',

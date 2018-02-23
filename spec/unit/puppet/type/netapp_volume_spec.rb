@@ -29,7 +29,7 @@ describe Puppet::Type.type(:netapp_volume) do
       end
     end
 
-    [:ensure, :initsize, :snapreserve, :autoincrement, :options, :snapschedule].each do |prop|
+    [:ensure, :initsize, :snapreserve, :autoincrement, :options, :snapschedule, :qospolicy].each do |prop|
       it "should have a #{prop} property" do
         described_class.attrtype(prop).should == :property
       end
@@ -248,6 +248,16 @@ describe Puppet::Type.type(:netapp_volume) do
         is_snapsched = {'minutes' => 'value', 'hours' => 'value', 'days' => 'value'}
         volume[:snapschedule] = {'minutes' => 'value', 'hours' => 'value', 'days' => 'value'}
         described_class.new(volume).property(:snapschedule).insync?(is_snapsched).should be_true
+      end
+    end
+
+    describe "for qospolicy" do
+      it "should support a valid qos policy name" do
+        described_class.new(:name => 'volume', :qospolicy => 'none', :ensure => :present)[:qospolicy].should == 'none'
+      end
+
+      it "should not support spaces" do
+        expect { described_class.new(:name => 'volume', :qospolicy => 'qospolicy 1', :ensure => :present) }.to raise_error(Puppet::Error, /qospolicy 1 is not a valid qospolicy name./)
       end
     end
   end
