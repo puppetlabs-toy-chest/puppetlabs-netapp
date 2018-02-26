@@ -27,10 +27,9 @@ NetApp Data ONTAP configuration using Puppet and its Network Device
 functionality.
 
 The NetApp Data ONTAP device module has been written and tested against NetApp
-Data ONTAP 8.2 Cluster-mode.
+Data ONTAP 9.0 Cluster-mode.
 <!--
-- It may also work on 7-mode.
-- It should be compatible with other ONTAP versions than just 8.2, but not tested
+- It should be compatible with other ONTAP versions than just 9.0, but not tested.
 -->
 
 ## Module Description
@@ -40,15 +39,41 @@ NetApp Data ONTAP software.
 
 The following items are supported:
 
+ * Creation, modification and deletion of aggregate, including offline and online an
+   aggregate.
+ * Creation and deletion of cifs server.
+ * Modification of cluster ID.
+ * Creation, modification and deletion of cluster peer.
+ * Creation and deletion of export policy.
+ * Creation, modification and deletion of export rule.
+ * Creation, modification and deletion of initiator groups.
+ * Creation, modification and deletion of iscsi service, including start and stop the
+   iscsi service.
+ * Addition and deletion of iSCSI LIFs to the accesslist of the specified initiator.
+ * Addition and deletion of ISCSI initiator (client) authentication.
+ * Modification of kerberos config.
+ * Creation, modification and deletion of kerberos realm.
+ * Creation, modification and deletion of LDAP client and LDAP config.
+ * Addition and deletion of license.
+ * Creation, modification and deletion of Logical Interface (LIF).
+ * Creation, modification and deletion of Lun.
+ * Creation and deletion of Lun map.
+ * Creation and deletion of dns server.
+ * Modification of network port.
+ * Creation, modification and deletion of nfs service.
+ * Creation, modification and deletion of QTrees.
+ * Creation, modification and deletion of Quotas.
+ * Creation, modification and deletion of security logins and security login roles.
+ * Enabling, disabling and modifing sis config.
+ * Creation, modification and deletion of sis policy.
+ * Creation of snapmirror relationships.
+ * Modification of storage array, storage failover and system node autosupport configuration.
+ * Creation, modification and deletion of users.
  * Creation, modification and deletion of volumes, including auto-increment,
    snapshot schedules and volume options.
- * Creation, modification and deletion of QTrees.
- * Creation, modification and deletion of NFS Exports, including NFS export
-   security.
- * Creation, modification and deletion of users, groups and roles.
- * Creation, modification and deletion of Quotas.
- * Creation of snapmirror relationships.
- * Creation of snapmirror schedules.
+ * Creation, modification and deletion of vserver.
+ * Modification of vserver cifs options, vserver cifs domain password schedule and vserver option.
+ * Creation, modification and deletion of vserver peer.
 
 ## Setup
 
@@ -239,30 +264,44 @@ None as of this first release. Common operations may be encapsulated in defined 
 ### Types and Providers
 
 [`netapp_aggregate`](#type-netapp_aggregate)
+[`netapp_cifs`](#type-netapp_cifs)
 [`netapp_cluster_id`](#type-netapp_cluster_id)
 [`netapp_cluster_peer`](#type-netapp_cluster_peer)
 [`netapp_export_policy`](#type-netapp_export_policy)
 [`netapp_export_rule`](#type-netapp_export_rule)
-[`netapp_group`](#type-netapp_group)
+[`netapp_igroup`](#type-netapp_igroup)
+[`netapp_iscsi`](#type-netapp_iscsi)
+[`netapp_iscsi_interface_accesslist`](#type-netapp_iscsi_interface_accesslist)
+[`netapp_iscsi_security`](#type-netapp_iscsi_security)
+[`netapp_kerberos_config`](#type-netapp_kerberos_config)
+[`netapp_kerberos_realm`](#type-netapp_kerberos_realm)
 [`netapp_ldap_client`](#type-netapp_ldap_client)
+[`netapp_ldap_config`](#type-netapp_ldap_config)
 [`netapp_license`](#type-netapp_license)
 [`netapp_lif`](#type-netapp_lif)
 [`netapp_lun`](#type-netapp_lun)
 [`netapp_lun_map`](#type-netapp_lun_map)
+[`netapp_net_dns`](#type-netapp_net_dns)
+[`netapp_net_port`](#type-netapp_net_port)
 [`netapp_nfs`](#type-netapp_nfs)
 [`netapp_notify`](#type-netapp_notify)
 [`netapp_qtree`](#type-netapp_qtree)
 [`netapp_quota`](#type-netapp_quota)
-[`netapp_role`](#type-netapp_role)
 [`netapp_security_login`](#type-netapp_security_login)
 [`netapp_security_login_role`](#type-netapp_security_login_role)
+[`netapp_sis_config`](#type-netapp_sis_config)
+[`netapp_sis_policy`](#type-netapp_sis_policy)
 [`netapp_snapmirror`](#type-netapp_snapmirror)
-[`netapp_snapmirror_schedule`](#type-netapp_snapmirror_schedule)
+[`netapp_storage_array`](#type-netapp_storage_array)
+[`netapp_storage_failover`](#type-netapp_storage_failover)
+[`netapp_system_node_autosupport`](#type-netapp_system_node_autosupport)
 [`netapp_user`](#type-netapp_user)
 [`netapp_volume`](#type-netapp_volume)
 [`netapp_vserver`](#type-netapp_vserver)
+[`netapp_vserver_cifs_domain_password_schedule`](#type-netapp_vserver_cifs_domain_password_schedule)
+[`netapp_vserver_cifs_options`](#type-netapp_vserver_cifs_options)
 [`netapp_vserver_option`](#type-netapp_vserver_option)
-[`netapp_vserver_sis_config`](#type-netapp_vserver_sis_config)
+[`netapp_vserver_peer`](#type-netapp_vserver_peer)
 
 ### Type: netapp_aggregate
 Manage Netapp Aggregate creation, modification and deletion. [Family: cluster]
@@ -345,6 +384,33 @@ Valid values are `online`, `offline`.
 Should the new aggregate be striped? Default: not_striped.
 
 Valid values are `striped`, `not_striped`.
+
+### Type: netapp_cifs
+Manage Netapp CIFS server. [Family: vserver]
+
+#### Parameters
+##### `name`
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+cifs server name
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `domain`
+
+Fully qualified domain name of the Windows Active Directory this CIFS server belongs to.
+
+##### `admin_username`
+
+Username for the account used to add this CIFS server to the Active Directory.
+
+##### `admin_password`
+
+Password for the account used to add this CIFS server to the Active Directory.
 
 ### Type: netapp_cluster_id
 Manage Netapp Cluster ID. [Family: cluster]
@@ -475,26 +541,6 @@ Superuser security flavor. Defaults to 'any'.
 
 Valid values are `any`, `none`, `never`, `never`, `krb5`, `ntlm`, `sys`, `spinauth`.
 
-### Type: netapp_group
-Manage Netapp Group creation, modification and deletion.
-
-#### Parameters
-##### `comment`
-Group comment
-
-##### `ensure`
-The basic property that the resource should be in.
-
-Valid values are `present`, `absent`.
-
-##### `groupname`
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
-
-The group name.
-
-##### `roles`
-List of roles for this group. Comma separate multiple values.
-
 ### Type: netapp_igroup
 Manage Netapp initiator groups. [Family: vserver]
 
@@ -505,7 +551,7 @@ Manage Netapp initiator groups. [Family: vserver]
 Initiator group name.
 
 ##### `force`
-Forcibly remove the initiator even if there are existing LUNs mapped to this initiator group. Best practice is to attempt to unmap all the luns associated with a group before removing the initiator. Default to false
+Forcibly remove the initiator even if there are existing LUNs mapped to this initiator group. Best practice is to attempt to unmap all the luns associated with a group before removing the initiator. Default to false.
 
 ##### `group_type`
 Initiator group type.
@@ -542,6 +588,15 @@ ISCSI service state.
 
 Valid values are `on`, `off`.
 
+### Type: netapp_iscsi_interface_accesslist
+Add / Remove the iSCSI LIFs to the accesslist of the specified initiator. [Family: vserver]
+
+#### Parameters
+##### `name`
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+iSCSI LIF Name and Initiator that can access the iSCSI LIFs. Separated by a "/" eg. iscsilif/iqn.1995-08.com.example:string.
+
 ### Type: netapp_iscsi_security
 Manage Netapp ISCSI initiator (client) authentication. [Family: vserver]
 
@@ -576,39 +631,115 @@ ISCSI initiator outbound CHAP password.
 
 Valid values are 12-16 hexidecimal digits.
 
-### Type: netapp_license
-Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer. [Family: cluster]
-This allows the removal or addition of a license. eg
-netapp_license { 'snaprestore' :
-    ensure => present,
-    codes  => "secret license code",
-  }
+### Type: netapp_kerberos_config
+Kerberos configuration information for a LIF. [Family: vserver]
 
 #### Parameters
-##### `package`
-(**Namevar:**)
-Package Possible values:
-base - Cluster Base License,
-nfs - NFS License,
-cifs - CIFS License,
-iscsi - iSCSI License,
-fcp - FCP License,
-snaprestore - SnapRestore License,
-snapmirror - SnapMirror License,
-flexclone - FlexClone License,
-snapvault - SnapVault License,
-snaplock - SnapLock License,
-snapmanagersuite - SnapManagerSuite License,
-snapprotectapps - SnapProtectApp License,
-v_storageattach - Virtual Attached Storage License
+##### `name`
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
 
-##### `codes`
-The license code to be added
+Logical interface.
 
 ##### `ensure`
+
 The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
+
+##### `admin_password`
+
+Administrator password for the Key Distribution Center.
+
+##### `admin_user_name`
+
+Administrator password for the Key Distribution Center.
+
+##### `force`
+
+Force option to disable Kerberos security on a LIF (default:false). If set to true, any errors encountered when deleting the corresponding account on the KDC are ignored in which case the account should be deleted manually.
+
+##### `is_kerberos_enabled`
+
+If 'true', Kerberos security is enabled by creating an account in the Key Distribution Center using the Service Principal Name. If another logical interface uses the same Service Principal Name, the account is shared.
+If 'false', Kerberos security is disabled and the associated account is deleted when it is not used by any logical interface. Attributes: non-creatable, modifiable.  Default to false.
+
+Valid values are `true`, `false`.
+
+##### `keytab_uri`
+
+Load Keytab from URI. This field should not be specified when disabling Kerberos.
+
+##### `organizational_unit`
+
+Organization Unit. This option is available for a Microsoft AD KDC only.
+
+##### `service_principal_name`
+
+Kerberos service principal name. This is a required input for enabling Kerberos. This input should not be specified when disabling Kerberos.
+
+### Type: netapp_kerberos_realm
+Kerberos realm configuration specifies the locations of Key Distribution Center (KDC) servers and administration daemons for the Kerberos realms of interest. When returned as part of the output, all elements of this typedef are reported, unless limited by a set of desired attributes specified by the caller. [Family: vserver]
+
+#### Parameters
+##### `name`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+Kerberos realm name.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `ad_server_ip`
+
+IP Address of the Active Directory Domain Controller (DC). This is a mandatory parameter if the kdc-vendor is 'microsoft'.
+
+##### `ad_server_name`
+
+Host name of the Active Directory Domain Controller (DC). This is a mandatory parameter if the kdc-vendor is 'microsoft'.
+
+##### `admin_server_ip`
+
+IP address of the host where the Kerberos administration daemon is running. This is usually the master KDC. If this parameter is omitted, the IP address specified in kdc-ip is used. If specified, this should be the same as the kdc-ip if the kdc-vendor is 'microsoft'.
+
+##### `admin_server_port`
+
+The TCP port on the Kerberos administration server where the Kerberos administration service is running. The default for this parmater is 749.
+
+##### `clock_skew`
+
+The clock skew in minutes is the tolerance for accepting tickets with time stamps that do not exactly match the host's system clock. The default for this parameter is 5 minutes.
+
+##### `comment`
+
+Comment.
+
+##### `config_name`
+
+Kerberos configuration name.
+
+##### `kdc_ip`
+
+The vendor of the Key Distribution Centre (KDC) server. If the configuration uses a Microsoft Active Directory (AD) domain for authentication, this field should be 'microsoft'.
+
+##### `kdc_port`
+
+TCP port on the KDC to be used for Kerberos communication. The default for this parameter is 88.
+
+##### `kdc_vendor`
+
+The vendor of the Key Distribution Centre (KDC) server. If the configuration uses a Microsoft Active Directory (AD) domain for authentication, this field should be 'microsoft'.
+
+##### `password_server_ip`
+
+IP address of the host where the Kerberos password-changing server is running. Typically, this is the same as the host indicated in the adminserver-ip. If this parameter is omitted, the IP address in kdc-ip is used.
+
+##### `password_server_port`
+
+The TCP port on the Kerberos password-changing server where the Kerberos password-changing service is running. The default for this parameter is 464.
 
 ### Type: netapp_ldap_client
 Manage Netapp LDAP client configuration for the cluster. [Family: vserver]
@@ -710,6 +841,60 @@ This indicates the scope for LDAP search when doing user lookups. Possible value
 base - Searches only the base directory entry,
 onelevel - Searches the immediate subordinates of the base directory entry,
 subtree - Searches the base directory entry and all its subordinates
+
+### Type: netapp_ldap_config
+Create a new association between a Lightweight Directory Access Protocol (LDAP) client configuration and a Vserver. A Vserver can have only one client configuration associated with it. [Family: vserver]
+
+#### Parameters
+##### `name`
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+The name of an existing Lightweight Directory Access Protocol (LDAP) client configuration. The LDAP client configuration can be created using the ldap-client-create API. The ldap-client-get-iter API can be used to retrieve the list of available LDAP client configurations for the cluster.
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `client_enabled`
+
+If true, the corresponding Lightweight Directory Access Protocol (LDAP) configuration is enabled for this Vserver. Default to false.
+
+Valid values are `true`, `false`.
+
+### Type: netapp_license
+Manage Netapp Licenses. Only supported by ONTAP 8.2 and newer. [Family: cluster]
+This allows the removal or addition of a license. eg
+netapp_license { 'snaprestore' :
+    ensure => present,
+    codes  => "secret license code",
+  }
+
+#### Parameters
+##### `package`
+(**Namevar:**)
+Package Possible values:
+base - Cluster Base License,
+nfs - NFS License,
+cifs - CIFS License,
+iscsi - iSCSI License,
+fcp - FCP License,
+snaprestore - SnapRestore License,
+snapmirror - SnapMirror License,
+flexclone - FlexClone License,
+snapvault - SnapVault License,
+snaplock - SnapLock License,
+snapmanagersuite - SnapManagerSuite License,
+snapprotectapps - SnapProtectApp License,
+v_storageattach - Virtual Attached Storage License
+
+##### `codes`
+The license code to be added
+
+##### `ensure`
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
 
 ### Type: netapp_lif
 
@@ -852,7 +1037,6 @@ whether or not to force a resize, when shrinking the lun.
 
 Valid values are `true`, `false`.
 
-
 ##### `state`
 Lun state. Default value: 'online'. Possible values: 'online', 'offline'.
 
@@ -867,13 +1051,67 @@ The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### `ensure`
+##### `initiatorgroup`
 Initiator group to map to.
 
 ##### `lunmap`
 (**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
 
 Lun map - Composite key of format {path}:{lun-id}.
+
+### Type: netapp_net_dns
+
+Manage Netapp DNS server mapping. [Family: vserver]
+
+#### Parameters
+##### `name`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+The Vserver name.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `domains`
+
+Domain for the Vserver.
+
+##### `name_servers`
+
+IPv4 addresses of name servers.
+
+##### `state`
+
+The state of the DNS server mapping.
+
+Valid values are `enabled`, `disabled`.
+
+### Type: netapp_net_port
+
+Manage Netapp network port. [Family: cluster]
+
+#### Parameters
+##### `node_port_name`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+The node and port name concatenated with @
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `flowcontrol_admin`
+
+The administrative flow control setting of the port.
+
+Valid values are `none`, `receive`, `send`, `full`.
 
 ### Type: netapp_nfs
 
@@ -883,7 +1121,9 @@ Manage NetApp NFS service. [Family: vserver]
 
 ##### `vserver`
 
-**Namevar:** If omitted, this parameter's value defaults to the resource's title. NFS service SVM. This resource can only be applied to vservers, so the title is redundant.
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+NFS service SVM. This resource can only be applied to vservers, so the title is redundant.
 
 ##### `state`
 
@@ -906,6 +1146,18 @@ Valid values are `enabled`, `disabled`.
 ##### `v41`
 
 Control NFS v4.1 access
+
+Valid values are `enabled`, `disabled`.
+
+##### `auth_sys_extended_groups`
+
+AUTH_SYS Extended Groups enabled.
+
+Valid values are `enabled`, `disabled`.
+
+##### `enable_ejukebox`
+
+Enable NFSv3 EJUKEBOX error.
 
 Valid values are `enabled`, `disabled`.
 
@@ -1035,64 +1287,6 @@ The name of the volume the quota resides on
 
 Values can match `/^\w+$/`.
 
-### Type: netapp_role
-Manage Netapp Role creation, modification and deletion. [Family: cluster]
-
-#### Parameters
-##### `capabilities`
-List of capabilities for this role. Comma separate multiple values.
-
-##### `comment`
-Role comment
-
-##### `ensure`
-The basic property that the resource should be in.
-
-Valid values are `present`, `absent`.
-
-##### `rolename`
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
-
-The role name.
-
-### Type: netapp_sis_policy
-
-Manage Netapp sis policies. [Family: vserver]
-
-#### Parameters
-
-##### `type`
-
-The type of policy.
-
-Valid values are `threshold`, `scheduled`.
-
-##### `job_schedule`
-
-Job schedule name. E.g., 'daily'.
-
-##### `duration`
-
-Job duration in hours.
-
-##### `enabled`
-
-Manage whether the sis policy is enabled.
-
-Valid values are `true`, `false`, `yes`, `no`, `enabled`, `disabled`
-
-##### `comment`
-
-Comment for the policy.
-
-##### `qos_policy`
-
-QoS policy name. E.g., 'best\_effort'
-
-##### `changelog_threshold_percent`
-
-Percentage at which the changelog will be processed for a threshold type of policy, tested once each hour
-
 ### Type: netapp_security_login
 A user account associated with the specified application and authentication method. A new user account can be created with user name as the Active Directory group name. This user account gives access to users belonging to the specified Active Directory group. [Family: cluster]
 
@@ -1138,6 +1332,106 @@ Valid values are `present`, `absent`.
 ##### `role_query`
 A query for the role. The query must apply to the specified command or directory name. Example: The command is 'volume show' and the query is '-volume vol1'. The query is applied to the command resulting in populating only the volumes with name vol1.
 
+### Type: netapp_sis_config
+
+Manage Netapp Vserver sis config modification. [Family: vserver]
+
+#### Parameters
+
+##### `compression`
+
+Enable compression on the sis volume.
+
+Valid options: `true`, `false`.
+
+##### `enabled`
+
+Enable sis on a volume.
+
+Valid options: `true`, `false`.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `idd`
+
+Enables file level incompressible data detection and quick check incompressible data detection for large files.
+
+Valid options: `true`, `false`.
+
+##### `inline_compression`
+
+Enable inline compression on the sis volume.
+
+Valid options: `true`, `false`.
+
+##### `path`
+
+(**Namevar:** If omitted, this parameter's value defaults to the resource's title.) The full path of the sis volume, `/vol/<vol_name>`.
+
+##### `policy`
+
+The sis policy name to be attached to the volume.
+
+##### `quick_check_fsize`
+
+Quick check file size for Incompressible Data Detection. Accepts integers
+
+Values can match `/^\d+$/`.
+
+##### `sis_schedule`
+
+The schedule string for the sis operation.
+
+Accepts the following formats:
+
+* `day_list[@hour_list]`
+* `hour_list[@day_list]`
+* `-`
+* `auto`
+* `manual`
+
+### Type: netapp_sis_policy
+
+Manage Netapp sis policies. [Family: vserver]
+
+#### Parameters
+
+##### `type`
+
+The type of policy.
+
+Valid values are `threshold`, `scheduled`.
+
+##### `job_schedule`
+
+Job schedule name. E.g., 'daily'.
+
+##### `duration`
+
+Job duration in hours.
+
+##### `enabled`
+
+Manage whether the sis policy is enabled.
+
+Valid values are `true`, `false`, `yes`, `no`, `enabled`, `disabled`
+
+##### `comment`
+
+Comment for the policy.
+
+##### `qos_policy`
+
+QoS policy name. E.g., 'best\_effort'
+
+##### `changelog_threshold_percent`
+
+Percentage at which the changelog will be processed for a threshold type of policy, tested once each hour
+
 ### Type: netapp_snapmirror
 Manage Netapp Snapmirror creation, modification and deletion. [Family: cluster, vserver]
 
@@ -1173,47 +1467,82 @@ Specifies the name of the snapmirror policy for the relationship. For SnapMirror
 ##### `snapmirror_schedule`
 Specifies the name of the cron schedule, which is used to update the SnapMirror relationship.
 
-### netapp_snapmirror_schedule
-Manage Netapp Snapmirror schedule creation, modification and deletion.
+### Type: netapp_storage_array
+
+Manage storage array. [Family: cluster]
 
 #### Parameters
-##### `connection_mode`
-The connection mode to use between source and destination.
+##### `name`
 
-Valid values are `inet`, `inet6`.
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
 
-##### `days_of_month`
-The days of month for schedule to be set.  Can be single value between 1 and 31, comma seperated list (1,7,14), range (2-10), range with divider (1-30/7), * to match all, or - to match none.
-
-##### `days_of_week`
-The days of week for schedule to be set. Can be single value between 0 and 6, inclusive, with 0 being Sunday, or must be name of the day (e.g. Tuesday), comma sepeated list (1,3,5), range (2-5), * to match all, or - to match none.
-
-##### `destination_location`
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.)
-
-The destination location.
+The storage array name.
 
 ##### `ensure`
-Netapp Snapmirror schedule resource state. Valid values are: present, absent.
+
+The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### `hours`
-The hour(s) in the day for schedule to be set.  Can be single value between 1 and 24, comma seperated list (1,7,14), range (2-10), range with divider (1-24/3), * to match all, or - to match none.
+##### `max_queue_depth`
 
-##### `max_transfer_rate`
-The max transfer rate, in KB/s. Defaults to unlimited.
+The target port queue depth for all target ports on this array.
 
-##### `minutes`
-The minutes in the hour for schedule to be set.  Can be single value between 0 and 59, comma seperated list (1,7,14), range (2-10), range with divider (1-59/3), * to match all, or - to match none.
+### Type: netapp_storage_failover
 
-##### `restart`
-The restart mode to use when transfer interrupted. Allowed values are: always, never and restart.
+Manage Netapp storage failover. [Family: cluster]
 
-Valid values are `always`, `never`, `default`.
+#### Parameters
+##### `name`
 
-##### `source_location`
-The source location.
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+The node name.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `auto_giveback`
+
+Auto Giveback Enabled
+
+Valid values are `true`, `false`.
+
+##### `auto_giveback_after_panic`
+
+Auto giveback after takeover on panic.
+
+Valid values are `true`, `false`.
+
+##### `auto_giveback_override_vetoes`
+
+Auto-giveback Override Vetoes Enabled.
+
+Valid values are `true`, `false`.
+
+### Type: netapp_system_node_autosupport
+
+Manage Netapp system node autosupport configuration. [Family: cluster]
+
+#### Parameters
+##### `name`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+The node name.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `periodic_tx_window`
+
+The transmission window.
 
 ### Type: netapp_user
 Manage Netapp User creation, modification and deletion.
@@ -1494,6 +1823,52 @@ The vserver state.
 
 Valid values are `stopped`, `running`.
 
+### Type: netapp_vserver_cifs_domain_password_schedule
+Manage Netapp vserver cifs domain password schedule. [Family: vserver]
+
+#### Parameters
+##### `name`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+The Vserver name.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `schedule_randomized_minute`
+
+Minutes within which schedule start can be randomized
+
+### Type: netapp_vserver_cifs_options
+Manage Netapp Vserver CIFS options. [Family: vserver]
+
+#### Parameters
+##### `name`
+
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
+
+Vserver name.
+
+##### `ensure`
+
+The basic property that the resource should be in.
+
+Valid values are `present`, `absent`.
+
+##### `max_mpx`
+
+Maximum simultaneous operations per TCP connection. Defaults to 255.
+
+##### `smb2_enabled`
+
+Enable all SMB2 Protocols. Defaults to true.
+
+Valid values are `true`, `false`.
+
 ### Type: netapp_vserver_option
 
 Manage Netapp Vserver option modification. [Family: cluster, vserver]
@@ -1514,23 +1889,12 @@ The vserver option name.
 
 The vserver option value.
 
-### Type: netapp_sis_config
-
-Manage Netapp Vserver sis config modification. [Family: vserver]
+### Type: netapp_vserver_peer
+Manage Netapp Vserver Peering. [Family: cluster]
 
 #### Parameters
-
-##### `compression`
-
-Enable compression on the sis volume.
-
-Valid options: `true`, `false`.
-
-##### `enabled`
-
-Enable sis on a volume.
-
-Valid options: `true`, `false`.
+##### `name`
+**Namevar:** If omitted, this parameter's value defaults to the resource's title.
 
 ##### `ensure`
 
@@ -1538,50 +1902,23 @@ The basic property that the resource should be in.
 
 Valid values are `present`, `absent`.
 
-##### `idd`
+##### `peer_cluster`
 
-Enables file level incompressible data detection and quick check incompressible data detection for large files.
+Specifies name of the peer Cluster. If peer Cluster is not given, it considers local Cluster.
 
-Valid options: `true`, `false`.
+##### `applications`
 
-##### `inline_compression`
+Applications which can make use of the peering relationship. Possible values: 'snapmirror', 'file_copy', 'lun_copy'.
 
-Enable inline compression on the sis volume.
 
-Valid options: `true`, `false`.
 
-##### `path`
-
-(**Namevar:** If omitted, this parameter's value defaults to the resource's title.) The full path of the sis volume, `/vol/<vol_name>`.
-
-##### `policy`
-
-The sis policy name to be attached to the volume.
-
-##### `quick_check_fsize`
-
-Quick check file size for Incompressible Data Detection. Accepts integers
-
-Values can match `/^\d+$/`.
-
-##### `sis_schedule`
-
-The schedule string for the sis operation.
-
-Accepts the following formats:
-
-* `day_list[@hour_list]`
-* `hour_list[@day_list]`
-* `-`
-* `auto`
-* `manual`
 
 ## TODO
 The following items are yet to be implemented:
 
  * Data Fabric Manager support
  * Support adding/deleting/modifying cifs shares
- * LDAP and/or AD configuration
+ * AD configuration
  * QA remaining resources
 
 ## Development
