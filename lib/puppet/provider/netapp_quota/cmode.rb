@@ -189,6 +189,12 @@ Puppet::Type.type(:netapp_quota).provide(:cmode, :parent => Puppet::Provider::Ne
       if status('volume', volume).child_get_string('status') == 'on'
         if @need_restart
           qoff 'volume', volume
+          for tries in 1..10
+            if status('volume', volume).child_get_string('status') == 'off'
+              break
+            end
+            sleep tries
+          end
           qon 'volume', volume
           @need_restart = false
         else
