@@ -29,63 +29,62 @@
     $size,
     $client,
     $path,
-    $svm = "svm3",
-    $svm_root = "rootdir",
-    $aggr = "aggr01_node02",
-    $exp_policy = "exp_svm3",
-    $root_policy = "default",
-    $root_policy_rule = "1",
-    $root_policy_match = "0.0.0.0/0",
-    $rule = "1",
-    $ensure = "present",
-    $spaceres = "volume",
-    $spacereserve = "0",
+    $svm = 'svm3',
+    $svm_root = 'rootdir',
+    $aggr = 'aggr01_node02',
+    $exp_policy = 'exp_svm3',
+    $root_policy = 'default',
+    $root_policy_rule = '1',
+    $root_policy_match = '0.0.0.0/0',
+    $rule = '1',
+    $ensure = 'present',
+    $snapreserve = '10',
+    $spaceres = 'volume',
+    $spacereserve = '0',
     $protocol = ['nfs'],
     $rorule = ['sys','none'],
     $rwrule = ['sys', 'none'],
-    $superusersecurity = "none",
-    $state = "on"
-   ) {
+    $superusersecurity = 'none',
+    $state = 'on'
+  ) {
 
-   netapp_export_policy {"${exp_policy}_${name}":
-     ensure => $ensure
-   }
+  netapp_export_policy {"${exp_policy}_${name}":
+    ensure => $ensure
+  }
 
-   netapp_export_rule { "${exp_policy}_${name}:${rule}":
+  netapp_export_rule { "${exp_policy}_${name}:${rule}":
     ensure            => $ensure,
     clientmatch       => $client,
     protocol          => $protocol,
     superusersecurity => $superusersecurity,
     rorule            => $rorule,
     rwrule            => $rwrule
-   }->
+  }
 
-   netapp_export_rule { "${root_policy}:${root_policy_rule}":
+  -> netapp_export_rule { "${root_policy}:${root_policy_rule}":
     ensure            => $ensure,
     clientmatch       => $root_policy_match,
     superusersecurity => $superusersecurity,
     rorule            => $rorule,
     rwrule            => $rwrule
-   }->
-   netapp_nfs { "${svm}":
+  }
+  -> netapp_nfs { $svm:
     ensure => $ensure,
-   }->
+  }
 
-   netapp_volume { "${svm_root}":
+  -> netapp_volume { $svm_root:
     ensure       => $ensure,
     exportpolicy => $root_policy,
-   }->
+  }
 
-   netapp_volume { "nfs_${name}":
+  -> netapp_volume { "nfs_${name}":
     ensure       => $ensure,
     aggregate    => $aggr,
     initsize     => $size,
-    exportpolicy => "$exp_policy_$name",
+    exportpolicy => "${exp_policy}_${name}",
     spaceres     => $spaceres,
     junctionpath => $path,
     snapreserve  => $snapreserve
-   }
+  }
 
 }
-
-

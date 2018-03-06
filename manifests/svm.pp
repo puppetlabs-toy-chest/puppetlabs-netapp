@@ -52,58 +52,59 @@
     $mask_mgmt,
     $address_data,
     $mask_data,
-    $homenode = "puppet-dev-01",
-    $homeport = "e0c",
-    $aggr = "aggr01_node02",
-    $aggrlist = ["aggr01_node02"],
-    $firewallpolicy_mgmt = "mgmt",
-    $firewallpolicy_data = "data",
-    $svm_root = "rootdir",
-    $rootvol = "rootdir",
-    $role = "data",
-    $status = "up",
-    $failoverpolicy = "disabled"
-   ) {
+    $ensure = 'present',
+    $homenode = 'puppet-dev-01',
+    $homeport = 'e0c',
+    $aggr = 'aggr01_node02',
+    $aggrlist = ['aggr01_node02'],
+    $firewallpolicy_mgmt = 'mgmt',
+    $firewallpolicy_data = 'data',
+    $svm_root = 'rootdir',
+    $rootvol = 'rootdir',
+    $role = 'data',
+    $status = 'up',
+    $failoverpolicy = 'disabled'
+  ) {
 
 
 #Creates SVM 
-   netapp_vserver {"${name}":
-     ensure        => $ensure,
-     rootvol       => $rootvol,
-     rootvolaggr   => $aggr,
-     aggregatelist => $aggrlist,
-     allowedprotos => $allowedprotos
-   }->
+  netapp_vserver { $name:
+    ensure        => $ensure,
+    rootvol       => $rootvol,
+    rootvolaggr   => $aggr,
+    aggregatelist => $aggrlist,
+    allowedprotos => $allowedprotos
+  }
 
 
 #Creates Management LIF
-   netapp_lif  { "${name}_mgmt":
-     ensure               => $ensure,
-     vserver              => $name,
-     role                 => $role,
-     administrativestatus => $status,
-     address              => $address_mgmt,
-     homenode             => $homenode,
-     homeport             => $homeport,
-     netmask              => $mask_data,
-     failoverpolicy       => $failoverpolicy,
-     firewallpolicy       => $firewallpolicy_mgmt
-   }->
+  -> netapp_lif  { "${name}_mgmt":
+    ensure               => $ensure,
+    vserver              => $name,
+    role                 => $role,
+    administrativestatus => $status,
+    address              => $address_mgmt,
+    homenode             => $homenode,
+    homeport             => $homeport,
+    netmask              => $mask_data,
+    failoverpolicy       => $failoverpolicy,
+    firewallpolicy       => $firewallpolicy_mgmt
+  }
 
 #Creates Data LIF
-   netapp_lif  { "${name}_data":
-     ensure               => $ensure,
-     vserver              => $name,
-     role                 => $role,
-     administrativestatus => $status,
-     dataprotocols        => $allowedprotos,
-     address              => $address_data,
-     homenode             => $homenode,
-     homeport             => $homeport,
-     netmask              => $mask_data,
-     failoverpolicy       => $failoverpolicy,
-     firewallpolicy       => $firewallpolicy_data
-   }
+  -> netapp_lif  { "${name}_data":
+    ensure               => $ensure,
+    vserver              => $name,
+    role                 => $role,
+    administrativestatus => $status,
+    dataprotocols        => $allowedprotos,
+    address              => $address_data,
+    homenode             => $homenode,
+    homeport             => $homeport,
+    netmask              => $mask_data,
+    failoverpolicy       => $failoverpolicy,
+    firewallpolicy       => $firewallpolicy_data
+  }
 
 }
 

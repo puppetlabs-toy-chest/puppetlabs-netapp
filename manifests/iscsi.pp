@@ -39,52 +39,53 @@
     $lunid,
     $initiator,
     $ostype,
-    $svm = "vserver01",
-    $aggr = "aggr02_node01",
+    $svm = 'vserver01',
+    $aggr = 'aggr02_node01',
     $vol_name = 'vol1_iscsi',
-    $vol_size = "1g",
-    $grouptype = "iscsi",
-    $ensure = "present",
-    $spaceres = "volume",
-    $spacereserve = "0",
-    $spaceresenabled = "false",
-    $state = "on",
-    $igroup = "iscsi_igroup_$name"
-   ) {
+    $vol_size = '1g',
+    $grouptype = 'iscsi',
+    $ensure = 'present',
+    $snapreserve = '10',
+    $spaceres = 'volume',
+    $spacereserve = '0',
+    $spaceresenabled = false,
+    $state = 'on',
+    $igroup = "iscsi_igroup_${name}"
+  ) {
 
 
 
-  netapp_volume { "${vol_name}":
+  netapp_volume { $vol_name:
     ensure      => $ensure,
     aggregate   => $aggr,
     initsize    => $vol_size,
     spaceres    => $spaceres,
     snapreserve => $snapreserve
-  }->
-  
-  netapp_lun {"/vol/${vol_name}/${name}":
+  }
+
+  -> netapp_lun {"/vol/${vol_name}/${name}":
     ensure          => $ensure,
     ostype          => $ostype,
     size            => $size,
     spaceresenabled => $spaceresenabled
-  }->
+  }
 
-  netapp_iscsi { "${svm}":
+  -> netapp_iscsi { $svm:
     ensure => $ensure,
-  }->
+  }
 
-  netapp_igroup { '${igroup}':
+  -> netapp_igroup { $igroup:
     ensure     => $ensure,
     group_type => $grouptype,
     members    => $initiator,
     os_type    => $ostype,
     name       => $igroup
- }->
+  }
 
- netapp_lun_map {"/vol/${vol_name}/${name}:${lunid}":
-    ensure => $ensure,
+  -> netapp_lun_map {"/vol/${vol_name}/${name}:${lunid}":
+    ensure         => $ensure,
     initiatorgroup => $igroup
-    
+
   }
 }
 
