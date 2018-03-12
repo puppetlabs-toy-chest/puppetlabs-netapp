@@ -21,6 +21,46 @@ node 'vserver-01' {
     run_device(:allow_changes => false)
   end
 
+  it 'offline an aggregate' do
+    pp=<<-EOS
+node 'vsim-01' {
+  netapp_aggregate {'aggr3':
+    ensure => 'present',
+    blocktype => '64_bit',
+    checksumstyle => 'block',
+    diskcount => '3',
+    state => 'offline',
+    nodes => ['VSIM-01']
+  }
+}
+node 'vserver-01' {
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
+  it 'online an aggregate' do
+    pp=<<-EOS
+node 'vsim-01' {
+  netapp_aggregate {'aggr3':
+    ensure => 'present',
+    blocktype => '64_bit',
+    checksumstyle => 'block',
+    diskcount => '3',
+    state => 'online',
+    nodes => ['VSIM-01']
+  }
+}
+node 'vserver-01' {
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
   it 'set an option on an aggregate' do
     pp=<<-EOS
 node 'vsim-01' {
