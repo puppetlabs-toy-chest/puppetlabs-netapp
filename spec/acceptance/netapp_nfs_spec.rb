@@ -35,6 +35,36 @@ node 'vserver-01' {
     run_device(:allow_changes => true)
     run_device(:allow_changes => false)
   end
+  it "stop a nfs server" do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_nfs {'vserver-01':
+    ensure                   => 'present',
+    state                    => 'off'
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+  it "start a nfs server" do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_nfs {'vserver-01':
+    ensure                   => 'present',
+    state                    => 'on'
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
   it "delete a nfs server" do
     pp=<<-EOS
 node 'vsim-01' {
