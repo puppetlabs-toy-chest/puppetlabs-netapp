@@ -24,7 +24,79 @@ node 'vserver-01' {
     run_device(:allow_changes => false)
   end
 
-  it 'delete an igroup' do
+  it 'adds initiator to an igroup' do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_igroup { 'test_igroup':
+    ensure     => 'present',
+    group_type => 'mixed',
+    os_type    => 'linux',
+    members    => ['eui.0123456789abcdef'],
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
+  it 'removes initiator from an igroup' do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_igroup { 'test_igroup':
+    ensure     => 'present',
+    group_type => 'mixed',
+    os_type    => 'linux',
+    members    => [],
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
+  it 'binds an igroup to a portset' do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_igroup { 'test_igroup':
+    ensure     => 'present',
+    group_type => 'mixed',
+    os_type    => 'linux',
+    portset    => 'wipro_portset'
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
+  it 'unbind an igroup from a portset' do
+    pp=<<-EOS
+node 'vsim-01' {
+}
+node 'vserver-01' {
+  netapp_igroup { 'test_igroup':
+    ensure     => 'present',
+    group_type => 'mixed',
+    os_type    => 'linux',
+    portset    => 'false'
+  }
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
+  it 'deletes an igroup' do
     pp=<<-EOS
 node 'vsim-01' {
 }
@@ -36,7 +108,6 @@ node 'vserver-01' {
     portset    => 'false',
     force      => 'true',
   }
-
 }
     EOS
     make_site_pp(pp)
