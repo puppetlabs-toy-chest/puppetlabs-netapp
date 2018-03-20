@@ -61,6 +61,24 @@ node 'vserver-01' {
     run_device(:allow_changes => false)
   end
 
+  it 'unlock a security_login' do
+    pp=<<-EOS
+node 'vsim-01' {
+  netapp_security_login {'ontapi:password:cat:VSIM':
+    ensure      => present,
+    role_name   => 'admin',
+    comment     => 'comment2',
+    is_locked   => 'false',
+  }
+}
+node 'vserver-01' {
+}
+    EOS
+    make_site_pp(pp)
+    run_device(:allow_changes => true)
+    run_device(:allow_changes => false)
+  end
+
 #lock a login
 
 #change a password
@@ -71,7 +89,7 @@ node 'vsim-01' {
   netapp_security_login {'ontapi:password:cat:VSIM':
     ensure      => absent,
     role_name   => 'admin',
-    comment     => 'comment',
+    comment     => 'comment2',
   }
 }
 node 'vserver-01' {
