@@ -155,6 +155,10 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get Auto size settings.
       unless vol_state == "offline"
         vol_auto_size = vol_autosize_info.child_get_string("mode")
+        # use the Minimum Autosize as size when autgrow is enabled, otherwise the autogrow function will not work properly.
+        if vol_auto_size == 'grow'
+          vol_size_bytes = vol_autosize_info.child_get_int("minimum-size")
+        end
       end
 
       # Get junction path
