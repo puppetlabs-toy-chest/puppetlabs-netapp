@@ -74,6 +74,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get qos policy
       volume_hash[:qospolicy] = volume[:qospolicy]
 
+      # Get comment
+      volume_hash[:comment] = volume[:comment]
+
       if ! transport.get_vserver.empty?
         # Get volume options, only if volume is online.
         if (volume[:state] == "online")
@@ -138,6 +141,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       vol_name = vol_id_info.child_get_string("name")
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Processing volume #{vol_name}.")
 
+      vol_comment = vol_id_info.child_get_string("comment")
       vol_snapshot_policy = vol_snapshot_info.child_get_string("snapshot-policy")
       vol_size_bytes = vol_space_info.child_get_int("size")
       vol_state = vol_state_info.child_get_string("state")
@@ -184,6 +188,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Construct hash
       vol_info = {
         :name            => vol_name,
+        :comment         => vol_comment,
         :size_bytes      => vol_size_bytes,
         :state           => vol_state,
         :snap_reserve    => vol_snap_reserve,
@@ -404,6 +409,35 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     volmodify(volume_modify)
   end
 
+  # Comment setter
+  def comment=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode comment=: setting comment value for Volume #{@resource[:name]} to #{@resource[:comment].inspect}")
+
+    # Build up the attributes to set
+    volume_idc_attributes = NaElement.new('volume-id-attributes')
+    volume_idc_attributes.child_add_string('comment', @resource[:comment])
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_idc_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    # I don't know why I can't just pass the attributes and query directly, so
+    # I have to make an invoke_elem NaElement call instead
+    #result = volmodify("attributes", volume_attributes, "query", volume_query)
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+    volmodify(volume_modify)
+  end
+
  def snapshot_policy=(value)
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapshot_policy=: setting snapshot policy value for Volume #{@resource[:name]} to #{@resource[:snapshot_policy].inspect}")
 
@@ -434,6 +468,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode: creating Netapp Volume #{resource[:name]} of initial size #{resource[:initsize]} in Aggregate #{resource[:aggregate]} using space reserve of #{resource[:spaceres]}, with a state of #{resource[:state]}.")
     # Call webservice to create volume.
     arguments =  ["volume", resource[:name]]
+    arguments += ["volume-comment", resource[:comment]] if resource[:comment]
     arguments += ["containing-aggr-name", resource[:aggregate]]
     arguments += ["size", resource[:initsize]] if resource[:initsize]
     arguments += ["language-code", resource[:languagecode]] if resource[:languagecode]
