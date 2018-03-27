@@ -9,7 +9,7 @@ describe Puppet::Type.type(:netapp_volume) do
       :initsize    => '10g',
       :aggregate   => 'aggr0',
       :snapreserve => '0',
-      :comment     => 'Test volume',
+      :comment     => 'Test volume'
     }
     @provider = stub('provider', :class => described_class.defaultprovider, :clear => nil)
     described_class.defaultprovider.stubs(:new).returns(@provider)
