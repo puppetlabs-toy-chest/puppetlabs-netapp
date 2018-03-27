@@ -8,7 +8,8 @@ describe Puppet::Type.type(:netapp_volume) do
       :state       => 'online',
       :initsize    => '10g',
       :aggregate   => 'aggr0',
-      :snapreserve => '0'
+      :snapreserve => '0',
+      :comment     => 'Test volume',
     }
     @provider = stub('provider', :class => described_class.defaultprovider, :clear => nil)
     described_class.defaultprovider.stubs(:new).returns(@provider)
@@ -29,7 +30,7 @@ describe Puppet::Type.type(:netapp_volume) do
       end
     end
 
-    [:ensure, :initsize, :snapreserve, :autoincrement, :options, :snapschedule, :qospolicy].each do |prop|
+    [:ensure, :initsize, :snapreserve, :autoincrement, :options, :snapschedule, :qospolicy, :comment].each do |prop|
       it "should have a #{prop} property" do
         described_class.attrtype(prop).should == :property
       end
@@ -260,6 +261,13 @@ describe Puppet::Type.type(:netapp_volume) do
         expect { described_class.new(:name => 'volume', :qospolicy => 'qospolicy 1', :ensure => :present) }.to raise_error(Puppet::Error, /qospolicy 1 is not a valid qospolicy name./)
       end
     end
+
+    describe "for comment" do
+      it "should support an alphanumerical comment, with hyphens and fullstop" do
+        described_class.new(:name => 'volume' :comment => 'This is test volume-1.', :ensure => :present)[:comment].should == 'This is test volume-1.'
+      end
+    end
+
   end
 
 end
