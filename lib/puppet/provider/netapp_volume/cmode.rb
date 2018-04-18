@@ -77,6 +77,15 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get comment
       volume_hash[:comment] = volume[:comment]
 
+      # Get user_id
+      volume_hash[:user_id] = volume[:user_id]
+
+      # Get group_id
+      volume_hash[:group_id] = volume[:group_id]
+
+      # Get unix_permissions
+      volume_hash[:unix_permissions] = volume[:unix_permissions]
+
       if ! transport.get_vserver.empty?
         # Get volume options, only if volume is online.
         if (volume[:state] == "online")
@@ -136,12 +145,17 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       vol_state_info = volume.child_get("volume-state-attributes")
       vol_autosize_info = volume.child_get("volume-autosize-attributes")
       vol_snapshot_info = volume.child_get("volume-snapshot-attributes")
+      vol_security_info = volume.child_get("volume-security-attributes")
+      vol_security_unix_info = vol_security_info.child_get("volume-security-unix-attributes")
 
       # Get name
       vol_name = vol_id_info.child_get_string("name")
       Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Processing volume #{vol_name}.")
 
       vol_comment = vol_id_info.child_get_string("comment")
+      vol_user_id = vol_security_unix_info.child_get_string("user-id")
+      vol_group_id = vol_security_unix_info.child_get_string("group-id")
+      vol_unix_permissions = vol_security_unix_info.child_get_string("permissions")
       vol_snapshot_policy = vol_snapshot_info.child_get_string("snapshot-policy")
       vol_size_bytes = vol_space_info.child_get_int("size")
       vol_state = vol_state_info.child_get_string("state")
@@ -183,21 +197,24 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       #  vol_auto_size = :false
       #end
 
-      Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Vol_name = #{vol_name}, vol_size_bytes = #{vol_size_bytes}, vol_state = #{vol_state}, vol_snap_reserve = #{vol_snap_reserve} vol_export_policy = #{vol_export_policy}, vol_auto_size = #{vol_auto_size}.")
+      Puppet.debug("Puppet::Provider::Netapp_volume.cmode get_volinfo: Vol_name = #{vol_name}, vol_size_bytes = #{vol_size_bytes}, vol_state = #{vol_state}, vol_snap_reserve = #{vol_snap_reserve} vol_export_policy = #{vol_export_policy}, vol_auto_size = #{vol_auto_size}, vol_user_id = #{vol_user_id}, vol_group_id = #{vol_group_id}, vol_unix_permissions = #{vol_unix_permissions}.")
 
       # Construct hash
       vol_info = {
-        :name            => vol_name,
-        :comment         => vol_comment,
-        :size_bytes      => vol_size_bytes,
-        :state           => vol_state,
-        :snap_reserve    => vol_snap_reserve,
-        :snapshot_policy => vol_snapshot_policy,
-        :exportpolicy    => vol_export_policy,
-        :qospolicy       => vol_qos_policy,
-        :auto_size       => vol_auto_size,
-        :junctionpath    => vol_junction_path,
-        :vserver_root    => vol_root,
+        :name             => vol_name,
+        :comment          => vol_comment,
+        :size_bytes       => vol_size_bytes,
+        :state            => vol_state,
+        :snap_reserve     => vol_snap_reserve,
+        :snapshot_policy  => vol_snapshot_policy,
+        :exportpolicy     => vol_export_policy,
+        :qospolicy        => vol_qos_policy,
+        :auto_size        => vol_auto_size,
+        :junctionpath     => vol_junction_path,
+        :vserver_root     => vol_root,
+        :user_id          => vol_user_id,
+        :group_id         => vol_group_id,
+        :unix_permissions => vol_unix_permissions,
       }
 
       Puppet.debug("Vol_info looks like: #{vol_info.inspect}")
@@ -435,6 +452,90 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     volume_get = NaElement.new('query')
     volume_get.child_add(volume_query)
     volume_modify.child_add(volume_get)
+    volmodify(volume_modify)
+  end
+
+  def user_id=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode user_id=: setting user_id value for Volume #{@resource[:name]} to #{@resource[:user_id].inspect}")
+
+    # Build up the attributes to set
+    volume_security_unix_attributes = NaElement.new('volume-security-unix-attributes')
+    volume_security_unix_attributes.child_add_string('user-id', @resource[:user_id])
+    volume_security_attributes = NaElement.new('volume-security-attributes')
+    volume_security_attributes.child_add(volume_security_unix_attributes)
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_security_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+
+    volmodify(volume_modify)
+  end
+
+  def group_id=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode group_id=: setting group_id value for Volume #{@resource[:name]} to #{@resource[:group_id].inspect}")
+
+    # Build up the attributes to set
+    volume_security_unix_attributes = NaElement.new('volume-security-unix-attributes')
+    volume_security_unix_attributes.child_add_string('group-id', @resource[:group_id])
+    volume_security_attributes = NaElement.new('volume-security-attributes')
+    volume_security_attributes.child_add(volume_security_unix_attributes)
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_security_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+
+    volmodify(volume_modify)
+  end
+
+  def unix_permissions=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode unix_permissions=: setting unix_permissions  value for Volume #{@resource[:name]} to #{@resource[:unix_permissions].inspect}")
+
+    # Build up the attributes to set
+    volume_security_unix_attributes = NaElement.new('volume-security-unix-attributes')
+    volume_security_unix_attributes.child_add_string('permissions', @resource[:unix_permissions])
+    volume_security_attributes = NaElement.new('volume-security-attributes')
+    volume_security_attributes.child_add(volume_security_unix_attributes)
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_security_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+
     volmodify(volume_modify)
   end
 
