@@ -15,6 +15,10 @@ Puppet::Type.newtype(:netapp_volume) do
     end
   end
 
+  newproperty(:comment) do
+    desc "The volume comment. Valid characters are UTF-8 characters."
+  end
+
   newproperty(:state) do
     desc "The volume state. Valid options are: online, offline, restricted."
     newvalues(:online, :offline, :restricted)

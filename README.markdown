@@ -1597,6 +1597,10 @@ Whether volume autosize should be grow, grow/shrink, or off.
 
 Valid values are `off`, `grow`, `grow_shrink`.
 
+##### `comment`
+
+This optionally specifies a comment for the volume.
+
 ##### `ensure`
 
 The basic state that the resource should be in.
@@ -1645,6 +1649,7 @@ Example:
 netapp_volume { 'nfsvol':
   ensure       => 'present',
   autosize     => 'off',
+  comment      => "nfs volume"
   exportpolicy => 'nfs_exports',
   qospolicy    => 'qos_policy',
   initsize     => '2g',
