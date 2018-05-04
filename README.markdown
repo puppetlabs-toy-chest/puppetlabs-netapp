@@ -2,23 +2,23 @@
 
 [![Coverage Status](https://coveralls.io/repos/fatmcgav/fatmcgav-netapp/badge.png?branch=develop)](https://coveralls.io/r/fatmcgav/fatmcgav-netapp?branch=develop)
 
-####Table of Contents
+#### Table of Contents
 
 1. [Overview](#overview)
-1. [Module Description](#module-description)
-1. [Setup](#setup)
+2. [Module Description](#module-description)
+3. [Setup](#setup)
     * [Requirements](#requirements)
     * [NetApp Manageability SDK](#netapp-manageability-sdk)
     * [Device Proxy System Setup](#device-proxy-system-setup)
-1. [Usage](#usage)
-  * [Beginning with netapp](#beginning-with-netapp)
-  * [Classes and Defined Types](#classes-and-defined-types)
-  * [Types and Providers](#types-and-providers)
-1. [Limitations](#limitations)
-  * [TODO](#todo)
-1. [Development](#development)
-  * [Testing](#testing)
-  * [Contributors](#contributors)
+4. [Usage](#usage)
+    * [Beginning with netapp](#beginning-with-netapp)
+    * [Classes and Defined Types](#classes-and-defined-types)
+    * [Types and Providers](#types-and-providers)
+5. [Limitations](#limitations)
+    * [TODO](#todo)
+6. [Development](#development)
+    * [Testing](#testing)
+    * [Contributors](#contributors)
 
 ## Overview
 
@@ -255,7 +255,7 @@ The space reservation mode will be set to volume, and snapshot space reserve wil
 The volume will be able to auto increment, and the NFS export will be persistent.
 
 You can also use any of the types individually, or create new defined types as required.
--->\
+-->
 
 ### Classes and Defined Types
 
