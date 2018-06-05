@@ -4,7 +4,7 @@ require_relative '../util/network_device/netapp/device'
 class Puppet::Provider::Netapp < Puppet::Provider
 
   attr_accessor :device
-  LUN_RESIZE_ERROR_CODE = 9042
+  LUN_RESIZE_ERROR_CODE ||= 9042
   def self.transport
     if Facter.value(:url) then
       Puppet.debug "Puppet::Util::NetworkDevice::Netapp: connecting via facter url."
