@@ -113,16 +113,28 @@ dc - data-cache volume (FlexCache)"
     newvalues(:rw, :ls, :dp, :dc)
   end
 
-  newparam(:group_id) do
+  newproperty(:group_id) do
     desc "The UNIX group ID for the volume."
+
+    validate do |value|
+      raise ArgumentError, "%s is not a valid group_id." % value unless value =~ /^\d+$/
+    end
   end
 
-  newparam(:user_id) do
+  newproperty(:user_id) do
     desc "The UNIX user ID for the volume."
+
+    validate do |value|
+      raise ArgumentError, "%s is not a valid user_id." % value unless value =~ /^\d+$/
+    end
   end
 
-  newparam(:unix_permissions) do
+  newproperty(:unix_permissions) do
     desc "Unix permission bits in octal string format.It's similar to Unix style permission bits: In Data ONTAP 7-mode, the default setting of '0755' gives read/write/execute permissions to owner and read/execute to group and other users. In Data ONTAP Cluster-Mode, for security style 'mixed' or 'unix', the default setting of '0755' gives read/write/execute permissions to owner and read/execute permissions to group and other users. For security style 'ntfs', the default setting of '0000' gives no permissions to owner, group and other users. It consists of 4 octal digits derived by adding up bits 4, 2 and 1. Omitted digits are assumed to be zeros. First digit selects the set user ID(4), set group ID (2) and sticky (1) attributes. The second digit selects permission for the owner of the file: read (4), write (2) and execute (1); the third selects permissions for other users in the same group; the fourth for other users not in the group."
+
+    validate do |value|
+      raise ArgumentError, "%s is not a valid unix_permissions." % value unless value =~ /^\d+$/
+    end
   end
 
   newproperty(:options, :array_matching => :all) do
