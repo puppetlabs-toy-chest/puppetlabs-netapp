@@ -170,6 +170,11 @@ dc - data-cache volume (FlexCache)"
     desc "The name of the snapshot policy. The default policy name is 'default'."
   end
 
+  newproperty(:snapshot_diraccess, :boolean => true) do
+    desc "Should access to the snapshot directory be on or off?"
+    newvalues(:true, :false)
+  end
+
   autorequire(:netapp_export_policy) do
     self[:exportpolicy]
   end
