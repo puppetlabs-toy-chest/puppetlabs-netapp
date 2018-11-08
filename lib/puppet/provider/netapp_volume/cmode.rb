@@ -71,6 +71,9 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       # Get snapshot policy
       volume_hash[:snapshot_policy] = volume[:snapshot_policy]
 
+      # Get snapshot snapdir-access
+      volume_hash[:snapshot_diraccess] = volume[:snapshot_diraccess]
+
       # Get qos policy
       volume_hash[:qospolicy] = volume[:qospolicy]
 
@@ -157,6 +160,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       vol_group_id = vol_security_unix_info.child_get_string("group-id")
       vol_unix_permissions = vol_security_unix_info.child_get_string("permissions")
       vol_snapshot_policy = vol_snapshot_info.child_get_string("snapshot-policy")
+      vol_snapshot_diraccess = vol_snapshot_info.child_get_string("snapdir-access-enabled")
       vol_size_bytes = vol_space_info.child_get_int("size")
       vol_state = vol_state_info.child_get_string("state")
       vol_root = vol_state_info.child_get_string("is-vserver-root")
@@ -168,7 +172,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       if vol_qos_attributes = volume.child_get("volume-qos-attributes")
         vol_qos_policy = vol_qos_attributes.child_get_string("policy-group-name")
       else
-	vol_qos_policy = 'none'
+       vol_qos_policy = 'none'
       end
       # Get Auto size settings.
       unless vol_state == "offline"
@@ -201,20 +205,21 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
       # Construct hash
       vol_info = {
-        :name             => vol_name,
-        :comment          => vol_comment,
-        :size_bytes       => vol_size_bytes,
-        :state            => vol_state,
-        :snap_reserve     => vol_snap_reserve,
-        :snapshot_policy  => vol_snapshot_policy,
-        :exportpolicy     => vol_export_policy,
-        :qospolicy        => vol_qos_policy,
-        :auto_size        => vol_auto_size,
-        :junctionpath     => vol_junction_path,
-        :vserver_root     => vol_root,
-        :user_id          => vol_user_id,
-        :group_id         => vol_group_id,
-        :unix_permissions => vol_unix_permissions,
+        :name               => vol_name,
+        :comment            => vol_comment,
+        :size_bytes         => vol_size_bytes,
+        :state              => vol_state,
+        :snap_reserve       => vol_snap_reserve,
+        :snapshot_policy    => vol_snapshot_policy,
+        :snapshot_diraccess => vol_snapshot_diraccess,
+        :exportpolicy       => vol_export_policy,
+        :qospolicy          => vol_qos_policy,
+        :auto_size          => vol_auto_size,
+        :junctionpath       => vol_junction_path,
+        :vserver_root       => vol_root,
+        :user_id            => vol_user_id,
+        :group_id           => vol_group_id,
+        :unix_permissions   => vol_unix_permissions,
       }
 
       Puppet.debug("Vol_info looks like: #{vol_info.inspect}")
@@ -539,7 +544,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
     volmodify(volume_modify)
   end
 
- def snapshot_policy=(value)
+  def snapshot_policy=(value)
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapshot_policy=: setting snapshot policy value for Volume #{@resource[:name]} to #{@resource[:snapshot_policy].inspect}")
 
     # Build up the attributes to set
@@ -564,6 +569,33 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
 
     volmodify(volume_modify)
   end
+
+  def snapshot_diraccess=(value)
+    Puppet.debug("Puppet::Provider::Netapp_volume.cmode snapshot_diraccess=: setting snapshot snapdir-access value for Volume #{@resource[:name]} to #{@resource[:snapshot_diraccess].inspect}")
+
+    # Build up the attributes to set
+    volume_snapshot_attributes = NaElement.new('volume-snapshot-attributes')
+    volume_snapshot_attributes.child_add_string('snapdir-access-enabled', @resource[:snapshot_diraccess])
+    volume_attributes = NaElement.new('volume-attributes')
+    volume_attributes.child_add(volume_snapshot_attributes)
+
+    # Build up the query
+    volume_id_attributes = NaElement.new("volume-id-attributes")
+    volume_id_attributes.child_add_string("name", @resource[:name])
+    volume_query = NaElement.new('volume-attributes')
+    volume_query.child_add(volume_id_attributes)
+
+    volume_modify = NaElement.new('volume-modify-iter')
+    volume_set = NaElement.new('attributes')
+    volume_set.child_add(volume_attributes)
+    volume_modify.child_add(volume_set)
+    volume_get = NaElement.new('query')
+    volume_get.child_add(volume_query)
+    volume_modify.child_add(volume_get)
+
+    volmodify(volume_modify)
+  end
+
   # Volume create.
   def create
     Puppet.debug("Puppet::Provider::Netapp_volume.cmode: creating Netapp Volume #{resource[:name]} of initial size #{resource[:initsize]} in Aggregate #{resource[:aggregate]} using space reserve of #{resource[:spaceres]}, with a state of #{resource[:state]}.")
@@ -586,6 +618,7 @@ Puppet::Type.type(:netapp_volume).provide(:cmode, :parent => Puppet::Provider::N
       'exportpolicy',
       'qospolicy',
       'snapshot_policy',
+      'snapshot_diraccess',
       'junctionpath',
       'options',
       'snapreserve',
